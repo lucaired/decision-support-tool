@@ -117,7 +117,6 @@ function App() {
         .catch((error) => console.log(error));
 
     useEffect(() => {queryProjects()}, [leftDrawerState]);
-    
 
     return (
         <div 

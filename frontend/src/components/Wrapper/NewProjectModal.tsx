@@ -104,7 +104,7 @@ export function NewProjectModal({
             //@ts-ignore
             formData.append('file', file)
             
-            axios.post('http://192.168.2.168:80/ifc/transform', formData, config)
+            axios.post('http://localhost:80/ifc/transform', formData, config)
             .then(function (response) {
             console.log(JSON.stringify(response.data));
             })

@@ -183,12 +183,37 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                         []
     }
 
+    const getBarFillColor = (data: Array<number>|Array<Array<number>>) => {
+        let largestValue = 0;
+        let index = -1;
+        let fillColor = data.map((datum: number | Array<number>, current_index: number) => {
+            let current_value = 0
+            if (typeof(datum) !== 'number') {
+                current_value = datum[1] - datum[0]
+            } else {
+                current_value = datum
+            }
+            if (current_value > largestValue) {
+                largestValue = current_value
+                index = current_index;
+            }
+            return "#E3E3E3"
+        });
+        if (index !== -1) {
+            fillColor[index] = '#FF000080'
+        }
+        return fillColor
+    }
+
+    const generated_data = getData()
+
     const data = {
         labels: getLabels(),
         datasets: [
             {
                 label: 'GWP in t CO2-eq',
-                data: getData()
+                data: generated_data,
+                backgroundColor: getBarFillColor(generated_data),
             },
         ],
     };

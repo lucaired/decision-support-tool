@@ -20,7 +20,7 @@ function App() {
     }
 
     const saveProjectHandler = (project: object) => {
-        axios.post(`http://192.168.2.168:80/projects/`, project)
+        axios.post(`http://localhost:80/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -36,7 +36,7 @@ function App() {
     const updateProjectHandler = (project) => {
         const updateSet = {...project}
         delete updateSet['_id']
-        axios.put(`http://192.168.2.168:80/projects/${project._id}`, updateSet)
+        axios.put(`http://localhost:80/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -53,7 +53,7 @@ function App() {
     }
 
     const removeProjectHandler = (projectId: string) => {
-        axios.delete(`http://192.168.2.168:80/projects/${projectId}`)
+        axios.delete(`http://localhost:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
         })
@@ -81,7 +81,7 @@ function App() {
         setLeftDrawerState(open);
     };
 
-    const queryProjects = () => axios.get(`http://192.168.2.168:80/projects/`)
+    const queryProjects = () => axios.get(`http://localhost:80/projects/`)
         // @ts-ignore
         .then(function (response) {
             // @ts-ignore

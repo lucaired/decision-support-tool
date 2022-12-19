@@ -38,7 +38,7 @@ function GWPEvaluation({activeVariant}) {
         })
     }, [activeVariant])
 
-    const decisionLevelTitle = ['Construction Level', 'Building Part Level', 'Layer Level', 'Material Level']
+    const decisionLevelTitle = ['Construction Level', 'Building Part Level', 'Layer Level']
     const [decisionLevel, setDecisionLevel] = useState(0)
     const handleSetDecisionLevel = (level: number) => setDecisionLevel(level)
 
@@ -62,15 +62,13 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
     const [elementIndex, setElementIndex] = React.useState<object>({});
     const handleElementIndex = (index: number) => {
-        if (decisionLevel !== 3) {
-            const newDecisionLevel = decisionLevel + 1
-            if (newDecisionLevel === 1) {
+        if (decisionLevel !== 2) {
+            if (decisionLevel === 0) {
                 setElementIndex({...elementIndex, 0: index})
-            } else if (newDecisionLevel === 2) {
+            } else if (decisionLevel === 1) {
                 setElementIndex({...elementIndex, 1: index})
-            } else if (newDecisionLevel === 3) {
-                setElementIndex({...elementIndex, 2: index})
             }
+            const newDecisionLevel = decisionLevel + 1
             handleSetDecisionLevel(newDecisionLevel)
         }
     }
@@ -81,8 +79,6 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                 setElementIndex({...elementIndex, 1: -1})
             } else if (decisionLevel === 2) {
                 setElementIndex({...elementIndex, 2: -1})
-            } else if (decisionLevel === 3) {
-                setElementIndex({...elementIndex, 3: -1})
             }
             const newDecisionLevel = decisionLevel - 1
             handleSetDecisionLevel(newDecisionLevel)
@@ -143,10 +139,12 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         },
     };
 
-    const getLayersForElementType = (index: number) => {
+    const getLayersForElementType = (): Map<string, object> => {
         // @ts-ignore
-        const elementType = Array.from(elementAreasByElementType.keys())[index]
+        const elementTypeIndex = elementIndex['1']
+        const elementType = Array.from(elementAreasByElementType.keys())[elementTypeIndex]
         const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType) || []
+
         let uniqueLayers = new Map();
         const layers = elementsMaterialLayers
             .filter((layers: string) => layers !== undefined && layers !== null)
@@ -162,50 +160,26 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                     uniqueLayers.set(layer[0], layer[1])
                 }
             })
-
-        return Array.from(uniqueLayers)
-    }
-
-    const getMaterialsForElementTypeAndLayer = (): object => {
-
-        // @ts-ignore
-        const elementTypeIndex = elementIndex['1']
-        // @ts-ignore
-        const layerIndex = elementIndex['2']
-        const layers = getLayersForElementType(elementTypeIndex)
-        console.log(layers)
-        // this seems the problem
-        const layer = layers[layerIndex]
-        console.log(layer)
-        if (layer?.length === 2) {
-            // @ts-ignore
-            return layer[0]
-        } else {
-            return {}
-        }
+        return uniqueLayers
     }
 
     const getLabels = () => {
         return decisionLevel === 0 ? ['Whole Building'] :
             decisionLevel === 1 ? Array.from(elementAreasByElementType.keys()) :
                 // @ts-ignore
-                decisionLevel === 2 ? getLayersForElementType(elementIndex[decisionLevel]).map((layer) => layer[0]):
-                    decisionLevel === 3 ? Object.keys(getMaterialsForElementTypeAndLayer()) :
+                decisionLevel === 2 ? Array.from(getLayersForElementType().keys()):
                         []
     }
 
     const getData = () => {
         return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5] :
             decisionLevel === 1 ? Array.from(elementAreasByElementType.values()).map(value => [value * Math.random(), value]) :
+                // TODO: get data from oracle
                 // @ts-ignore
-                decisionLevel === 2 ? getLayersForElementType(elementIndex[decisionLevel]).map(() => {
+                decisionLevel === 2 ? Array.from(getLayersForElementType().keys()).map(() => {
                         let gwp: number = faker.datatype.number({min: 0, max: 1000})
                         return [gwp, gwp * 2]
                     }) :
-                    decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"].map(() => {
-                            let gwp: number = faker.datatype.number({min: 0, max: 1000})
-                            return [gwp, gwp * 2]
-                        }) :
                         []
     }
 

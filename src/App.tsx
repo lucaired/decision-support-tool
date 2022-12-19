@@ -68,11 +68,11 @@ function App() {
                             {activeVariantExplorationIndex === 0 ?
                                 <ForgeViewer
                                     key={"renderer-variant-exploration"}
-                                    local={true}
-                                    path={'http://localhost:3000/0.svf'}
-                                    //urn={urn}
-                                    //testing={true}
-                                    //token={token}
+                                    // local={true}
+                                    // testing={true}
+                                    // path={'http://localhost:3000/0.svf'}
+                                    urn={'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGVjaXNpb24tc3VwcG9ydC1idWNrZXQvVjItMS5pZmM'}
+                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6IkpFNnowSUtQYXVocWxGWUtQWGxZV0hSbEVRWkNmUW1RYmU1VTh5bk1ZVzRnSWNWQnB4Z0ZnbUFlYzhrdmRyNm0iLCJleHAiOjE2NjkxMTQ3MzB9.BYrblH-Crcw-h7cP2wbkHVObTZ8l7VTdeeTAd-dmlEYO1A3L40iCEo5MO4drcUsALXWVTcZZX-5qmasoT1hWwawLYzTuzHF63mcznR-I-oVDixa9oOPwjgtGW8XSy1SaKbhyyi88l-W7OneAYXdpG8bFnFNclTrqYURJB-lWM2qB0bWVuZZtzECfaG_FV-ddQE-9unMGlm8ERemkqlsL5MAPRDCCvCPqZEV-xY5uyO1t2hamudMrE-yaYx32gjyHYcOI6-FdiN6R4GuSDwHvcLzhEVGwJoRrSzZEh1UI5XjyHzE6EL-tEN7sVoN48CI8GeZBitiUojqThkKW3DaRXQ'}
                                 /> :
                                 activeVariantExplorationIndex === 1 ?
                                     <GWPEvaluation

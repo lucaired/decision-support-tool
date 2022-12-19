@@ -1,9 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 
 router = APIRouter(
     prefix="/ifc",
 )
 
-@router.get("/")
-async def get_result():
-    return {}
+@router.post("/transform/")
+async def handle_ifc_for_transformation(file: UploadFile):
+    return {"filename": file.filename}

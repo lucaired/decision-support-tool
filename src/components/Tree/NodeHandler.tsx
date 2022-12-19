@@ -74,7 +74,10 @@ export function RenderNode({
                 }}
             />
             <foreignObject {...foreignObjectProps}>
-                <p>{nodeDatum.name}</p>
+                <div style={{display:"flex", flexDirection:"column"}}>
+                    <span><strong>{nodeDatum.name} </strong></span>
+                    <span>{nodeDatum.decisionLevel} level</span>
+                </div>
                 {nodeDatum.showNodeControl &&
                     <Button variant="outlined" size="small" onClick={() => {
                         handleNodeControl(nodeDatum.id);
@@ -85,9 +88,6 @@ export function RenderNode({
                         handleNodeControl(nodeDatum.id);
                         handleAddSibling(nodeDatum.id);
                     }}>↔</Button>}
-                {nodeDatum.showNodeControl &&
-                    <Button variant="outlined" size="small" onClick={() => {
-                    }}>G</Button>}
                 {nodeDatum.showNodeControl && nodeDatum.children?.length === 0 &&
                     <Button variant="outlined" size="small" onClick={() => {
                         handleNodeControl(nodeDatum.id);

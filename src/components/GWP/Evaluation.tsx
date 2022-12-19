@@ -11,10 +11,10 @@ import {
     Legend,
 } from 'chart.js';
 
-import { Bar, getElementAtEvent } from 'react-chartjs-2';
+import {Bar, getElementAtEvent} from 'react-chartjs-2';
 import Button from "@mui/material/Button";
 import * as React from "react";
-import { faker } from '@faker-js/faker';
+import {faker} from '@faker-js/faker';
 
 ChartJS.register(
     CategoryScale,
@@ -27,23 +27,18 @@ ChartJS.register(
 
 // @ts-ignore
 function Evaluation({activeVariant}) {
-
-    // TODO: remove this shit
-    const [activeLevel, setActiveLevel] = React.useState('building');
-    const activeLevelHandler = (level: string) => setActiveLevel(level);
-
     // use essential building elements for BoQ
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
-        'WHERE (not (element:Space))'+
+        'WHERE (not (element:Space))' +
         'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal'
-    const { loading, records, run, } = useReadCypher(q, {ifcmodel: activeVariant.neo4JReference})
+    const {loading, records, run,} = useReadCypher(q, {ifcmodel: activeVariant.neo4JReference})
 
     useEffect(() => {
-        console.log(activeVariant.neo4JReference)
-        run({ifcmodel: activeVariant.neo4JReference}).then(r=>{console.log(r)})
-     }, [ activeVariant ])
+        run({ifcmodel: activeVariant.neo4JReference}).then(r => {
+        })
+    }, [activeVariant])
 
-    if ( loading ) return (<div>Loading...</div>)
+    if (loading) return (<div>Loading...</div>)
 
     let totalArea = 0
 
@@ -58,27 +53,20 @@ function Evaluation({activeVariant}) {
     const totalAreaRounded = Math.round((totalArea + Number.EPSILON) * 100) / 100
 
 
-    return <div>
-        <VariantExplorerMenu activeLevelHandler={activeLevelHandler}/>
-        {
-            activeLevel === 'building' ? <WholeBuildingEvaluation totalAreaRounded={totalAreaRounded}/> :
-                activeLevel === 'building-part' ? <BuildingPartEvaluation records={records}/> :<p>No Level</p>
-        }
+    return <div>{
+        activeVariant.decisionLevel === 'construction' ?
+            <div>
+                <Button style={{background: "green", color: "white"}}>Construction Types</Button>
+                <WholeBuildingEvaluation totalAreaRounded={totalAreaRounded}/>
+            </div> :
+            activeVariant.decisionLevel === 'building-part' ?
+                <div>
+                    <Button style={{background: "green", color: "white"}}>Building Parts</Button>
+                    <BuildingPartEvaluation records={records}/>
+                </div>
+                : <div></div>
+    }
     </div>
-}
-
-// @ts-ignore
-function VariantExplorerMenu({activeLevelHandler}) {
-    return <div
-        style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "start",
-            gap: "5px",
-        }}>
-        <Button style={{background: "green"}} onClick={() => activeLevelHandler('building')} variant="contained">Construction Level</Button>
-        <Button style={{background: "green"}} onClick={() => activeLevelHandler('building-part')} variant="contained">Building Part Level</Button>
-    </div>;
 }
 
 // @ts-ignore
@@ -112,7 +100,7 @@ function WholeBuildingEvaluation({totalAreaRounded}) {
         ],
     };
 
-    return <Bar options={options} data={data} />;
+    return <Bar options={options} data={data}/>;
 }
 
 // @ts-ignore
@@ -129,14 +117,17 @@ const mapToBuildingPartDecision = (elementsByElementType, index) => {
     };
 
     // TODO: do mapping
-    const labels = ["Wood frame 1", "Wood fram 2", "Wood solid 1", "Wood solid 2"]
+    const labels = ["Wood frame 1", "Wood frame 2", "Wood solid 1", "Wood solid 2"]
 
     const data = {
         labels,
         datasets: [
             {
                 label: 'GWP in t CO2-eq',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+                data: labels.map(() => {
+                    let gwp: number = faker.datatype.number({min: 0, max: 1000})
+                    return [gwp, gwp * 2]
+                }),
             },
         ],
     };
@@ -206,13 +197,20 @@ function BuildingPartEvaluation({records}) {
     // Show all building parts or the evaluation for a specific one
     return (
         <div>
+            {/*Show evaluation for the entire building level*/}
             {elementIndex === -1 ? <Bar
                     options={options}
                     data={data}
                     ref={chartRef}
                     onClick={(event) => onClick(event, handleElementIndex)}
                 />
-                : mapToBuildingPartDecision(elementsByElementType, elementIndex)
+                : <div>
+                    {/*Show evaluation for the building part level*/}
+                    <Button size="small" onClick={()=>handleElementIndex(-1)}>
+                        Show all
+                    </Button>
+                    {mapToBuildingPartDecision(elementsByElementType, elementIndex)}
+                </div>
             }
         </div>
     );

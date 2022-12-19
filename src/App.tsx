@@ -10,13 +10,20 @@ import VariantExplorerMenu from "./components/VariantExplorerMenu";
 import Evaluation from "./components/GWP/Evaluation";
 
 function App() {
+    const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
+    const activeVariantExplorationHandler = (index: number) => {
+        if (0 <= index && index <= 3) {
+            setActiveVariantExplorationIndex(index)
+        }
+    }
+
     const [activeVariant, setActiveVariant] = React.useState({});
     // @ts-ignore
     const activeVariantHandler = (variant) => {
         setActiveVariant(variant)
     }
 
-    function emptyObject(activeVariant: {}) {
+    function isEmptyObject(activeVariant: {}) {
         return activeVariant // 👈 null and undefined check
         && Object.keys(activeVariant).length === 0
         && Object.getPrototypeOf(activeVariant) === Object.prototype
@@ -44,29 +51,47 @@ function App() {
                     </React.Fragment>
                 </Card>
             </Box>
-            {!emptyObject(activeVariant) && <Box>
+            {!isEmptyObject(activeVariant) && <Box>
                 <Card variant="outlined">
                     <React.Fragment>
                         <CardContent
                             style={{
-                                height: '640px'
+                                minHeight: '630px'
                             }}
                         >
-                            <VariantExplorerMenu/>
-                            <Evaluation
-                                activeVariant={activeVariant}
+                            <VariantExplorerMenu
+                                activeVariantExplorationHandler={activeVariantExplorationHandler}
                             />
-                            {/* TODO: load stuff depending on the click here
-                                - implement state for the menu and clicked button there
-                                -
-                            <ForgeViewer
-                                local={true}
-                                path={'http://localhost:3000/0.svf'}
-                                //urn={urn}
-                                //testing={true}
-                                //token={token}
-                            />
-                            */}
+                            {activeVariantExplorationIndex === 0 ?
+                                <ForgeViewer
+                                    key={"renderer-variant-exploration"}
+                                    local={true}
+                                    path={'http://localhost:3000/0.svf'}
+                                    //urn={urn}
+                                    //testing={true}
+                                    //token={token}
+                                /> :
+                                activeVariantExplorationIndex === 1 ?
+                                    <Evaluation
+                                        key={"gwp-variant-exploration"}
+                                        activeVariant={activeVariant}
+                                    /> :
+                                    activeVariantExplorationIndex === 2 ?
+                                        <div
+                                            key={"design-rationale-variant-exploration"}
+                                        >
+                                            Not implemented
+                                        </div>
+                                        : activeVariantExplorationIndex === 3 ?
+                                            <div
+                                                key={"objective-evaluation-variant-exploration"}
+                                            >
+                                                Not implemented
+                                            </div> :
+                                            <Evaluation
+                                                activeVariant={activeVariant}
+                                            />
+                            }
                         </CardContent>
                     </React.Fragment>
                 </Card>

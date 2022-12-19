@@ -99,34 +99,48 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
     };
 
     const mockObjectiveEvaluation = [
-        {user: 'Architect Adrian', factorRating: mockFactorRating},
+        {user: 'Architect Adrian', factorRatings: [mockFactorRating]},
         {user: 'Architect Bertha'},
         {user: 'Architect Chris'}
     ]
 
     const [objectiveEvaluation, setObjectiveEvaluation] = React.useState(mockObjectiveEvaluation);
+
     // @ts-ignore
     const handleObjectiveEvaluationUpdate = (factorRating, user: string) => {
         const index = objectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
             setObjectiveEvaluation((objectiveEvaluation) => {
-                const index = objectiveEvaluation.findIndex((evaluation) => evaluation.user == user)
+                const evaluationIndex = objectiveEvaluation.findIndex((evaluation) => evaluation.user == user)
+                const factorRatings = objectiveEvaluation[evaluationIndex].factorRatings || []
+                const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label == factorRating.label)
+
                 let update = [...objectiveEvaluation]
-                update[index] = {user: user, factorRating: factorRating}
+                let updateRating = [...factorRatings]
+                if (factorEvaluationIndex !== -1) {
+                    updateRating[factorEvaluationIndex] = factorRating
+                } else {
+                    // @ts-ignore
+                    updateRating.push(factorRating)
+                }
+                update[evaluationIndex] = {user: user, factorRatings: updateRating}
                 return update
             })
         }
     }
     const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
         user: undefined,
-        factor: undefined,
+        factorLabel: undefined,
     });
 
     const getFactorRating = () => {
         const factor = objectiveEvaluation
-            .filter((evaluation) => evaluation.user == currentUserEvaluation.user)
-            .map((evaluation) => evaluation.factorRating)
-            .filter((factorRating) => factorRating?.label == currentUserEvaluation.factor)[0]
+            .filter((evaluation) => evaluation.user === currentUserEvaluation.user)
+            .map((evaluation) => evaluation.factorRatings)
+            .flat()
+            .filter((factorRating) =>
+                factorRating?.label === currentUserEvaluation.factorLabel
+            )[0] || undefined
         return factor
     }
 
@@ -134,7 +148,7 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
     const handleShowObjectiveEvaluationSurvey = (state: boolean) => toggleShowObjectiveEvaluationSurvey(state);
 
     return <div>
-        {showObjectiveEvaluationSurvey && currentUserEvaluation.user && currentUserEvaluation.factor
+        {showObjectiveEvaluationSurvey && currentUserEvaluation.user && currentUserEvaluation.factorLabel
             ? <ObjectiveEvaluationSurvey
                 factorRating={getFactorRating()}
                 handleShowObjectiveEvaluationSurvey={handleShowObjectiveEvaluationSurvey}
@@ -148,6 +162,12 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
                 setCurrentUserEvaluation={setCurrentUserEvaluation}
             />}
     </div>
+}
+
+
+function computeOverallScore(factorEvaluation: object): number {
+    // TODO: go over the criteriaGroups and sum up the values and the rating
+    return 6.6
 }
 
 // @ts-ignore
@@ -170,81 +190,85 @@ function ObjectiveEvaluationTable({
                     padding: "15px",
                 }}
             >
-                <Card style={{
-                    padding: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px"
-                }}>
+                <Card
+                    elevation={4}
+                    style={{
+                        padding: "5px",
+                        marginRight: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px"
+                    }}
+                >
                     <Avatar {...stringAvatar(evaluation.user)} />
                     <p>{evaluation.user}</p>
                 </Card>
                 <div style={{display: "flex", gap: "5px"}}>
                     <Paper
-                        variant="outlined"
+                        elevation={1}
                         style={{
-                            width: "120px",
+                            width: "125px",
                             padding: "5px",
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "space-around"
+                            justifyContent: "space-around",
                         }}
                     >
-                        <p style={{maxWidth: "80px"}}>Overall score</p>
-                        <Chip label="6.6"/>
+                        <p style={{textAlign: "center"}}>Overall score</p>
+                        <Chip label={computeOverallScore(evaluation)}/>
                     </Paper>
                     <Paper
                         variant="outlined"
                         style={{
                             cursor: "pointer",
-                            width: "120px",
+                            width: "125px",
                             padding: "5px",
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "space-around"
+                            justifyContent: "space-around",
                         }}
                         onClick={() => {
                             toggleShowObjectiveEvaluationSurvey(true)
-                            setCurrentUserEvaluation({user: evaluation.user, factor: 'Social Factors'})
+                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Social Factors'})
                         }}
                     >
-                        <p style={{maxWidth: "80px"}}>Social Factors</p>
-                        <Chip label="8"/>
+                        <p style={{textAlign: "center"}}>Social Factors</p>
+                        <Chip label={computeOverallScore(evaluation)}/>
                     </Paper>
                     <Paper
                         variant="outlined"
                         style={{
                             cursor: "pointer",
-                            width: "120px",
+                            width: "125px",
                             padding: "5px",
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "space-around"
+                            justifyContent: "space-around",
                         }}
                         onClick={() => {
                             toggleShowObjectiveEvaluationSurvey(true)
-                            setCurrentUserEvaluation({user: evaluation.user, factor: 'Economic Factors'})
+                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Economic Factors'})
                         }}
                     >
-                        <p style={{maxWidth: "80px"}}>Economic Factors</p>
-                        <Chip label="5"/>
+                        <p style={{textAlign: "center"}}>Economic Factors</p>
+                        <Chip label={computeOverallScore(evaluation)}/>
                     </Paper>
                     <Paper variant="outlined"
                            style={{
                                cursor: "pointer",
-                               width: "120px",
+                               width: "125px",
                                padding: "5px",
                                display: "flex",
                                flexDirection: "column",
-                               justifyContent: "space-around"
+                               justifyContent: "space-around",
                            }}
                            onClick={() => {
                                toggleShowObjectiveEvaluationSurvey(true)
-                               setCurrentUserEvaluation({user: evaluation.user, factor: 'Environmental Factors'})
+                               setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Environmental Factors'})
                            }}
                     >
-                        <p style={{maxWidth: "80px"}}>Environmental Factors</p>
-                        <Chip label="7"/>
+                        <p style={{textAlign: "center"}}>Environmental Factors</p>
+                        <Chip label={computeOverallScore(evaluation)}/>
                     </Paper>
                     <Button startIcon={<DeleteIcon/>}/>
                 </div>
@@ -299,7 +323,7 @@ function ObjectiveEvaluationSurvey({
                     <SvgIcon
                         onClick={() => {
                             handleShowObjectiveEvaluationSurvey(false)
-                            setCurrentUserEvaluation({user: undefined, factor: undefined})
+                            setCurrentUserEvaluation({user: undefined, factorLabel: undefined})
                         }}
                         component={CloseIcon}/></Button>
             </div>
@@ -365,7 +389,7 @@ function ObjectiveEvaluationSurvey({
                 <SvgIcon
                     onClick={() => {
                         handleShowObjectiveEvaluationSurvey(false)
-                        setCurrentUserEvaluation({user: undefined, factor: undefined})
+                        setCurrentUserEvaluation({user: undefined, factorLabel: undefined})
                         handleObjectiveEvaluationUpdate(rating, currentUserEvaluation.user)
                     }}
                     component={SaveIcon}

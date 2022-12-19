@@ -14,7 +14,7 @@ interface NewProjectModalProps {
     saveProjectHandler: (newProject: object)=>void
 }
 
-const steps = ['Project information', 'Building Codes', 'Upload BIM', 'IFC file name', 'Upload IFC file'];
+const steps = ['Project information', 'Root variant name', 'Upload BIM', 'IFC file name', 'Upload IFC file', 'Design Episodes'];
 const emptyProject = {
     name: '',
     "weightsSets Design Quality": '1',
@@ -23,6 +23,7 @@ const emptyProject = {
     treeName: '',
     treeBimReference: '',
     treeIfcFile: '',
+    treeDesignEpisodeIds: ''
 }
 
 export function NewProjectModal({
@@ -65,7 +66,8 @@ export function NewProjectModal({
                     id: (Math.random() + 1).toString(36).substring(8),
                     decisionLevel: "construction",
                     children: [],
-                    showNodeControl: false
+                    showNodeControl: false,
+                    designEpisodeIds: project.treeDesignEpisodeIds
                 }
             }
             sendFile();
@@ -207,6 +209,12 @@ export function NewProjectModal({
                                         onChange={handleFileUpload}
                                     />
                                     </Button>}
+                                    {activeStep === 5 && <NodeStringPropInput
+                                        target={project}
+                                        updateFunction={setProject}
+                                        property={'treeDesignEpisodeIds'}
+                                        propertyName={'Design Episode IDs'}
+                                    />}
                                 <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                                     <Button
                                         color="inherit"

@@ -11,8 +11,9 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
 
 function App() {
 
-
     const [allProjects, setAllProjects] = React.useState<any>([]);
+    const [allSimilarProjects, setAllSimilarProjects] = React.useState<any>([]);
+
     const [activeProject, setActiveProject] = React.useState<any>();
     const activeProjectHandler = (project: any) => {
         setActiveProject(project)
@@ -24,12 +25,29 @@ function App() {
     }
 
     const saveProjectHandler = (project: object) => {
+        const parsedTree = {
+            // @ts-ignore
+            ...project.tree,
+            // @ts-ignore
+            'designEpisodeIds': project.tree.designEpisodeIds.split(',')
+        }
+        // @ts-ignore
+        project.tree = parsedTree
         axios.post(`http://${backendUrl}:80/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
             if (response.data) {
-                setActiveProject(response.data)
+                let project = response.data
+                const parsedTree = {
+                    // @ts-ignore
+                    ...project.tree,
+                    // @ts-ignore
+                    'designEpisodeIds': project.tree.designEpisodeIds.join(',')
+                }
+                // @ts-ignore
+                project.tree = parsedTree
+                activeProjectHandler(response.data)
             }
         })
         // @ts-ignore
@@ -40,12 +58,17 @@ function App() {
     const updateProjectHandler = (project) => {
         const updateSet = {...project}
         delete updateSet['_id']
+        // @ts-ignore
+        updateSet.tree = parseOutgoingTree(updateSet.tree)
         axios.put(`http://${backendUrl}:80/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
             if (response.data) {
-                setActiveProject(response.data)
+                let project = response.data
+                // @ts-ignore
+                project.tree = parseIncomingTree(project.tree)
+                activeProjectHandler(response.data)
             }
         })
         // @ts-ignore
@@ -60,9 +83,80 @@ function App() {
         axios.delete(`http://${backendUrl}:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
+            // TODO: set to some other project
         })
         // @ts-ignore
         .catch((error) => console.log(error))
+    }
+
+    const queryProjects = () => axios.get(`http://${backendUrl}:80/projects/`)
+    // @ts-ignore
+    .then(function (response) {
+
+        // @ts-ignore
+        const projects = response.data.map((project) => {
+            // @ts-ignore
+            project.tree = parseIncomingTree(project.tree)
+            return project
+        })
+
+        setAllProjects(projects);
+
+        if (response.data.length > 0) {
+            if (!activeProject) {
+                setActiveProject(projects[0]);
+                setActiveVariant(projects[0].tree);
+            } else {
+                setActiveProject(activeProject)
+                setActiveVariant(activeProject.tree)
+            }
+        } else {
+            setActiveProject(undefined);
+            setActiveVariant(undefined);
+        }
+    })
+    // @ts-ignore
+    .catch((error) => console.log(error));
+
+    const querySimilarProjects = () => {
+        const projectId = activeProject._id
+        return axios.get(`http://${backendUrl}:80/matchings/project/${projectId}/match_by_design_episodes`)
+        // @ts-ignore
+        .then(function (response) {
+
+            // @ts-ignore
+            const projects = response.data.map((project) => {
+                // @ts-ignore
+                project.tree = parseIncomingTree(project.tree)
+                return project
+            })
+
+            setAllSimilarProjects(projects)
+        })
+        // @ts-ignore
+        .catch((error) => console.log(error));
+    }
+
+     // @ts-ignore
+    const parseIncomingTree = (tree) => {
+        const parsedTree = {
+            // @ts-ignore
+            ...tree,
+            // @ts-ignore
+            'designEpisodeIds': tree.designEpisodeIds.join(',')
+        }
+        return parsedTree
+    }
+
+    // @ts-ignore
+    const parseOutgoingTree = (tree) => {
+        const parsedTree = {
+            // @ts-ignore
+            ...updateSet.tree,
+            // @ts-ignore
+            'designEpisodeIds': updateSet.tree.designEpisodeIds.split(',')
+        }
+        return parsedTree
     }
 
     const [activeVariant, setActiveVariant] = React.useState<DecisionTree>();
@@ -98,28 +192,12 @@ function App() {
         setRightDrawerState(open);
     };
 
-    const queryProjects = () => axios.get(`http://${backendUrl}:80/projects/`)
-        // @ts-ignore
-        .then(function (response) {
-            // @ts-ignore
-            setAllProjects(response.data);
-            if (response.data.length > 0) {
-                if (!activeProject) {
-                    setActiveProject(response.data[0]);
-                    setActiveVariant(response.data[0].tree);
-                } else {
-                    setActiveProject(activeProject)
-                    setActiveVariant(activeProject.tree)
-                }
-            } else {
-                setActiveProject(undefined);
-                setActiveVariant(undefined);
-            }
-        })
-        // @ts-ignore
-        .catch((error) => console.log(error));
-
     useEffect(() => {queryProjects()}, [leftDrawerState]);
+    useEffect(() => {
+        if (allSimilarProjects.length > 0) {
+            setRightDrawerState(true)
+        }
+    }, [allSimilarProjects]);
 
     return (
         <div 
@@ -133,7 +211,7 @@ function App() {
                 drawerState={rightDrawerState} 
                 toggleRightDrawer={toggleRightDrawer}
                 activeProjectHandler={activeProjectHandler}
-                allSimilarProjectsByDE={allProjects}
+                allSimilarProjectsByDE={allSimilarProjects}
                 allSimilarProjectsByBuildingCode={allProjects}
             />
             <ProjectsDrawer 
@@ -148,7 +226,7 @@ function App() {
                 activeVariant={activeVariant}
                 activeProject={activeProject}
                 toggleLeftDrawer={toggleLeftDrawer}
-                toggleRightDrawer={toggleRightDrawer}
+                querySimilarProjects={querySimilarProjects}
                 saveCurrentProject={saveCurrentProject}
             />
             {activeProject && <VariantViewer 

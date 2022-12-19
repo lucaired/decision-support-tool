@@ -97,12 +97,10 @@ async def create_project(project):
 
 async def update_project(id, project_update): 
     update_result = await mongodb.projects.update_one({"_id": id}, {"$set": project_update})
-
-    if update_result.modified_count == 1:
-        if (
-            updated_project := await mongodb.projects.find_one({"_id": id})
-        ) is not None:
-            return updated_project
+    if (
+        updated_project := await mongodb.projects.find_one({"_id": id})
+    ) is not None:
+        return updated_project
 
 async def get_projects_by_design_episode_guid(design_episode_ids: list[str]) -> list[Project]:
     all_project = await mongodb.projects.find().to_list(1000)

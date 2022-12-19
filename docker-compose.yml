@@ -39,8 +39,8 @@ services:
     build: ./frontend
     container_name: decision-support-client    
     environment:
-      - BACKEND_URL=localhost
-      - VARIANT_NEO4J_URL=192.168.2.168
+      - BACKEND_URL=0.0.0.0
+      - VARIANT_NEO4J_URL=0.0.0.0
       - DE_NEO4J_URL=10.195.6.112
     volumes:
       - ./frontend/src:/app/src

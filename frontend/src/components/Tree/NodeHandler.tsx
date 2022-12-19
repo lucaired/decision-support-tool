@@ -1,7 +1,17 @@
 import Button from "@mui/material/Button";
 import { DecisionLevel } from "./DecisionTreeHandler";
 
-export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: boolean; decisionLevel: DecisionLevel, children: Array<DecisionTree>; ifcFile: string, bimReference: string };
+export type DecisionTree = { 
+    id: string;
+    name: string;
+    attributes: object;
+    showNodeControl: boolean;
+    decisionLevel: DecisionLevel,
+    children: Array<DecisionTree>;
+    ifcFile: string,
+    bimReference: string;
+    designEpisodeIds: string;
+};
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {

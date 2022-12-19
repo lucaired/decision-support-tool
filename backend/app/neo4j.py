@@ -2,9 +2,12 @@ from dataclasses import dataclass
 from neo4j import GraphDatabase, basic_auth
 import os
 
-uri = os.getenv("NEO4J_URI", "neo4j://10.195.6.112:7687")  #
-username = os.getenv("NEO4J_USER", "neo4j")
-password = os.getenv("NEO4J_PASSWORD", "123")
+#uri = os.getenv("NEO4J_URI", "neo4j://10.195.6.112:7687")  #
+#username = os.getenv("NEO4J_USER", "neo4j")
+#password = os.getenv("NEO4J_PASSWORD", "123")
+uri = "neo4j://10.195.6.112:7687"
+username = "neo4j"
+password = "123"
 
 neo4jVersion = os.getenv("NEO4J_VERSION", "4")
 database = os.getenv("NEO4J_DATABASE", "neo4j")

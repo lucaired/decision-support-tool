@@ -15,12 +15,12 @@ interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
     activeProject?: object;
     toggleLeftDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
-    toggleRightDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
+    querySimilarProjects: () => void;
     // @ts-ignore
     saveCurrentProject: () => void;
 }
 
-export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDrawer, toggleRightDrawer, saveCurrentProject}: ButtonAppBarProps) {
+export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDrawer, querySimilarProjects, saveCurrentProject}: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -59,7 +59,7 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDr
           >
               <SvgIcon
                   color='primary'
-                  onClick={toggleRightDrawer(true)}
+                  onClick={() => querySimilarProjects()}
                   component={AnalyticsIcon}
               />
           </Button>}

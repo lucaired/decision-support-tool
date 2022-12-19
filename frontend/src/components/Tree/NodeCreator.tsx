@@ -13,7 +13,7 @@ import axios from 'axios';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
 
-const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file'];
+const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file', 'Design Episodes'];
 
 export default function VariantCreatorStepper({
 // @ts-ignore
@@ -44,7 +44,8 @@ export default function VariantCreatorStepper({
         showNodeControl: false,
         ifcFile: 'V1-1.ifc',
         decisionLevel: 'construction',
-        bimReference: ''
+        bimReference: '',
+        designEpisodeIds: ''
     })
 
     const handleNext = () => {
@@ -157,6 +158,12 @@ export default function VariantCreatorStepper({
                                 onChange={handleFileUpload}
                             />
                             </Button>}
+                        {activeStep === 4 && <NodeStringPropInput
+                            target={node}
+                            updateFunction={setNode}
+                            property={'designEpisodeIds'}
+                            propertyName={'Design Episode IDs'}
+                        />}
                         <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                             <Button
                                 color="inherit"

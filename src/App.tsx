@@ -6,7 +6,8 @@ import CardContent from '@mui/material/CardContent';
 import './App.css';
 import DecisionTreeHandler from './components/Tree/DecisionTreeHandler';
 import {ForgeViewer} from "./components/ForgeViewer/viewer";
-import Button from "@mui/material/Button";
+import VariantExplorerMenu from "./components/VariantExplorerMenu";
+import Evaluation from "./components/GWP/Evaluation";
 
 function App() {
   return (
@@ -36,19 +37,11 @@ function App() {
                             height: '440px'
                         }}
                     >
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                marginBottom: '15px'
-                            }}>
-                                <Button variant="contained">BIM visualization</Button>
-                                <Button variant="contained">Design Rationale</Button>
-                                <Button variant="contained">Building Performance Evaluation</Button>
-                                <Button variant="contained">Objective Evaluation</Button>
-                        </div>
-
+                        <VariantExplorerMenu/>
+                        <Evaluation neo4JReference={"AC-20-Smiley-West-10-Bldg.ifc"}/>
+                        {/* TODO: load stuff depending on the click here
+                            - implement state for the menu and clicked button there
+                            -
                         <ForgeViewer
                             local={true}
                             path={'http://localhost:3000/0.svf'}
@@ -56,6 +49,7 @@ function App() {
                             //testing={true}
                             //token={token}
                         />
+                        */}
                     </CardContent>
                 </React.Fragment>
             </Card>

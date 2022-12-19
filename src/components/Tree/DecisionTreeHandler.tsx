@@ -22,7 +22,7 @@ const modalStyle = {
     transform: 'translate(-50%, -50%)',
     width: 600,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: '2px solid #1976d2',
     boxShadow: 24,
     p: 4,
 };
@@ -36,45 +36,11 @@ function DecisionTreeHandler() {
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
-        neo4JReference: '',
-        bimReference: '',
-        children: [
-            {
-                name: 'Bricks',
-                attributes: {
-                    level: 'Construction Type',
-                },
-                id: (Math.random() + 1).toString(36).substring(7),
-                showNodeControl: false,
-                neo4JReference: '',
-                bimReference: '',
-                children: []
-            },
-            {
-                name: 'Wood',
-                attributes: {
-                    level: 'Construction Type',
-                },
-                id: (Math.random() + 1).toString(36).substring(7),
-                showNodeControl: false,
-                neo4JReference: '',
-                bimReference: '',
-                children: []
-            },
-            {
-                name: 'Reinforced Concrete',
-                attributes: {
-                    level: 'Construction Type',
-                },
-                id: (Math.random() + 1).toString(36).substring(7),
-                showNodeControl: false,
-                neo4JReference: '',
-                bimReference: '',
-                children: []
-            },
-        ],
-        // node handlers
+        neo4JReference: 'AC-20-Smiley-West-10-Bldg.ifc',
+        bimReference: 'AC-20-Smiley-West-10-Bldg',
+        children: [],
     })
+    // node handlers
     const [activeNode, setActiveNode] = useState({})
     const [activeAction, setModalActiveAction] = useState('')
 

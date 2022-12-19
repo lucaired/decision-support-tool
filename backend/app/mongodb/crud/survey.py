@@ -1,7 +1,7 @@
 from ..database import mongodb
 
-def query_all_surveys_for_project_id(project_id: str): 
-    all_survey = mongodb.surveys.find({"projectId": project_id}).to_list(100)
+def query_all_surveys_for_variant_id(variant_id: str): 
+    all_survey = mongodb.surveys.find({"variantId": variant_id}).to_list(100)
     return all_survey
 
 async def delete_survey(survey_id: str): 

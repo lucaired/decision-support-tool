@@ -25,38 +25,54 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
+class Criterion(BaseModel):
+    label: str
+    rating: int
+
+class CriteriaGroup(BaseModel):
+    label: str
+    criteria: list[Criterion]
+
+class FactorRating(BaseModel):
+    label: str
+    criteria_groups: list[CriteriaGroup] = Field(..., alias='criteriaGroups')
+
 class Survey(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    test: str = Field(..., alias='test')
-    project_id: str = Field(..., alias='projectId')
+    variant_id: str = Field(..., alias='variantId')
+    user: str
+    factor_ratings: list[FactorRating] = Field(..., alias='factorRatings')
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "test": "Jane Doe",
-                "projectId": "123abc",
+                "variantId": "123abc",
+                "user": "Name",
+                "factorRatings": [{"label":"Social Factors","criteriaGroups":[{"label":"Design Quality","criteria":[{"label":"Urban integration","rating":3},{"label":"External space quality","rating":3},{"label":"Building quality","rating":3},{"label":"User and task-specific image","rating":2}]},{"label":"Functionality","criteria":[{"label":"Accessibility","rating":2},{"label":"Public accessibility","rating":3},{"label":"Barrier-free access","rating":2},{"label":"Social integration spaces","rating":3}]},{"label":"Comfort and health","criteria":[{"label":"Safety","rating":2},{"label":"Sound insulation","rating":6}]}]}]
             }
         }
 
 class UpdateSurvey(BaseModel):
-    test: str
-    project_id: str = Field(..., alias='projectId')
+    variant_id: str = Field(..., alias='variantId')
+    user: str
+    factor_ratings: list[FactorRating] = Field(..., alias='factorRatings')
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "test": "Jane Doe",                
-                "projectId": "123abc",
+                "variantId": "123abc",
+                "user": "Name",
+                "factorRatings": [{"label":"Social Factors","criteriaGroups":[{"label":"Design Quality","criteria":[{"label":"Urban integration","rating":3},{"label":"External space quality","rating":3},{"label":"Building quality","rating":3},{"label":"User and task-specific image","rating":2}]},{"label":"Functionality","criteria":[{"label":"Accessibility","rating":2},{"label":"Public accessibility","rating":3},{"label":"Barrier-free access","rating":2},{"label":"Social integration spaces","rating":3}]},{"label":"Comfort and health","criteria":[{"label":"Safety","rating":2},{"label":"Sound insulation","rating":6}]}]}]
             }
         }
 
-@router.get("/{project_id}", response_model=list[Survey])
-async def get_all_surveys_for_project_id(project_id: str):
-    all_survey = await crud.query_all_surveys_for_project_id(project_id)
+@router.get("/{variant_id}", response_model=list[Survey])
+async def get_all_surveys_for_variant_id(variant_id: str):
+    all_survey = await crud.query_all_surveys_for_variant_id(variant_id)
     return all_survey
 
 @router.post("/", response_description="Add new survey", response_model=Survey)

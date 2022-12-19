@@ -548,42 +548,67 @@ function tooltipForCriterionRating(criterion: {
 }) {
     switch (criterion.label) {
         case 'Safety':
-            return 'Security contributes to social and economic stability. Users should feel' +
-                'safe in the building itself, as well as in its environment and be protected' +
-                'as far as possible. Accordingly, the objective hazard potentials (e.g. site-' +
-                'specific natural hazards such as flooding, stumbling blocks, fire, etc.)' +
-                'should be eliminated as far as possible and the subjective sense of' +
-                'security (e.g. clarity, social control / animation, good visibility, etc.) should' +
-                'be strengthen.'
+            return ['POOR - Fire protection requirements not considered; Safety requirements\n' +
+                'not met (too long\n' +
+                'escape routes); partly confusing escape routes\n',
+                'AVERAGE - Fire safety requirements partly considered; Safety requirements\n' +
+                'partially met; mostly\n' +
+                'escape routes\n',
+                'EXCELLENT - Fire safety requirements considered; Safety requirements met;\n' +
+                'clear escape routes']
         case 'Sound insulation':
-            return 'POOR - unfavorable orientation of vulnerable rooms; unfavorable' +
+            return ['POOR - unfavorable orientation of vulnerable rooms; unfavorable' +
                 'orientation of private open spaces (e.g. railway tracks); structural sound' +
-                'insulation measures not recognizable; use conflicts | ' +
+                'insulation measures not recognizable; use conflicts | ',
                 'AVERAGE - partly unfavorable orientation of vulnerable rooms; partly' +
                 'unfavorable orientation of private open spaces; structural noise' +
                 'protection measures partly considered; if necessary, use conflicts (z. B.' +
-                'between exercise and rest rooms)\n'
+                'between exercise and rest rooms)\n',
+                'EXCELLENT - favorable orientation of vulnerable areas; favorable\n' +
+                'orientation of private open spaces; structural noise protection measures\n' +
+                'considered; no conflicts of use\n']
         case 'Accessibility':
-            return 'Based on the existing or projected road and traffic network, an external and internal development concept is to be developed that ensures good networking with the neighborhood, unmistakable orientation options, good clarity and secure accessibility. A high degree of cycling comfort should support the development of environmentally friendly mobility.'
+            return ['POOR - driveway not considered; supply and disposal not accessible; poor\n' +
+                'access to the underground parking; poor positioning of bicycle parking\n' +
+                'spaces; number of bicycle parking spaces not fulfilled (0 pcs.); main\n' +
+                'entrance not recognizable; long internal ways\n',
+                'AVERAGE - driveway considered in a limited way; supply and disposal not\n' +
+                'fully accessible; average access to the underground parking; average\n' +
+                'positioning of bicycle parking spaces; number of bicycle parking spaces\n' +
+                'not fulfilled (5 pcs.); main entrance partially recognizable; average long\n' +
+                'internal ways \n',
+                'EXCELLENT - driveway considered; supply and disposal easily accessible;\n' +
+                'good access to the underground parking; good positioning of bicycle\n' +
+                'parking spaces; number of bicycle parking spaces fulfilled (10 pcs.); main\n' +
+                'entrance well recognizable; short internal ways\n']
         case 'Public accessibility':
-            return 'A high degree of public accessibility promotes the integration and acceptance of the buildings within the neighborhood.'
+            return ['POOR - public accessibility not considered; structural requirements for the\n' +
+                'opening of internal facilities not considered\n',
+                'AVERAGE - public accessibility partially considered; structural requirements\n' +
+                'for the opening of internal facilities partially considered\n',
+                'EXCELLENT - considered public accessibility; structural requirements for the\n' +
+                'opening of internal facilities considered']
         case 'Barrier-free access':
-            return 'The barrier-free design should ensure unrestricted freedom of movement, increase communication in the building and enhance the spatial qualities of architecture and open space.'
+            return ['POOR - barrier-free access not possible (elevator missing); barrier-free\n' +
+                'entrance not possible\n',
+                'AVERAGE - barrier-free access to some of the rooms (elevator on some\n' +
+                'floors); barrier-free entrance possibility (e.g. ramps inside entrance area)\n',
+                'EXCELLENT - barrier-free access to all rooms (elevator on each floor);\n' +
+                'Barrier-free entrance (ramps in entrance area)']
         case 'Social integration spaces':
-            return 'Caring for social contacts supports responsibility, creativity and building social networks. This is promoted by semi-public areas, communication-' +
-                'promoting develooment and meeting areas and a well-coordinated interaction of the private, semi-public and public' +
-                'areas of buildings and their environment. In addition, the widest possible' +
-                'range of accommodation options should promote communication.'
+            return ['POOR - offer of free spaces with possibilities to sit in the building is barely\n' +
+                'existing, offer in the outdoor area (foyer, communication zones, outdoor areas) is barely existing',
+                'AVERAGE - small offer of free spaces with possibilities to sit in the building,\n' +
+                'small offer in the outdoor area (foyer, Communication zones, outdoor areas)\n',
+                'EXCELLENT - varied offer of free spaces with possibilities to sit in the\n' +
+                'building, varied offer in the outdoor area (foyer, communication zones,\n' +
+                'outdoor areas)']
         case 'User and task-specific image':
-            return 'A proper self-presentation and identity formation can be achieved through equilibrium between the usability and design.'
         case 'Building quality':
-            return 'As a contribution to the building culture the building ensemble should be of a high design quality and should have a specific Identity, as well as it should contribute to solution of current social problems.'
         case 'External space quality':
-            return 'Creation of optimal local and user-specific social spaces for urban spaces and ground floor areas, as well as design of the roof as \'Fifth facade to promote a three-dimensional cityscape.'
         case 'Urban integration':
-            return 'The building will significantly characterize the surrounding buildings and public street spaces. A solitaire is expected as an accent in the urban space, but at the same time it should fit the neighborhood, blend with the environment and altogether support the urban image of a place.'
         default:
-            return ""
+            return []
     }
 }
 

@@ -1,4 +1,4 @@
-export type DecisionTree = { id: any; showNodeControl: any; children: any };
+export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: any };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree) => void) => {
     if (tree.id === id) {
@@ -12,7 +12,7 @@ export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: Dec
 export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string) => void) => {
     if (tree.children) {
         if (tree.children.some((child: DecisionTree) => child.id === id)) {
-            func(tree)
+            func(tree, id)
         } else {
             if (tree.children) {
                 tree.children.map((child: any) => setParentNodeProperty(child, id, func))
@@ -27,7 +27,7 @@ export const addNodeChild = (tree: DecisionTree) => {
     // TODO: make this collision-proof
     const id = (Math.random() + 1).toString(36).substring(7);
     const child = {
-        name: `Wood frame ${id}`,
+        name: id,
         attributes: {
             level: 'Building Part Type',
         },

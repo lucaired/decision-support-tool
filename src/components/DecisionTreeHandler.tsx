@@ -1,5 +1,11 @@
+import * as React from 'react';
 import {useState} from 'react';
 import Tree from "react-d3-tree";
+import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+
 import {
     addNodeChild,
     removeNodeChild,
@@ -8,8 +14,22 @@ import {
     setNodeProperty,
     setParentNodeProperty
 } from "./NodeHandler";
+import VariantCreatorStepper from "./NodeCreator";
+
+const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 function DecisionTreeHandler() {
+    // node handling
     const [decisionTree, setDecisionTree] = useState({
         name: 'Building.Lab Project',
         attributes: {
@@ -43,17 +63,17 @@ function DecisionTreeHandler() {
                 showNodeControl: false,
             },
         ],
+        // node handlers
     })
-
+    const [activeNode, setActiveNode] = useState({})
     const handleNodeControl = (nodeId: string) => {
         let tree = {...decisionTree};
         setNodeProperty(tree, nodeId, setNodeControl)
         setDecisionTree(tree)
     }
     const handleAddChild = (nodeId: string) => {
-        let tree = {...decisionTree};
-        setNodeProperty(tree, nodeId, addNodeChild)
-        setDecisionTree(tree)
+        setActiveNode({id: nodeId})
+        handleNodeModalOpen()
     }
     const handleRemoveChild = (nodeId: string) => {
         let tree = {...decisionTree};
@@ -65,6 +85,12 @@ function DecisionTreeHandler() {
         setParentNodeProperty(tree, nodeId, addNodeChild)
         setDecisionTree(tree)
     }
+
+    // modal handling
+    const [nodeModalOpen, setNodeModalOpen] = React.useState(false);
+    const handleNodeModalOpen = () => setNodeModalOpen(true);
+    const handleNodeModalClose = () => setNodeModalOpen(false);
+
 
     const nodeSize = {x: 200, y: 200};
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
@@ -88,6 +114,32 @@ function DecisionTreeHandler() {
                 })
             }
         />
+        <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={nodeModalOpen}
+            onClose={handleNodeModalClose}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+                timeout: 500,
+            }}
+        >
+            <Fade in={nodeModalOpen}>
+                <Box sx={modalStyle}>
+                    <h1>New design variant</h1>
+                    <VariantCreatorStepper
+                        decisionTree={decisionTree}
+                        setDecisionTree={setDecisionTree}
+                        setNodeProperty={setNodeProperty}
+                        addNodeChild={addNodeChild}
+                        activeNodeId={activeNode}
+                        setActiveNodeId={setActiveNode}
+                        handleNodeModalClose={handleNodeModalClose}
+                    />
+                </Box>
+            </Fade>
+        </Modal>
     </div>;
 }
 

@@ -32,9 +32,9 @@ services:
       - ./neo4j/import:/var/lib/neo4j/import
       - ./neo4j/plugins:/plugins
     ports:
-        - "7474:7474"
-        - "7687:7687"
-        - "7473:7473"
+        - 7474:7474
+        - 7687:7687
+        - 7473:7473
   decision-support-client:
     build: ./frontend
     container_name: decision-support-client    
@@ -43,9 +43,9 @@ services:
       - VARIANT_NEO4J_URL=192.168.2.168
       - DE_NEO4J_URL=10.195.6.112
     volumes:
-      - ./frontend/src:/src
+      - ./frontend/src:/app/src
     ports:
-        - "3000:3000"
+        - 3000:3000
     depends_on:
       - "decision-support-server"
       - "mongodb"

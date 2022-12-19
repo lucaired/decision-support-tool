@@ -42,8 +42,6 @@ function stringAvatar(name: string) {
     };
 }
 
-// TODO: compute overall score from evaluations
-
 // @ts-ignore
 function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingModalUpdate}) {
 
@@ -69,7 +67,10 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={showRatingModal}
-        onClose={handleRatingModalClose}
+        onClose={() => {
+            setUser({name: ''})
+            handleRatingModalClose()
+        }}
         closeAfterTransition
     >
         <Fade in={showRatingModal}>
@@ -111,6 +112,10 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                     {
                         label: 'Building quality',
                         rating: 3
+                    },
+                    {
+                        label: 'User and task-specific image',
+                        rating: 2
                     }
                 ]
             },
@@ -218,7 +223,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     const [showRatingModal, setShowRatingModal] = React.useState(false);
     const handleRatingModalOpen = () => setShowRatingModal(true);
     const handleRatingModalClose = () => setShowRatingModal(false);
-    const handleRatingModalUpdate = (rating: object,name: string) => {
+    const handleRatingModalUpdate = (rating: object, name: string) => {
         handleSubjectiveEvaluationUpdate(rating, name)
         setShowRatingModal(false);
     }
@@ -256,27 +261,37 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     </div>
 }
 
-function computeCriteriaGroupScore(criteriaGroup: object[]): number {
+function computeCriteriaGroupScore(criteriaGroup: object): number {
     // @ts-ignore
-    return Math.round(criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0) * 100) / 100
+    const groupRating =  criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
+    return Math.round(groupRating * 100) / 100
 }
 
 function computeFactorScore(evaluation: object): number {
+    const criteriaGroupWeights = {
+        'Design Quality': 0.5,
+        'Functionality': 0.25,
+        'Comfort and health': 0.25,
+    }
     // @ts-ignore
-    const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => acc + computeCriteriaGroupScore(criteriaGroup), 0) / evaluation.criteriaGroups?.length
-    return Math.round( score   * 100) / 100
+    const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => {
+        // @ts-ignore
+        const weight = criteriaGroupWeights[criteriaGroup.label]
+        return acc + weight * computeCriteriaGroupScore(criteriaGroup)
+    }, 0)
+    return Math.round(score * 100) / 100
 }
 
 function SubjectiveEvaluationTable({
-    // @ts-ignore
-    subjectiveEvaluation,
-    // @ts-ignore
-    toggleShowSubjectiveEvaluationSurvey,
-    // @ts-ignore
-    setCurrentUserEvaluation,
-    // @ts-ignore
-    handleSubjectiveEvaluationRemoval
-}) {
+                                       // @ts-ignore
+                                       subjectiveEvaluation,
+                                       // @ts-ignore
+                                       toggleShowSubjectiveEvaluationSurvey,
+                                       // @ts-ignore
+                                       setCurrentUserEvaluation,
+                                       // @ts-ignore
+                                       handleSubjectiveEvaluationRemoval
+                                   }) {
 
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
         { /* @ts-ignore */}
@@ -303,51 +318,54 @@ function SubjectiveEvaluationTable({
                     <Avatar {...stringAvatar(evaluation.user)} />
                     <p>{evaluation.user}</p>
                 </Card>
-                    {/* @ts-ignore */}
-                    {evaluation.factorRatings?.map((factorRating) =>
-                        <div
-                            style={{display: "flex", flexDirection: "row", gap: "5px"}}
-                            key={`${factorRating.label}`}
+                {/* @ts-ignore */}
+                {evaluation.factorRatings?.map((factorRating) =>
+                    <div
+                        style={{display: "flex", flexDirection: "row", gap: "5px"}}
+                        key={`${factorRating.label}`}
+                    >
+                        <Paper
+                            elevation={1}
+                            style={{
+                                width: "90px",
+                                padding: "5px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-around",
+                            }}
                         >
-                            <Paper
-                                elevation={1}
-                                style={{
-                                    width: "90px",
-                                    padding: "5px",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-around",
-                                }}
-                            >
-                                <p style={{textAlign: "center"}}>{factorRating.label}</p>
-                                <Chip label={computeFactorScore(factorRating)}/>
-                            </Paper>
-                            <div style={{display: "flex", gap: "5px"}}>
-                                {/* @ts-ignore */}
-                                {factorRating.criteriaGroups.map((criteriaGroup) =>
-                                    <Paper
-                                        key={`${criteriaGroup.label}`}
-                                        variant="outlined"
-                                        style={{
-                                            cursor: "pointer",
-                                            width: "90px",
-                                            padding: "5px",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            justifyContent: "space-around",
-                                        }}
-                                        onClick={() => {
-                                            toggleShowSubjectiveEvaluationSurvey(true)
-                                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: factorRating.label})
-                                        }}
-                                    >
-                                        <p style={{textAlign: "center"}}>{criteriaGroup.label}</p>
-                                        <Chip label={computeCriteriaGroupScore(criteriaGroup)}/>
-                                    </Paper>
-                                )}
-                            </div>
+                            <p style={{textAlign: "center"}}>{factorRating.label}</p>
+                            <Chip label={computeFactorScore(factorRating)}/>
+                        </Paper>
+                        <div style={{display: "flex", gap: "5px"}}>
+                            {/* @ts-ignore */}
+                            {factorRating.criteriaGroups.map((criteriaGroup) =>
+                                <Paper
+                                    key={`${criteriaGroup.label}`}
+                                    variant="outlined"
+                                    style={{
+                                        cursor: "pointer",
+                                        width: "90px",
+                                        padding: "5px",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-around",
+                                    }}
+                                    onClick={() => {
+                                        toggleShowSubjectiveEvaluationSurvey(true)
+                                        setCurrentUserEvaluation({
+                                            user: evaluation.user,
+                                            factorLabel: factorRating.label
+                                        })
+                                    }}
+                                >
+                                    <p style={{textAlign: "center"}}>{criteriaGroup.label}</p>
+                                    <Chip label={computeCriteriaGroupScore(criteriaGroup)}/>
+                                </Paper>
+                            )}
+                        </div>
                     </div>)}
-                    <Button onClick={() => handleSubjectiveEvaluationRemoval(evaluation.user)} startIcon={<DeleteIcon/>}/>
+                <Button onClick={() => handleSubjectiveEvaluationRemoval(evaluation.user)} startIcon={<DeleteIcon/>}/>
             </Card>
         ))}
     </div>
@@ -419,16 +437,16 @@ function RatingConstructor(factorLabel: string) {
 
 function SubjectiveEvaluationSurvey({
 // @ts-ignore
-                                       factorRating,
-                                       // @ts-ignore
-                                       handleShowSubjectiveEvaluationSurvey,
-                                       // @ts-ignore
-                                       setCurrentUserEvaluation,
-                                       // @ts-ignore
-                                       currentUserEvaluation,
-                                       // @ts-ignore
-                                       handleSubjectiveEvaluationUpdate
-                                   }) {
+                                        factorRating,
+                                        // @ts-ignore
+                                        handleShowSubjectiveEvaluationSurvey,
+                                        // @ts-ignore
+                                        setCurrentUserEvaluation,
+                                        // @ts-ignore
+                                        currentUserEvaluation,
+                                        // @ts-ignore
+                                        handleSubjectiveEvaluationUpdate
+                                    }) {
 
     const [rating, setRating] = React.useState(factorRating);
 

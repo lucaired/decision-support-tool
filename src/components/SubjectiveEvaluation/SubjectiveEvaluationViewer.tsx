@@ -162,7 +162,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
 
     const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState(mockSubjectiveEvaluation);
     const [totalSubjectiveEvaluation, setTotalSubjectiveEvaluation] =
-        React.useState({'user': 'Total', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]});
+        React.useState({});
 
     const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
         user: undefined,
@@ -175,35 +175,43 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
             let update = {...acc}
             // apply the criteriaGroup array to the accumulator
             evaluation.factorRatings[0].criteriaGroups.forEach((criteriaGroup) => {
-                // criteriaGroup not accumulator
+                // if criteriaGroup not in accumulator, we can just use it
                 let updateCriteriaGroup = criteriaGroup
 
-                const index = update.factorRatings[0]?.criteriaGroups?.findIndex((updateCriteriaGroup) => updateCriteriaGroup.label === criteriaGroup.label)
+                const index = update.factorRatings[0]?.criteriaGroups?.findIndex((old) => old.label === criteriaGroup.label)
                 // criteriaGroup is in the accumulator
                 if (index !== -1 && index !== undefined) {
                     let right = update.factorRatings[0].criteriaGroups[index].criteria
                     const updatedCriteria = mergeCriteriaGroupScores(criteriaGroup.criteria, right)
-                    updateCriteriaGroup = {...updateCriteriaGroup, criteria: updatedCriteria}
+                    updateCriteriaGroup = {label: criteriaGroup.label, criteria: updatedCriteria}
                     update.factorRatings[0].criteriaGroups[index] = updateCriteriaGroup
                 } else {
                     update.factorRatings[0].criteriaGroups = [updateCriteriaGroup, ...update.factorRatings[0].criteriaGroups]
                 }
             })
             return update
-        }, totalSubjectiveEvaluation)
+        }, {'user': 'Total Score', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]})
         // @ts-ignore
         setTotalSubjectiveEvaluation((oldTotal) => totalEvaluation)
     }
 
     const mergeCriteriaGroupScores = (left: { label: string, rating: number }[], right: { label: string, rating: number }[]) => {
-        return left.map((score) => {
-            const index = right.findIndex((score) => score.label === score.label)
+        const leftUpdate = left.map((leftScore) => {
+            const index = right.findIndex((rightScore) => leftScore.label === rightScore.label)
             if (index !== -1) {
-                return {...score, rating: score.rating + right[index].rating}
+                return {label: leftScore.label, rating: leftScore.rating + right[index].rating}
             } else {
-                return score
+                return leftScore
             }
         })
+        // add missing criteria
+        const missingCriteria = right.filter((score) => {
+            const index = leftUpdate.findIndex((update) => update.label === score.label)
+            if (index === -1) {
+                leftUpdate.push(score)
+            }
+        })
+        return leftUpdate
     }
 
     // @ts-ignore
@@ -322,9 +330,9 @@ function computeCriteriaGroupScore(criteriaGroup: object): number {
 
 function computeFactorScore(evaluation: object): number {
     const criteriaGroupWeights = {
-        'Design Quality': 0.5,
-        'Functionality': 0.25,
-        'Comfort and health': 0.25,
+        'Design Quality': 1,
+        'Functionality': 1,
+        'Comfort and health': 1,
     }
     // @ts-ignore
     const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => {
@@ -372,7 +380,7 @@ function SubjectiveEvaluationTable({
                     <p>{evaluation.user}</p>
                 </Card>
                 {/* @ts-ignore */}
-                {evaluation.factorRatings?.map((factorRating) =>
+                {evaluation.factorRatings?.sort().map((factorRating) =>
                     <div
                         style={{display: "flex", flexDirection: "row", gap: "5px"}}
                         key={`${factorRating.label}`}
@@ -392,7 +400,7 @@ function SubjectiveEvaluationTable({
                         </Paper>
                         <div style={{display: "flex", gap: "5px"}}>
                             {/* @ts-ignore */}
-                            {factorRating.criteriaGroups.map((criteriaGroup) =>
+                            {factorRating.criteriaGroups.sort((groupA,groupB) => groupA.label < groupB.label ).map((criteriaGroup) =>
                                 <Paper
                                     key={`${criteriaGroup.label}`}
                                     variant="outlined"

@@ -9,7 +9,7 @@ function VariantExplorerMenu({activeVariantExplorationHandler}) {
         </Button>;
     }
 
-    const labels = ["BIM visualization", "GWP Evaluation", "Design Rationale", "Objective Evaluation"]
+    const labels = ["BIM visualization", "GWP Evaluation", "Design Rationale", "Subjective Evaluation", "Objective Evaluation"]
 
     return <div
         style={{

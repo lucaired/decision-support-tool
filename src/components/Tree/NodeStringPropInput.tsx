@@ -3,11 +3,12 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 // @ts-ignore
-export default function NodeStringPropInput({node, setNode, property, propertyName}) {
+export default function StringPropInput({target, updateFunction, property, propertyName}) {
+
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        let update = {...node}
+        let update = {...target}
         update[property] = event.target.value;
-        setNode(update);
+        updateFunction(update);
     };
 
     return (
@@ -22,7 +23,7 @@ export default function NodeStringPropInput({node, setNode, property, propertyNa
             <TextField
                 id="outlined-name"
                 label={propertyName}
-                value={node[property]}
+                value={target[property]}
                 onChange={handleChange}
             />
         </Box>

@@ -87,8 +87,8 @@ export default function VariantCreatorStepper({
                 <React.Fragment>
                         {activeStep === 0 && (<div>
                             <NodeStringPropInput
-                                node={node}
-                                setNode={setNode}
+                                target={node}
+                                updateFunction={setNode}
                                 property={'name'}
                                 propertyName={'Name'}
                             />
@@ -102,14 +102,14 @@ export default function VariantCreatorStepper({
                         </div>)
                         }
                         {activeStep === 1 && <NodeStringPropInput
-                            node={node}
-                            setNode={setNode}
+                            target={node}
+                            updateFunction={setNode}
                             property={'bimReference'}
                             propertyName={'BIM Reference'}
                         />}
                         {activeStep === 2 && <NodeStringPropInput
-                            node={node}
-                            setNode={setNode}
+                            target={node}
+                            updateFunction={setNode}
                             property={'neo4JReference'}
                             propertyName={'Neo4j Reference'}
                         />}

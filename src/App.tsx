@@ -8,7 +8,7 @@ import DecisionTreeHandler from './components/Tree/DecisionTreeHandler';
 import {ForgeViewer} from "./components/ForgeViewer/viewer";
 import VariantExplorerMenu from "./components/VariantExplorerMenu";
 import GWPEvaluation from "./components/GWP/GWPEvaluation";
-import ObjectiveEvaluationViewer from "./components/ObjectiveEvaluation/ObjectiveEvaluationViewer";
+import SubjectiveEvaluationViewer from "./components/SubjectiveEvaluation/SubjectiveEvaluationViewer";
 
 function App() {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
@@ -85,14 +85,20 @@ function App() {
                                         </div>
                                         : activeVariantExplorationIndex === 3 ?
                                             <div
-                                                key={"objective-evaluation-variant-exploration"}
+                                                key={"subjective-evaluation-variant-exploration"}
                                             >
-                                                <ObjectiveEvaluationViewer
-                                                    key={"objective-evaluation-viewer"}
+                                                <SubjectiveEvaluationViewer
+                                                    key={"subjective-evaluation-viewer"}
                                                     // @ts-ignore
                                                     activeVariantId={activeVariant.id}
                                                 />
-                                            </div> :
+                                            </div>
+                                            : activeVariantExplorationIndex === 4 ?
+                                                <div
+                                                    key={"subjective-evaluation-exploration"}
+                                                >
+                                                    Not implemented
+                                                </div> :
                                             <GWPEvaluation
                                                 activeVariant={activeVariant}
                                             />

@@ -6,6 +6,10 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import Box from "@mui/material/Box";
+import StringPropInput from "../Tree/NodeStringPropInput";
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -39,7 +43,54 @@ function stringAvatar(name: string) {
 // TODO: compute overall score from evaluations
 
 // @ts-ignore
-function ObjectiveEvaluationViewer({activeVariantId}) {
+function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingModalUpdate}) {
+
+    const [user, setUser] = React.useState({name: ''});
+    const handleSave = () => {
+        setUser({name: ''})
+        handleRatingModalUpdate(RatingConstructor("Social Factors"), user.name)
+    }
+
+    const modalStyle = {
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 600,
+        bgcolor: 'background.paper',
+        border: '2px solid #1976d2',
+        boxShadow: 24,
+        p: 4,
+    };
+
+    return <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={showRatingModal}
+        onClose={handleRatingModalClose}
+        closeAfterTransition
+    >
+        <Fade in={showRatingModal}>
+            <Box sx={modalStyle}>
+                <h1>Rate variant</h1>
+                <div>
+                    <StringPropInput
+                        target={user}
+                        updateFunction={setUser}
+                        property={"name"}
+                        propertyName={"Name"}
+                    />
+                    <Button onClick={() => handleSave()}>
+                        Save
+                    </Button>
+                </div>
+            </Box>
+        </Fade>
+    </Modal>;
+}
+
+// @ts-ignore
+function SubjectiveEvaluationViewer({activeVariantId}) {
     // TODO: get evaluations for the activeVariant
     const mockFactorRating = {
         label: 'Social Factors',
@@ -98,24 +149,24 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
         ]
     };
 
-    const mockObjectiveEvaluation = [
+    const mockSubjectiveEvaluation = [
         {user: 'Architect Adrian', factorRatings: [mockFactorRating]},
         {user: 'Architect Bertha'},
         {user: 'Architect Chris'}
     ]
 
-    const [objectiveEvaluation, setObjectiveEvaluation] = React.useState(mockObjectiveEvaluation);
+    const [subjectiveEvaluation, setSubjectiveEvaluation] = React.useState(mockSubjectiveEvaluation);
 
     // @ts-ignore
-    const handleObjectiveEvaluationUpdate = (factorRating, user: string) => {
-        const index = objectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
+    const handleSubjectiveEvaluationUpdate = (factorRating, user: string) => {
+        const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
-            setObjectiveEvaluation((objectiveEvaluation) => {
-                const evaluationIndex = objectiveEvaluation.findIndex((evaluation) => evaluation.user == user)
-                const factorRatings = objectiveEvaluation[evaluationIndex].factorRatings || []
+            setSubjectiveEvaluation((subjectiveEvaluation) => {
+                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user == user)
+                const factorRatings = subjectiveEvaluation[evaluationIndex].factorRatings || []
                 const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label == factorRating.label)
 
-                let update = [...objectiveEvaluation]
+                let update = [...subjectiveEvaluation]
                 let updateRating = [...factorRatings]
                 if (factorEvaluationIndex !== -1) {
                     updateRating[factorEvaluationIndex] = factorRating
@@ -126,15 +177,22 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
                 update[evaluationIndex] = {user: user, factorRatings: updateRating}
                 return update
             })
+        } else {
+            setSubjectiveEvaluation((subjectiveEvaluation) => {
+                let update = [...subjectiveEvaluation]
+                update.push({user: user, factorRatings: [factorRating]})
+                return update
+            })
         }
     }
+
     const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
         user: undefined,
         factorLabel: undefined,
     });
 
     const getFactorRating = () => {
-        const factor = objectiveEvaluation
+        const factor = subjectiveEvaluation
             .filter((evaluation) => evaluation.user === currentUserEvaluation.user)
             .map((evaluation) => evaluation.factorRatings)
             .flat()
@@ -144,23 +202,46 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
         return factor
     }
 
-    const [showObjectiveEvaluationSurvey, toggleShowObjectiveEvaluationSurvey] = React.useState(false);
-    const handleShowObjectiveEvaluationSurvey = (state: boolean) => toggleShowObjectiveEvaluationSurvey(state);
+    const [showSubjectiveEvaluationSurvey, toggleShowSubjectiveEvaluationSurvey] = React.useState(false);
+    const handleShowSubjectiveEvaluationSurvey = (state: boolean) => toggleShowSubjectiveEvaluationSurvey(state);
+
+    const [showRatingModal, setShowRatingModal] = React.useState(false);
+    const handleRatingModalOpen = () => setShowRatingModal(true);
+    const handleRatingModalClose = () => setShowRatingModal(false);
+    const handleRatingModalUpdate = (rating: object,name: string) => {
+        handleSubjectiveEvaluationUpdate(rating, name)
+        setShowRatingModal(false);
+    }
 
     return <div>
-        {showObjectiveEvaluationSurvey && currentUserEvaluation.user && currentUserEvaluation.factorLabel
-            ? <ObjectiveEvaluationSurvey
+        {showSubjectiveEvaluationSurvey && currentUserEvaluation.user && currentUserEvaluation.factorLabel
+            ? <SubjectiveEvaluationSurvey
                 factorRating={getFactorRating()}
-                handleShowObjectiveEvaluationSurvey={handleShowObjectiveEvaluationSurvey}
+                handleShowSubjectiveEvaluationSurvey={handleShowSubjectiveEvaluationSurvey}
                 setCurrentUserEvaluation={setCurrentUserEvaluation}
                 currentUserEvaluation={currentUserEvaluation}
-                handleObjectiveEvaluationUpdate={handleObjectiveEvaluationUpdate}
+                handleSubjectiveEvaluationUpdate={handleSubjectiveEvaluationUpdate}
             /> :
-            <ObjectiveEvaluationTable
-                objectiveEvaluation={objectiveEvaluation}
-                toggleShowObjectiveEvaluationSurvey={toggleShowObjectiveEvaluationSurvey}
-                setCurrentUserEvaluation={setCurrentUserEvaluation}
-            />}
+            <div>
+                <SubjectiveEvaluationTable
+                    subjectiveEvaluation={subjectiveEvaluation}
+                    toggleShowSubjectiveEvaluationSurvey={toggleShowSubjectiveEvaluationSurvey}
+                    setCurrentUserEvaluation={setCurrentUserEvaluation}
+                />
+                <Button
+                    onClick={() => handleRatingModalOpen()}
+                    variant="outlined"
+                    startIcon={<AddIcon/>}
+                >
+                    Rate variant
+                </Button>
+                <NewRatingModal
+                    showRatingModal={showRatingModal}
+                    handleRatingModalClose={handleRatingModalClose}
+                    handleRatingModalUpdate={handleRatingModalUpdate}
+                />
+            </div>
+        }
     </div>
 }
 
@@ -176,19 +257,20 @@ function computeFactorScore(evaluation: object): number {
 }
 
 // @ts-ignore
-function ObjectiveEvaluationTable({
+function SubjectiveEvaluationTable({
 // @ts-ignore
-                                      objectiveEvaluation,
+                                      subjectiveEvaluation,
                                       // @ts-ignore
-                                      toggleShowObjectiveEvaluationSurvey,
+                                      toggleShowSubjectiveEvaluationSurvey,
                                       // @ts-ignore
                                       setCurrentUserEvaluation
                                   }) {
+
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
         { /* @ts-ignore */}
-        {objectiveEvaluation?.map((evaluation) => (
+        {subjectiveEvaluation?.map((evaluation) => (
             <Card
-                key={`objectiveEvaluation-${evaluation.user}`}
+                key={`subjectiveEvaluation-${evaluation.user}`}
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -242,7 +324,7 @@ function ObjectiveEvaluationTable({
                                             justifyContent: "space-around",
                                         }}
                                         onClick={() => {
-                                            toggleShowObjectiveEvaluationSurvey(true)
+                                            toggleShowSubjectiveEvaluationSurvey(true)
                                             setCurrentUserEvaluation({user: evaluation.user, factorLabel: factorRating.label})
                                         }}
                                     >
@@ -255,9 +337,6 @@ function ObjectiveEvaluationTable({
                     <Button startIcon={<DeleteIcon/>}/>
             </Card>
         ))}
-        <Button variant="outlined" startIcon={<AddIcon/>}>
-            Rate variant
-        </Button>
     </div>
 }
 
@@ -325,17 +404,17 @@ function RatingConstructor(factorLabel: string) {
     }
 }
 
-function ObjectiveEvaluationSurvey({
+function SubjectiveEvaluationSurvey({
 // @ts-ignore
                                        factorRating,
                                        // @ts-ignore
-                                       handleShowObjectiveEvaluationSurvey,
+                                       handleShowSubjectiveEvaluationSurvey,
                                        // @ts-ignore
                                        setCurrentUserEvaluation,
                                        // @ts-ignore
                                        currentUserEvaluation,
                                        // @ts-ignore
-                                       handleObjectiveEvaluationUpdate
+                                       handleSubjectiveEvaluationUpdate
                                    }) {
 
     const [rating, setRating] = React.useState(factorRating);
@@ -371,7 +450,7 @@ function ObjectiveEvaluationSurvey({
                 <Button variant="contained">
                     <SvgIcon
                         onClick={() => {
-                            handleShowObjectiveEvaluationSurvey(false)
+                            handleShowSubjectiveEvaluationSurvey(false)
                             setCurrentUserEvaluation({user: undefined, factorLabel: undefined})
                         }}
                         component={CloseIcon}/></Button>
@@ -437,9 +516,9 @@ function ObjectiveEvaluationSurvey({
             <Button variant="contained">
                 <SvgIcon
                     onClick={() => {
-                        handleShowObjectiveEvaluationSurvey(false)
+                        handleShowSubjectiveEvaluationSurvey(false)
                         setCurrentUserEvaluation({user: undefined, factorLabel: undefined})
-                        handleObjectiveEvaluationUpdate(rating, currentUserEvaluation.user)
+                        handleSubjectiveEvaluationUpdate(rating, currentUserEvaluation.user)
                     }}
                     component={SaveIcon}
                 />
@@ -448,4 +527,4 @@ function ObjectiveEvaluationSurvey({
     </Card>
 }
 
-export default ObjectiveEvaluationViewer
+export default SubjectiveEvaluationViewer

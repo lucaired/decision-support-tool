@@ -148,11 +148,11 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 criteria: [
                     {
                         label: 'Safety',
-                        rating: 1
+                        rating: 2
                     },
                     {
                         label: 'Sound insulation',
-                        rating: 3
+                        rating: 6
                     }
                 ]
             }
@@ -197,7 +197,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 }
             })
             return update
-        }, {'user': 'Total Score', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]})
+        }, {'user': 'Total Score (Average)', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]})
         // @ts-ignore
         setTotalSubjectiveEvaluation((totalSubjectiveEvaluation) => totalEvaluation)
     }
@@ -341,23 +341,19 @@ function computeCriteriaGroupScore(criteriaGroup: object, globalFactorWeight: nu
 }
 
 function computeFactorScore(evaluation: object, globalFactorWeight: number): number {
-    const criteriaGroupWeights = {
-        'Design Quality': 1,
-        'Functionality': 1,
-        'Comfort and health': 1,
-    }
     // @ts-ignore
     const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => {
-        // @ts-ignore
-        const weight = criteriaGroupWeights[criteriaGroup.label]
-        return acc + weight * computeCriteriaGroupScore(criteriaGroup, globalFactorWeight)
+        return acc + computeCriteriaGroupScore(criteriaGroup, globalFactorWeight)
     }, 0)
     return Math.round(score * 100) / 100
 }
 
 function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, globalFactorWeight: any }) {
-    return <Paper
+    const criteriaGroupScore = computeCriteriaGroupScore(props.criteriaGroup, props.globalFactorWeight)
+    const maxScore = props.criteriaGroup.criteria.length * weightForCriteriaGroup(props.criteriaGroup.label) * 3
+    const scoreLabel = `${criteriaGroupScore}/${maxScore}`
 
+    return <Paper
         variant="outlined"
         style={{
             cursor: "pointer",
@@ -370,11 +366,18 @@ function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, gl
         onClick={props.onClick}
     >
         <p style={{textAlign: "center"}}>{props.criteriaGroup.label}</p>
-        <Chip label={computeCriteriaGroupScore(props.criteriaGroup, props.globalFactorWeight)}/>
+        <Chip label={scoreLabel}/>
     </Paper>;
 }
 
 function FactorScore(props: { factorRating: any, globalFactorWeight: any }) {
+    const criteriaGroupScore = computeFactorScore(props.factorRating, props.globalFactorWeight)
+    // @ts-ignore
+    const maxScore = props.factorRating.criteriaGroups.reduce((acc, criteriaGroup) =>
+        acc + criteriaGroup.criteria.length * weightForCriteriaGroup(criteriaGroup.label) * 3
+    ,0)
+    const scoreLabel = `${criteriaGroupScore}/${maxScore}`
+
     return <Paper
         elevation={1}
         style={{
@@ -386,7 +389,7 @@ function FactorScore(props: { factorRating: any, globalFactorWeight: any }) {
         }}
     >
         <p style={{textAlign: "center"}}>{props.factorRating.label}</p>
-        <Chip label={computeFactorScore(props.factorRating, props.globalFactorWeight)}/>
+        <Chip label={scoreLabel}/>
     </Paper>;
 }
 
@@ -487,6 +490,10 @@ function RatingConstructor(factorLabel: string) {
                             {
                                 label: 'Building quality',
                                 rating: 3
+                            },
+                            {
+                                label: 'User and task-specific image',
+                                rating: 2
                             }
                         ]
                     },
@@ -644,6 +651,18 @@ function tooltipForCriterionRating(criterion: {
     }
 }
 
+function weightForCriteriaGroup (label: string): number {
+    switch (label.toLowerCase()) {
+        case 'comfort and health':
+            return 2
+        case 'design quality':
+            return 1
+        case 'functionality':
+            return 1
+        default:
+            return 1
+    }
+}
 
 function SubjectiveEvaluationSurvey({
 // @ts-ignore
@@ -676,7 +695,7 @@ function SubjectiveEvaluationSurvey({
                 setRating(rating => {
                     let update = {...rating}
                     let criterion = criteriaGroup.criteria[criterionIndex]
-                    criterion.rating = newValue
+                    criterion.rating = newValue * weightForCriteriaGroup(criteriaGroupLabel)
                     criteriaGroup.criteria[criterionIndex] = criterion
                     update.criteriaGroups[criteriaGroupIndex] = criteriaGroup
                     return update
@@ -742,8 +761,8 @@ function SubjectiveEvaluationSurvey({
                                             <p>poor</p>
                                             <Slider
                                                 aria-label="Rating"
-                                                defaultValue={criterion.rating}
-                                                value={criterion.rating}
+                                                defaultValue={criterion.rating / weightForCriteriaGroup(criteriaGroup.label)}
+                                                value={criterion.rating / weightForCriteriaGroup(criteriaGroup.label)}
                                                 onChange={(event: Event, newValue: number | number[]) => {
                                                     handleChange(newValue as number, criteriaGroup.label, criterion.label)
                                                 }}

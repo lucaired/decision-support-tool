@@ -60,7 +60,7 @@ export function DesignEpisodeMatchingModal({
         const isDesignEpisodeSetInVariant = (variantName: string, designEpisodeId: string) => {
           if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
             // @ts-ignore
-            return variantsToDesignEpisodes[variantName]['designEpisodeIds'].findIndex((id: string) => id === designEpisodeId) !== -1
+            return variantsToDesignEpisodes[variantName]['designEpisodes'].findIndex((designEpisode: object) => designEpisode.designEpisodeId === designEpisodeId) !== -1
           }
           return false;
         }
@@ -70,19 +70,24 @@ export function DesignEpisodeMatchingModal({
 
           if (isDesignEpisodeSetInVariant(variantName, designEpisodeId)) {
             // @ts-ignore
-            let designEpisodeIds = variantsToDesignEpisodes[variantName]['designEpisodeIds']
-            let index = designEpisodeIds.findIndex((id: string) => id === designEpisodeId)
-            designEpisodeIds.splice(index, 1)
+            let designEpisodes = variantsToDesignEpisodes[variantName]['designEpisodes']
             // @ts-ignore
-            update[variantName]['designEpisodeIds'] = designEpisodeIds
+            let index = designEpisodes.findIndex((designEpisode: object) => designEpisode.designEpisodeId === designEpisodeId)
+            designEpisodes.splice(index, 1)
+            // @ts-ignore
+            update[variantName]['designEpisodes'] = designEpisodes
           } else {
             // @ts-ignore
             if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
               // @ts-ignore
-              update[variantName]['designEpisodeIds'] = [...variantsToDesignEpisodes[variantName]['designEpisodeIds'], designEpisodeId]
+              update[variantName]['designEpisodes'] = [
+              // @ts-ignore
+                ...variantsToDesignEpisodes[variantName]['designEpisodes'],
+                 {designEpisodeId: designEpisodeId, designEpisodeWeight: 1}
+              ]
             } else {
               // @ts-ignore
-              update[variantName] = {designEpisodeIds: [designEpisodeId], variantWeight: 1}
+              update[variantName] = {designEpisodes: [{designEpisodeId: designEpisodeId, designEpisodeWeight: 1}], variantWeight: 1}
             }
           }
           setVariantsToDesignEpisodes((state) => {
@@ -99,7 +104,12 @@ export function DesignEpisodeMatchingModal({
             delete update[variantName]
           } else {
             // @ts-ignore
-            update[variantName] = {designEpisodeIds: designEpisodeIds, variantWeight: 1}
+            update[variantName] = {
+              designEpisodes: designEpisodeIds.map((designEpisodeId) => {
+                return {designEpisodeId: designEpisodeId, designEpisodeWeight: 1}
+              }),
+              variantWeight: 1
+            }
           }
           setVariantsToDesignEpisodes((state) => {
             return {
@@ -131,8 +141,16 @@ export function DesignEpisodeMatchingModal({
           return variantsAndDesignEpisodes;
         }
 
+        const getDesignEpisodeWeight = (variantName: string, designEpisodeId: string) => {
+          // @ts-ignore
+          return variantsToDesignEpisodes[variantName]['designEpisodes']
+          // @ts-ignore
+          .filter((designEpisode: object) => designEpisode.designEpisodeId === designEpisodeId)
+          // @ts-ignore
+          .map((designEpisode: object) => designEpisode.designEpisodeWeight) || 1
+        }
+
         const handleVariantWeightChange = (variantName: string, weight: string) => {
-          console.log(weight)
           if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
             let update = {...variantsToDesignEpisodes}
             // @ts-ignore
@@ -143,7 +161,27 @@ export function DesignEpisodeMatchingModal({
               }}
             )
           }
-      };
+        };
+
+        const handleDesignEpisodeWeightChange = (variantName: string, designEpisodeId: string, weight: string) => {
+          if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
+            let update = {...variantsToDesignEpisodes}
+            // @ts-ignore
+            let index = update[variantName]['designEpisodes'].findIndex((designEpisode: object) => designEpisode.designEpisodeId === designEpisodeId)
+            if (index !== -1) {
+              // @ts-ignore
+              const designEpisode = update[variantName]['designEpisodes'][index]
+              // @ts-ignore
+              update[variantName]['designEpisodes'][index] = {...designEpisode, designEpisodeWeight:  Math.max(weight,1)}
+              console.log(update)
+              setVariantsToDesignEpisodes((state) => {
+                return {
+                  ...update 
+                }}
+              )
+            }
+          }
+        };
 
         return <Modal
             aria-labelledby="transition-modal-title"
@@ -168,14 +206,14 @@ export function DesignEpisodeMatchingModal({
                           checked={
                             Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
                             /* @ts-ignore */
-                            variantsToDesignEpisodes[entry[0]]['designEpisodeIds'].length > 0
+                            variantsToDesignEpisodes[entry[0]]['designEpisodes'].length > 0
                           } 
                           onChange={(event)=> addOrRemoveAllDesignEpisodeFromVariant(entry[0], entry[1])}
                         />
                         </div>
                         { Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
                             /* @ts-ignore */
-                            variantsToDesignEpisodes[entry[0]]['designEpisodeIds'].length > 0 &&                       <Box
+                            variantsToDesignEpisodes[entry[0]]['designEpisodes'].length > 0 &&                       <Box
                           component="form"
                           sx={{
                             '& .MuiTextField-root': { m: 1, width: '12ch' },
@@ -220,12 +258,14 @@ export function DesignEpisodeMatchingModal({
                         <TextField
                           id="outlined-number"
                           label="Weight"
+                          // @ts-ignore
+                          value={getDesignEpisodeWeight(entry[0], designEpisodeId)}
                           type="number"
                           size="small"
-                          defaultValue={"1"}
                           InputLabelProps={{
-                            shrink: true,
+                              shrink: true,
                           }}
+                          onChange={(event) => handleDesignEpisodeWeightChange(entry[0], designEpisodeId, event.target.value)}
                         />               
                       </Box>}
                           </div> 

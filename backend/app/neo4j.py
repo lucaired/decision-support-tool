@@ -1,32 +1,34 @@
-import os
+from dataclasses import dataclass
 from neo4j import GraphDatabase, basic_auth
+import os
 
-url = os.getenv("NEO4J_URI", "neo4j://10.195.6.112:7687")  #
+uri = os.getenv("NEO4J_URI", "neo4j://10.195.6.112:7687")  #
 username = os.getenv("NEO4J_USER", "neo4j")
 password = os.getenv("NEO4J_PASSWORD", "123")
 
 neo4jVersion = os.getenv("NEO4J_VERSION", "4")
 database = os.getenv("NEO4J_DATABASE", "neo4j")
 
-driver = GraphDatabase.driver(url, auth=basic_auth(username, password))
-
-def get_db():
-    if not hasattr(g, 'neo4j_db'):
-        if neo4jVersion.startswith("4"):
-            g.neo4j_db = driver.session(database=database)
-        else:
-            g.neo4j_db = driver.session()
-    return g.neo4j_db
-
-
-def query_design_episode_by_id(id: str):
-    pass
-
+@dataclass
 class DE:
     id: str
     description: str
 
-def query_all_design_episode_descriptions() -> list[DE]:
-    db = get_db()
-    all_id_and_description = db.read_transaction(lambda tx: list(tx.run("MATCH (n:DesignEpisode) RETURN id(n), n.Description")))
-    return list(map(lambda element: DE(id=element[0], description=element[1]), all_id_and_description))
+class Neo4JGraph:
+
+    def __init__(self):
+        self.driver = GraphDatabase.driver(uri, auth=(username, password))
+
+    def close(self):
+        self.driver.close()
+
+    @staticmethod
+    def _query_all_design_episode_descriptions(tx):
+        result = tx.run("MATCH (n:DesignEpisode) RETURN id(n), n.Description")
+        return [record.values() for record in result]
+    
+    def query_all_design_episode_descriptions(self) -> list[DE]:
+        with self.driver.session() as session:
+            all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions)
+            return list(map(lambda element: DE(id=element[0], description=element[1]), all_id_and_description))
+

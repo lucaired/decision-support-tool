@@ -1,21 +1,25 @@
+from dataclasses import dataclass
 import spacy
 
-from app.neo4j import query_all_design_episode_descriptions, DE
+from app.neo4j import Neo4JGraph, DE
 
-
-package = "en_core_web_lg"
-nlp = spacy.load(package)
-nlp.add_pipe('universal_sentence_encoder')
-
+@dataclass
 class MatchingResult:
     source_de_id: str
     result_de_id: str
     similarity: float
 
 def match_design_episodes_by_description(source_de_id: str) -> list[MatchingResult]:
-    all_design_episode_descriptions: list[DE] = query_all_design_episode_descriptions()
-    if not (source_de := all_design_episode_descriptions.filter(lambda de: de.id == source_de_id)):
+
+    neo = Neo4JGraph()
+    all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
+    print(all_design_episode_descriptions)
+    if not (source_de := filter(lambda de: de.id == source_de_id, all_design_episode_descriptions)):
         return []
+
+    package = "en_core_web_lg"
+    nlp = spacy.load(package)
+    nlp.add_pipe('universal_sentence_encoder')
 
     source_de = source_de[0]
     doc1 = nlp(source_de.description)
@@ -52,7 +56,11 @@ def match_design_episodes_by_description(source_de_id: str) -> list[MatchingResu
 
     return matching_results
 
-
 def get_best_matching_design_episodes(all_matchings: list[MatchingResult]) -> list[MatchingResult]:
-    # TODO: sort by similiary
-    return all_matchings
+    def useSimilarity(matching_result: MatchingResult):
+        return matching_result.similarity
+
+    all_matchings.sort(key=useSimilarity)
+    best_matching = all_matchings[-3:] if len(all_matchings) >= 3 else all_matchings
+    best_matching.reverse()
+    return best_matching

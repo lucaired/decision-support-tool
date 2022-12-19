@@ -23,7 +23,7 @@ class Project(BaseModel):
     name: str
     weights_set: dict[str, float] = Field(..., alias="weightsSets")
     tree: Tree = Field(...)
-    _id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
     class Config:
         arbitrary_types_allowed = True
@@ -82,20 +82,17 @@ class UpdateProject(BaseModel):
 
 
 def query_all_projects(): 
-    all_project = mongodb.projects.find().to_list(100)
-    return all_project
+    return mongodb.projects.find().to_list(100)
 
 async def query_project_by_id(id: str):
     return await mongodb.projects.find_one({"_id": id})
 
 async def delete_project(project_id: str): 
-    response = await mongodb.projects.delete_one({"_id": project_id})
-    return response
+    return await mongodb.projects.delete_one({"_id": project_id})
 
 async def create_project(project): 
     new_project = await mongodb.projects.insert_one(project)
-    created_project = await mongodb.projects.find_one({"_id": new_project.inserted_id})
-    return created_project
+    return await mongodb.projects.find_one({"_id": new_project.inserted_id})
 
 async def update_project(id, project_update): 
     update_result = await mongodb.projects.update_one({"_id": id}, {"$set": project_update})
@@ -107,7 +104,7 @@ async def update_project(id, project_update):
             return updated_project
 
 async def get_projects_by_design_episode_id(design_episode_ids: list[str]) -> list[Project]:
-    all_project = mongodb.projects.find().to_list(100)
+    all_project = mongodb.projects.find().to_list(1000)
     all_project_objects: list[Project] = list(map(lambda project_dict: Project.parse_obj(project_dict, all_project)))
     all_projects_with_design_episode_ids: list[(Project, list[str])] = list(map(lambda project: (project, project.tree.extract_all_design_episode_ids())))
     all_matched_projects_by_design_episode_ids: list[(Project, list[str])] = list(filter(lambda project_and_de_ids: project_and_de_ids[1] in design_episode_ids))

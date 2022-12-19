@@ -1,6 +1,6 @@
 fastapi==0.87.0
 spacy==3.4.3
-spacy-universal-sentence-encoder==0.4.5 
+spacy-universal-sentence-encoder==0.4.5
 pydantic==1.10.2
 pymongo==4.3.3
 python-dotenv==0.21.0 

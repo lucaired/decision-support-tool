@@ -76,6 +76,9 @@ export function RenderNode({
                         handleNodeControl(nodeDatum.id);
                         handleAddSibling(nodeDatum.id);
                     }}>↔</button>}
+                {nodeDatum.showNodeControl &&
+                    <button onClick={() => {
+                    }}>G</button>}
                 {nodeDatum.showNodeControl && nodeDatum.children?.length === 0 &&
                     <button onClick={() => {
                         handleNodeControl(nodeDatum.id);

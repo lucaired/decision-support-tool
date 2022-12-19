@@ -72,7 +72,7 @@ function DecisionTreeHandler() {
         // node handlers
     })
     const [activeNode, setActiveNode] = useState({})
-    const [activeAction, setActiveAction] = useState('')
+    const [activeAction, setModalActiveAction] = useState('')
 
 
     const handleNodeControl = (nodeId: string) => {
@@ -86,23 +86,22 @@ function DecisionTreeHandler() {
         setDecisionTree(tree)
     }
 
+    // modal handling
     const handleAddChild = (nodeId: string) => {
         setActiveNode({id: nodeId})
-        setActiveAction("addNodeChild")
+        setModalActiveAction("addNodeChild")
         handleNodeModalOpen()
     }
     const handleAddSibling = (nodeId: string) => {
         setActiveNode({id: nodeId})
-        setActiveAction("addNodeSibling")
+        setModalActiveAction("addNodeSibling")
         handleNodeModalOpen()
     }
-
-    // modal handling
     const [nodeModalOpen, setNodeModalOpen] = React.useState(false);
     const handleNodeModalOpen = () => setNodeModalOpen(true);
     const handleNodeModalClose = () => {
         setNodeModalOpen(false);
-        setActiveAction('')
+        setModalActiveAction('')
     }
 
     const nodeSize = {x: 200, y: 200};

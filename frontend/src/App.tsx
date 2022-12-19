@@ -140,10 +140,11 @@ function App() {
      // @ts-ignore
     const parseIncomingTree = (tree) => {
         const parsedTree = {
-            // @ts-ignore
             ...tree,
             // @ts-ignore
-            'designEpisodeIds': tree.designEpisodeIds.join(',')
+            'designEpisodeIds': tree.designEpisodeIds.join(','),
+            // @ts-ignore
+            'children': tree.children.map((child) => parseIncomingTree(child))
         }
         return parsedTree
     }
@@ -152,9 +153,11 @@ function App() {
     const parseOutgoingTree = (tree) => {
         const parsedTree = {
             // @ts-ignore
-            ...updateSet.tree,
+            ...tree,
             // @ts-ignore
-            'designEpisodeIds': updateSet.tree.designEpisodeIds.split(',')
+            'designEpisodeIds': tree.designEpisodeIds.split(','),
+            // @ts-ignore
+            'children': tree.children.map((child) => parseOutgoingTree(child))
         }
         return parsedTree
     }

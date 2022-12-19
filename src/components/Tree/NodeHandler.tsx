@@ -40,6 +40,7 @@ export const removeNodeChild = (tree: DecisionTree, nodeId?: string) => {
     }
 }
 
+// @ts-ignore
 export function RenderNode({
                                // @ts-ignore
                                nodeDatum,
@@ -54,7 +55,9 @@ export function RenderNode({
                                // @ts-ignore
                                handleAddSibling,
                                // @ts-ignore
-                               handleRemoveChild
+                               handleRemoveChild,
+                               // @ts-ignore
+                               activeVariantHandler
                            }) {
     return (
         <g>
@@ -66,6 +69,7 @@ export function RenderNode({
                 onClick={() => {
                     handleNodeControl(nodeDatum.id);
                     toggleNode();
+                    activeVariantHandler(nodeDatum)
                 }}
             />
             <foreignObject {...foreignObjectProps}>

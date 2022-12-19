@@ -10,52 +10,69 @@ import VariantExplorerMenu from "./components/VariantExplorerMenu";
 import Evaluation from "./components/GWP/Evaluation";
 
 function App() {
-  return (
-    <div className="App" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '5px'
-    }}>
-        <Box>
-            <Card variant="outlined">
-                <React.Fragment>
-                    <CardContent
-                        style={{
-                            height: '430px'
-                        }}
-                    >
-                        <DecisionTreeHandler/>
-                    </CardContent>
-                </React.Fragment>
-            </Card>
-        </Box>
-        <Box>
-            <Card variant="outlined">
-                <React.Fragment>
-                    <CardContent
-                        style={{
-                            height: '640px'
-                        }}
-                    >
-                        <VariantExplorerMenu/>
-                        <Evaluation neo4JReference={"AC-20-Smiley-West-10-Bldg.ifc"}/>
-                        {/* TODO: load stuff depending on the click here
-                            - implement state for the menu and clicked button there
-                            -
-                        <ForgeViewer
-                            local={true}
-                            path={'http://localhost:3000/0.svf'}
-                            //urn={urn}
-                            //testing={true}
-                            //token={token}
-                        />
-                        */}
-                    </CardContent>
-                </React.Fragment>
-            </Card>
-        </Box>
-    </div>
-  );
+    const [activeVariant, setActiveVariant] = React.useState({});
+    // @ts-ignore
+    const activeVariantHandler = (variant) => {
+        setActiveVariant(variant)
+    }
+
+    function emptyObject(activeVariant: {}) {
+        return activeVariant // 👈 null and undefined check
+        && Object.keys(activeVariant).length === 0
+        && Object.getPrototypeOf(activeVariant) === Object.prototype
+    }
+
+    // @ts-ignore
+    return (
+        <div className="App" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '5px'
+        }}>
+            <Box>
+                <Card variant="outlined">
+                    <React.Fragment>
+                        <CardContent
+                            style={{
+                                height: '430px'
+                            }}
+                        >
+                            <DecisionTreeHandler
+                                activeVariantHandler={activeVariantHandler}
+                            />
+                        </CardContent>
+                    </React.Fragment>
+                </Card>
+            </Box>
+            {!emptyObject(activeVariant) && <Box>
+                <Card variant="outlined">
+                    <React.Fragment>
+                        <CardContent
+                            style={{
+                                height: '640px'
+                            }}
+                        >
+                            <VariantExplorerMenu/>
+                            <Evaluation
+                                activeVariant={activeVariant}
+                            />
+                            {/* TODO: load stuff depending on the click here
+                                - implement state for the menu and clicked button there
+                                -
+                            <ForgeViewer
+                                local={true}
+                                path={'http://localhost:3000/0.svf'}
+                                //urn={urn}
+                                //testing={true}
+                                //token={token}
+                            />
+                            */}
+                        </CardContent>
+                    </React.Fragment>
+                </Card>
+            </Box>}
+        </div>
+    );
 }
 
 export default App;

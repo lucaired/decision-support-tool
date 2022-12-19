@@ -1,5 +1,5 @@
 import {useReadCypher} from "use-neo4j";
-import { useRef } from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {
     Chart as ChartJS,
@@ -26,25 +26,22 @@ ChartJS.register(
 );
 
 // @ts-ignore
-function Evaluation({neo4JReference}) {
+function Evaluation({activeVariant}) {
 
+    // TODO: remove this shit
     const [activeLevel, setActiveLevel] = React.useState('building');
     const activeLevelHandler = (level: string) => setActiveLevel(level);
-
-    const [buildingConfiguration, setBuildingConfiguration] = React.useState({});
-    const buildingConfigurationHandler = (key: string, value: string) => {
-        setBuildingConfiguration({
-            ...buildingConfiguration,
-            key: value
-        })
-    }
 
     // use essential building elements for BoQ
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
         'WHERE (not (element:Space))'+
         'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal'
-    const params = {ifcmodel: neo4JReference}
-    const { loading, records } = useReadCypher(q, params)
+    const { loading, records, run, } = useReadCypher(q, {ifcmodel: activeVariant.neo4JReference})
+
+    useEffect(() => {
+        console.log(activeVariant.neo4JReference)
+        run({ifcmodel: activeVariant.neo4JReference}).then(r=>{console.log(r)})
+     }, [ activeVariant ])
 
     if ( loading ) return (<div>Loading...</div>)
 

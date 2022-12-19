@@ -27,7 +27,8 @@ const modalStyle = {
     p: 4,
 };
 
-function DecisionTreeHandler() {
+// @ts-ignore
+function DecisionTreeHandler({activeVariantHandler}) {
     // node handling
     const [decisionTree, setDecisionTree] = useState({
         name: 'Building.Lab Project',
@@ -93,6 +94,7 @@ function DecisionTreeHandler() {
                     handleAddChild: handleAddChild,
                     handleAddSibling: handleAddSibling,
                     handleRemoveChild: handleRemoveChild,
+                    activeVariantHandler: activeVariantHandler
                 })
             }
         />

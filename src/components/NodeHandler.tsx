@@ -1,8 +1,8 @@
-export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: any };
+export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: any; neo4JReference: string };
 
-export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, newNode?: DecisionTree) => void, newNode?: DecisionTree) => {
+export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {
-        func(tree, newNode)
+        func(tree,id, newNode)
     } else {
         if (tree.children) {
             tree.children.map((child: any) => setNodeProperty(child, id, func, newNode))
@@ -23,14 +23,15 @@ export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tre
 export const setNodeControl = (tree: DecisionTree) => {
     tree.showNodeControl = !tree.showNodeControl;
 }
-export const addNodeChild = (tree: DecisionTree, child?: DecisionTree) => {
+export const addNodeChild = (tree: DecisionTree, id?: string, child?: DecisionTree) => {
     tree.children = tree.children ? [...tree.children, child] : [child]
 }
+
 export const removeNodeChild = (tree: DecisionTree, nodeId?: string) => {
     if (tree.children) {
-        const childIndex = tree.children.indexOf((child: DecisionTree) => child.id == nodeId, 0)
+        const childIndex = tree.children.indexOf((child: DecisionTree) => child.id === nodeId, 0)
         tree.children.splice(childIndex, 1)
-        if (tree.children.lenght == 0) {
+        if (tree.children.lenght === 0) {
             tree.children = undefined
         }
     }
@@ -75,7 +76,7 @@ export function RenderNode({
                         handleNodeControl(nodeDatum.id);
                         handleAddSibling(nodeDatum.id);
                     }}>↔</button>}
-                {nodeDatum.showNodeControl && !nodeDatum.children &&
+                {nodeDatum.showNodeControl && nodeDatum.children?.length === 0 &&
                     <button onClick={() => {
                         handleNodeControl(nodeDatum.id);
                         handleRemoveChild(nodeDatum.id);

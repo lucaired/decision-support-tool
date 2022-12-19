@@ -6,7 +6,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {DecisionTree} from "./NodeHandler";
-import NodeName from './NodeName';
+import NodeStringPropInput from './NodeName';
 
 const steps = ['Enter basic information', 'Upload BIM', 'Enter Neo4j graph reference'];
 
@@ -16,10 +16,10 @@ export default function VariantCreatorStepper({
 // @ts-ignore
                                                   setDecisionTree,
 // @ts-ignore
-                                                  setNodeProperty,
+                                                  setProperty,
 // @ts-ignore
 
-                                                  addNodeChild,
+                                                  addProperty,
 // @ts-ignore
                                                   activeNodeId: activeNode,
 // @ts-ignore
@@ -36,7 +36,8 @@ export default function VariantCreatorStepper({
             level: 'Building Part Type',
         },
         id: (Math.random() + 1).toString(36).substring(7),
-        showNodeControl: false
+        showNodeControl: false,
+        neo4JReference: ''
     })
 
     const handleNext = () => {
@@ -49,7 +50,7 @@ export default function VariantCreatorStepper({
 
     const handleComplete = () => {
         let tree = {...decisionTree};
-        setNodeProperty(tree, activeNode.id, addNodeChild, node)
+        setProperty(tree, activeNode.id, addProperty, node)
         setDecisionTree(tree)
         setActiveNodeId({id: undefined})
         setActiveStep(0);
@@ -59,7 +60,7 @@ export default function VariantCreatorStepper({
     return (
         <Box sx={{width: '100%'}}>
             <Stepper activeStep={activeStep}>
-                {steps.map((label, index) => {
+                {steps.map((label) => {
                     const stepProps: { completed?: boolean } = {};
                     const labelProps: {} = {};
                     return (
@@ -81,9 +82,17 @@ export default function VariantCreatorStepper({
                 </React.Fragment>
             ) : (
                 <React.Fragment>
-                        {activeStep == 0 && <NodeName
+                        {activeStep == 0 && <NodeStringPropInput
                             node={node}
                             setNode={setNode}
+                            property={'name'}
+                            propertyName={'Name'}
+                        />}
+                        {activeStep == 2 && <NodeStringPropInput
+                            node={node}
+                            setNode={setNode}
+                            property={'neo4JReference'}
+                            propertyName={'Neo4j Reference'}
                         />}
                         <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                             <Button

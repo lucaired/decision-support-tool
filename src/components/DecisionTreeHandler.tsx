@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {useState} from 'react';
 import Tree from "react-d3-tree";
-import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
@@ -37,6 +36,7 @@ function DecisionTreeHandler() {
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
+        neo4JReference: '',
         children: [
             {
                 name: 'Bricks',
@@ -45,6 +45,8 @@ function DecisionTreeHandler() {
                 },
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
+                neo4JReference: '',
+                children: []
             },
             {
                 name: 'Wood',
@@ -53,6 +55,8 @@ function DecisionTreeHandler() {
                 },
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
+                neo4JReference: '',
+                children: []
             },
             {
                 name: 'Reinforced Concrete',
@@ -61,36 +65,45 @@ function DecisionTreeHandler() {
                 },
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
+                neo4JReference: '',
+                children: []
             },
         ],
         // node handlers
     })
     const [activeNode, setActiveNode] = useState({})
+    const [activeAction, setActiveAction] = useState('')
+
+
     const handleNodeControl = (nodeId: string) => {
         let tree = {...decisionTree};
         setNodeProperty(tree, nodeId, setNodeControl)
         setDecisionTree(tree)
-    }
-    const handleAddChild = (nodeId: string) => {
-        setActiveNode({id: nodeId})
-        handleNodeModalOpen()
     }
     const handleRemoveChild = (nodeId: string) => {
         let tree = {...decisionTree};
         setParentNodeProperty(tree, nodeId, removeNodeChild)
         setDecisionTree(tree)
     }
+
+    const handleAddChild = (nodeId: string) => {
+        setActiveNode({id: nodeId})
+        setActiveAction("addNodeChild")
+        handleNodeModalOpen()
+    }
     const handleAddSibling = (nodeId: string) => {
-        // let tree = {...decisionTree};
-        // setParentNodeProperty(tree, nodeId, addNodeChild)
-        // setDecisionTree(tree)
+        setActiveNode({id: nodeId})
+        setActiveAction("addNodeSibling")
+        handleNodeModalOpen()
     }
 
     // modal handling
     const [nodeModalOpen, setNodeModalOpen] = React.useState(false);
     const handleNodeModalOpen = () => setNodeModalOpen(true);
-    const handleNodeModalClose = () => setNodeModalOpen(false);
-
+    const handleNodeModalClose = () => {
+        setNodeModalOpen(false);
+        setActiveAction('')
+    }
 
     const nodeSize = {x: 200, y: 200};
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
@@ -120,23 +133,30 @@ function DecisionTreeHandler() {
             open={nodeModalOpen}
             onClose={handleNodeModalClose}
             closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
         >
             <Fade in={nodeModalOpen}>
                 <Box sx={modalStyle}>
                     <h1>New design variant</h1>
+                    {activeAction === 'addNodeChild' &&
                     <VariantCreatorStepper
                         decisionTree={decisionTree}
                         setDecisionTree={setDecisionTree}
-                        setNodeProperty={setNodeProperty}
-                        addNodeChild={addNodeChild}
+                        setProperty={setNodeProperty}
+                        addProperty={addNodeChild}
                         activeNodeId={activeNode}
                         setActiveNodeId={setActiveNode}
                         handleNodeModalClose={handleNodeModalClose}
-                    />
+                    />}
+                    {activeAction === 'addNodeSibling' &&
+                        <VariantCreatorStepper
+                            decisionTree={decisionTree}
+                            setDecisionTree={setDecisionTree}
+                            setProperty={setParentNodeProperty}
+                            addProperty={addNodeChild}
+                            activeNodeId={activeNode}
+                            setActiveNodeId={setActiveNode}
+                            handleNodeModalClose={handleNodeModalClose}
+                        />}
                 </Box>
             </Fade>
         </Modal>

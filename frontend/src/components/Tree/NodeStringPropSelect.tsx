@@ -1,8 +1,5 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
-import {DecisionLevel} from "./DecisionTreeHandler";
 
 // @ts-ignore
 export default function NodeStringPropSelect({node, setNode, property, propertyName, options}) {

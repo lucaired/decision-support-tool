@@ -37,7 +37,8 @@ export default function VariantCreatorStepper({
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
-        neo4JReference: ''
+        neo4JReference: '',
+        forgeReference: ''
     })
 
     const handleNext = () => {
@@ -87,6 +88,12 @@ export default function VariantCreatorStepper({
                             setNode={setNode}
                             property={'name'}
                             propertyName={'Name'}
+                        />}
+                        {activeStep === 1 && <NodeStringPropInput
+                            node={node}
+                            setNode={setNode}
+                            property={'forgeReference'}
+                            propertyName={'Forge Cloud Reference'}
                         />}
                         {activeStep === 2 && <NodeStringPropInput
                             node={node}

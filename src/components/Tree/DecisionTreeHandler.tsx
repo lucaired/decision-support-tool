@@ -37,6 +37,7 @@ function DecisionTreeHandler() {
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
         neo4JReference: '',
+        forgeReference: '',
         children: [
             {
                 name: 'Bricks',
@@ -46,6 +47,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
+                forgeReference: '',
                 children: []
             },
             {
@@ -56,6 +58,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
+                forgeReference: '',
                 children: []
             },
             {
@@ -66,6 +69,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
+                forgeReference: '',
                 children: []
             },
         ],

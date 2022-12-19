@@ -9,6 +9,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Box from "@mui/material/Box";
+import Tooltip from '@mui/material/Tooltip';
+
 import StringPropInput from "../Tree/NodeStringPropInput";
 import Typography from "@mui/material/Typography";
 
@@ -192,7 +194,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
             return update
         }, {'user': 'Total Score', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]})
         // @ts-ignore
-        setTotalSubjectiveEvaluation((oldTotal) => totalEvaluation)
+        setTotalSubjectiveEvaluation((totalSubjectiveEvaluation) => totalEvaluation)
     }
 
     const mergeCriteriaGroupScores = (left: { label: string, rating: number }[], right: { label: string, rating: number }[]) => {
@@ -496,6 +498,49 @@ function RatingConstructor(factorLabel: string) {
     }
 }
 
+function tooltipForCriterion(criterion: {
+    label: string;
+    rating: number;
+}) {
+    switch (criterion.label) {
+        case 'Safety':
+            return 'Security contributes to social and economic stability. Users should feel' +
+                'safe in the building itself, as well as in its environment and be protected' +
+                'as far as possible. Accordingly, the objective hazard potentials (e.g. site-' +
+                'specific natural hazards such as flooding, stumbling blocks, fire, etc.)' +
+                'should be eliminated as far as possible and the subjective sense of' +
+                'security (e.g. clarity, social control / animation, good visibility, etc.) should' +
+                'be strengthen.'
+        case 'Sound insulation':
+            return 'Unwanted noise and acoustic conditions affect the well-being and can' +
+                'affect the health. By appropriate conceptual and structural measures' +
+                'pleasant acoustic conditions are to be established. This applies equally to' +
+                'the structural sound insulation against external noise and noise pollution' +
+                'between different rooms.'
+        case 'Accessibility':
+            return 'Based on the existing or projected road and traffic network, an external and internal development concept is to be developed that ensures good networking with the neighborhood, unmistakable orientation options, good clarity and secure accessibility. A high degree of cycling comfort should support the development of environmentally friendly mobility.'
+        case 'Public accessibility':
+            return 'A high degree of public accessibility promotes the integration and acceptance of the buildings within the neighborhood.'
+        case 'Barrier-free access':
+            return 'The barrier-free design should ensure unrestricted freedom of movement, increase communication in the building and enhance the spatial qualities of architecture and open space.'
+        case 'Social integration spaces':
+            return 'Caring for social contacts supports responsibility, creativity and building social networks. This is promoted by semi-public areas, communication-' +
+                'promoting develooment and meeting areas and a well-coordinated interaction of the private, semi-public and public' +
+                'areas of buildings and their environment. In addition, the widest possible' +
+                'range of accommodation options should promote communication.'
+        case 'User and task-specific image':
+            return 'A proper self-presentation and identity formation can be achieved through equilibrium between the usability and design.'
+        case 'Building quality':
+            return 'As a contribution to the building culture the building ensemble should be of a high design quality and should have a specific Identity, as well as it should contribute to solution of current social problems.'
+        case 'External space quality':
+            return 'Creation of optimal local and user-specific social spaces for urban spaces and ground floor areas, as well as design of the roof as \'Fifth facade to promote a three-dimensional cityscape.'
+        case 'Urban integration':
+            return 'The building will significantly characterize the surrounding buildings and public street spaces. A solitaire is expected as an accent in the urban space, but at the same time it should fit the neighborhood, blend with the environment and altogether support the urban image of a place.'
+        default:
+            return ""
+    }
+}
+
 function SubjectiveEvaluationSurvey({
 // @ts-ignore
                                         factorRating,
@@ -576,6 +621,7 @@ function SubjectiveEvaluationSurvey({
                         </Typography>
                         {/* @ts-ignore */}
                         {criteriaGroup.criteria?.map((criterion) =>
+                            <Tooltip title={tooltipForCriterion(criterion)}>
                             <Paper
                                 variant="outlined"
                                 style={{
@@ -605,6 +651,7 @@ function SubjectiveEvaluationSurvey({
                                     <p>excellent</p>
                                 </Stack>
                             </Paper>
+                            </Tooltip>
                         )}
                     </Card>
                 </div>

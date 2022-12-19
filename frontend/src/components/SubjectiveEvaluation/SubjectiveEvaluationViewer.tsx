@@ -97,7 +97,7 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
 }
 
 // @ts-ignore
-function SubjectiveEvaluationViewer({activeVariantId}) {
+function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
 
     useEffect(() => {
         axios.get(`http://localhost:80/surveys/${activeVariantId}`)
@@ -283,21 +283,20 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 setCurrentUserEvaluation={setCurrentUserEvaluation}
                 currentUserEvaluation={currentUserEvaluation}
                 handleSubjectiveEvaluationUpdate={handleSubjectiveEvaluationUpdate}
+                weightsSets={weightsSets}
             /> :
             <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                 {subjectiveEvaluations.length > 1 &&
                     // show aggregated score over all users
                     <SubjectiveEvaluationTable
                         subjectiveEvaluations={[totalSubjectiveEvaluation]}
-                        toggleShowSubjectiveEvaluationSurvey={() => {
-                        }}
-                        setCurrentUserEvaluation={() => {
-                        }}
-                        handleSubjectiveEvaluationRemoval={() => {
-                        }}
+                        toggleShowSubjectiveEvaluationSurvey={() => {}}
+                        setCurrentUserEvaluation={() => {}}
+                        handleSubjectiveEvaluationRemoval={() => {}}
                         globalFactorWeight={1 / subjectiveEvaluations.length}
                         disableEvaluationRemoval={true}
                         subjectiveEvaluationStyle={{border: 'solid #1976d2 1.5px', marginBottom: '10px'}}
+                        weightsSets={weightsSets}
                     />
                 }
                 <SubjectiveEvaluationTable
@@ -308,6 +307,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                     globalFactorWeight={1}
                     disableEvaluationRemoval={false}
                     subjectiveEvaluationStyle={{}}
+                    weightsSets={weightsSets}
                 />
                 <Button
                     onClick={() => handleRatingModalOpen()}
@@ -340,9 +340,9 @@ function computeFactorScore(evaluation: object, globalFactorWeight: number): num
     return Math.round(score * 100) / 100
 }
 
-function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, globalFactorWeight: any }) {
+function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, globalFactorWeight: any, weightsSets: any }) {
     const criteriaGroupScore = computeCriteriaGroupScore(props.criteriaGroup, props.globalFactorWeight)
-    const maxScore = props.criteriaGroup.criteria.length * weightForCriteriaGroup(props.criteriaGroup.label) * 3
+    const maxScore = props.criteriaGroup.criteria.length * weightForCriteriaGroup(props.criteriaGroup.label, props.weightsSets) * 3
     const scoreLabel = `${criteriaGroupScore}/${maxScore}`
 
     return <Paper
@@ -362,11 +362,11 @@ function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, gl
     </Paper>;
 }
 
-function FactorScore(props: { factorRating: any, globalFactorWeight: any }) {
+function FactorScore(props: { factorRating: any, globalFactorWeight: any, weightsSets: any }) {
     const criteriaGroupScore = computeFactorScore(props.factorRating, props.globalFactorWeight)
     // @ts-ignore
     const maxScore = props.factorRating.criteriaGroups.reduce((acc, criteriaGroup) =>
-            acc + criteriaGroup.criteria.length * weightForCriteriaGroup(criteriaGroup.label) * 3
+            acc + criteriaGroup.criteria.length * weightForCriteriaGroup(criteriaGroup.label, props.weightsSets) * 3
         , 0)
     const scoreLabel = `${criteriaGroupScore}/${maxScore}`
 
@@ -400,6 +400,8 @@ function SubjectiveEvaluationTable({
                                        disableEvaluationRemoval,
                                        // @ts-ignore
                                        subjectiveEvaluationStyle,
+                                       // @ts-ignore
+                                       weightsSets
                                    }) {
 
     // @ts-ignore
@@ -435,20 +437,29 @@ function SubjectiveEvaluationTable({
                         style={{display: "flex", flexDirection: "row", gap: "5px"}}
                         key={`${factorRating.label}`}
                     >
-                        <FactorScore factorRating={factorRating} globalFactorWeight={globalFactorWeight}/>
+                        <FactorScore 
+                            factorRating={factorRating} 
+                            globalFactorWeight={globalFactorWeight}
+                            weightsSets={weightsSets}
+                        />
                         <div style={{display: "flex", gap: "5px"}}>
                             {/* @ts-ignore */}
                             {factorRating.criteriaGroups.sort((groupA, groupB) => {
                                 return groupA.label < groupB.label ? -1 :
                                     groupA.label > groupB.label ? 1 : 0;
                             }).map((criteriaGroup: { label: string }) =>
-                                <CriteriaGroupScore key={`${criteriaGroup.label}`} onClick={() => {
-                                    toggleShowSubjectiveEvaluationSurvey(true)
-                                    setCurrentUserEvaluation({
-                                        user: evaluation.user,
-                                        factorLabel: factorRating.label
-                                    })
-                                }} criteriaGroup={criteriaGroup} globalFactorWeight={globalFactorWeight}/>
+                                <CriteriaGroupScore 
+                                    key={`${criteriaGroup.label}`} 
+                                    onClick={() => {
+                                        toggleShowSubjectiveEvaluationSurvey(true)
+                                        setCurrentUserEvaluation({
+                                            user: evaluation.user,
+                                            factorLabel: factorRating.label
+                                        })
+                                    }} 
+                                    criteriaGroup={criteriaGroup} globalFactorWeight={globalFactorWeight}
+                                    weightsSets={weightsSets}
+                                />
                             )}
                         </div>
                     </div>)}
@@ -643,21 +654,13 @@ function tooltipForCriterionRating(criterion: {
     }
 }
 
-function weightForCriteriaGroup(label: string): number {
-    switch (label.toLowerCase()) {
-        case 'comfort and health':
-            return 2
-        case 'design quality':
-            return 1
-        case 'functionality':
-            return 1
-        default:
-            return 1
-    }
+//@ts-ignore
+function weightForCriteriaGroup(label: string, weightsSets): number {
+    return weightsSets[label]
 }
 
 function SubjectiveEvaluationSurvey({
-// @ts-ignore
+                                        // @ts-ignore
                                         factorRating,
                                         // @ts-ignore
                                         handleShowSubjectiveEvaluationSurvey,
@@ -666,7 +669,9 @@ function SubjectiveEvaluationSurvey({
                                         // @ts-ignore
                                         currentUserEvaluation,
                                         // @ts-ignore
-                                        handleSubjectiveEvaluationUpdate
+                                        handleSubjectiveEvaluationUpdate,
+                                        // @ts-ignore
+                                        weightsSets
                                     }) {
 
     const [rating, setRating] = React.useState(factorRating);
@@ -675,7 +680,7 @@ function SubjectiveEvaluationSurvey({
         setRating(RatingConstructor(currentUserEvaluation.factorLabel))
     }
 
-    function handleChange(newValue: number, criteriaGroupLabel: string, criterionLabel: string) {
+    function handleChange(newValue: number, criteriaGroupLabel: string, criterionLabel: string, weightsSets: any) {
         // @ts-ignore
         const criteriaGroupIndex = rating.criteriaGroups.findIndex((criteriaGroup) => criteriaGroup.label === criteriaGroupLabel)
         if (criteriaGroupIndex !== -1) {
@@ -687,7 +692,7 @@ function SubjectiveEvaluationSurvey({
                 setRating(rating => {
                     let update = {...rating}
                     let criterion = criteriaGroup.criteria[criterionIndex]
-                    criterion.rating = newValue * weightForCriteriaGroup(criteriaGroupLabel)
+                    criterion.rating = newValue * weightForCriteriaGroup(criteriaGroupLabel, weightsSets)
                     criteriaGroup.criteria[criterionIndex] = criterion
                     update.criteriaGroups[criteriaGroupIndex] = criteriaGroup
                     return update
@@ -753,10 +758,10 @@ function SubjectiveEvaluationSurvey({
                                             <p>poor</p>
                                             <Slider
                                                 aria-label="Rating"
-                                                defaultValue={criterion.rating / weightForCriteriaGroup(criteriaGroup.label)}
-                                                value={criterion.rating / weightForCriteriaGroup(criteriaGroup.label)}
+                                                defaultValue={criterion.rating / weightForCriteriaGroup(criteriaGroup.label, weightsSets)}
+                                                value={criterion.rating / weightForCriteriaGroup(criteriaGroup.label, weightsSets)}
                                                 onChange={(event: Event, newValue: number | number[]) => {
-                                                    handleChange(newValue as number, criteriaGroup.label, criterion.label)
+                                                    handleChange(newValue as number, criteriaGroup.label, criterion.label, weightsSets)
                                                 }}
                                                 valueLabelDisplay="auto"
                                                 step={1}

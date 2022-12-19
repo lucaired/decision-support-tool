@@ -37,7 +37,7 @@ export function NewProjectModal({
         const saveProject = () => {
             const newProject = {
                 name: project.name,
-                weightsSet: {
+                weightsSets: {
                     "Design Quality": parseFloat(project["Design Quality"]),
                     "Comfort and health": parseFloat(project["Comfort and health"]),
                     "Functionality": parseFloat(project["Functionality"])

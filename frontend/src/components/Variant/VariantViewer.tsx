@@ -13,11 +13,12 @@ import DesignEpisode from "../../components/DesignRationale/DesignEpisode";
 import { DecisionTree } from '../../components/Tree/NodeHandler';
 
 interface VariantViewerProps {
+    activeProject?: any;
     activeVariant?: DecisionTree;
     activeVariantHandler: (activeVariant: DecisionTree) => void
 }
 
-function VariantViewer({activeVariant, activeVariantHandler}: VariantViewerProps) {
+function VariantViewer({activeProject, activeVariant, activeVariantHandler}: VariantViewerProps) {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
     const activeVariantExplorationHandler = (index: number) => {
         if (0 <= index && index <= 3) {
@@ -94,6 +95,8 @@ function VariantViewer({activeVariant, activeVariantHandler}: VariantViewerProps
                                                     key={"subjective-evaluation-viewer"}
                                                     // @ts-ignore
                                                     activeVariantId={activeVariant.id}
+                                                    // @ts-ignore
+                                                    weightsSets={activeProject.weightsSet}
                                                 />
                                             </div>
                                             : activeVariantExplorationIndex === 4 ?

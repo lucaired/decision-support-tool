@@ -104,6 +104,7 @@ function App() {
                 toggleDrawer={toggleDrawer}
             />
             <VariantViewer 
+                activeProject={activeProject} 
                 activeVariant={activeVariant} 
                 activeVariantHandler={activeVariantHandler}
                 />

@@ -740,9 +740,8 @@ function SubjectiveEvaluationSurvey({
                             {criteriaGroup.label}
                         </Typography>
                         {/* @ts-ignore */}
-                        {criteriaGroup.criteria?.map((criterion) =>
-                            <Tooltip placement="top" title={tooltipForCriterion(criterion)}>
-                                <Tooltip placement="bottom" title={tooltipForCriterionRating(criterion).join('|')}>
+                        {criteriaGroup.criteria?.map((criterion, index) =>
+                            <Tooltip key={`criteria-tooltip-${index}`} placement="top" title={tooltipForCriterion(criterion)}>
                                     <Paper
                                         variant="outlined"
                                         style={{
@@ -772,7 +771,6 @@ function SubjectiveEvaluationSurvey({
                                             <p>excellent</p>
                                         </Stack>
                                     </Paper>
-                                </Tooltip>
                             </Tooltip>
                         )}
                     </Card>

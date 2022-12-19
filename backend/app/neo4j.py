@@ -11,7 +11,7 @@ database = os.getenv("NEO4J_DATABASE", "neo4j")
 
 @dataclass
 class DE:
-    id: str
+    Guid: str
     description: str
 
 class Neo4JGraph:
@@ -24,11 +24,11 @@ class Neo4JGraph:
 
     @staticmethod
     def _query_all_design_episode_descriptions(tx):
-        result = tx.run("MATCH (n:DesignEpisode) RETURN id(n), n.Description")
+        result = tx.run("MATCH (n:DesignEpisode) RETURN n.Guid, n.Description")
         return [record.values() for record in result]
     
     def query_all_design_episode_descriptions(self) -> list[DE]:
         with self.driver.session() as session:
             all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions)
-            return list(map(lambda element: DE(id=element[0], description=element[1]), all_id_and_description))
+            return list(map(lambda element: DE(Guid=element[0], description=element[1]), all_id_and_description))
 

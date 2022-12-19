@@ -1,3 +1,4 @@
+import contextlib
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
@@ -103,10 +104,27 @@ async def update_project(id, project_update):
         ) is not None:
             return updated_project
 
-async def get_projects_by_design_episode_id(design_episode_ids: list[str]) -> list[Project]:
-    all_project = mongodb.projects.find().to_list(1000)
-    all_project_objects: list[Project] = list(map(lambda project_dict: Project.parse_obj(project_dict, all_project)))
-    all_projects_with_design_episode_ids: list[(Project, list[str])] = list(map(lambda project: (project, project.tree.extract_all_design_episode_ids())))
-    all_matched_projects_by_design_episode_ids: list[(Project, list[str])] = list(filter(lambda project_and_de_ids: project_and_de_ids[1] in design_episode_ids))
+async def get_projects_by_design_episode_guid(design_episode_ids: list[str]) -> list[Project]:
+    all_project = await mongodb.projects.find().to_list(1000)
+    all_project_objects: list[Project] = list(map(lambda project_dict: Project.parse_obj(project_dict), all_project))
+    
+    all_projects_with_design_episode_ids: list[(Project, list[str])] = \
+        list(
+            map(
+                lambda project: (project, project.tree.extract_all_design_episode_ids()),
+                all_project_objects
+                )
+            )
+    gen = (
+        project_with_de_ids for project_with_de_ids in all_projects_with_design_episode_ids
+        if [value for value in project_with_de_ids[1] if value in design_episode_ids]
+    )
+
+    all_matched_projects_by_design_episode_ids = []
+
+    with contextlib.suppress(StopIteration):
+        poject = next(gen)
+        all_matched_projects_by_design_episode_ids.append(poject)
+
     return list(map(lambda project_and_de_ids: project_and_de_ids[0], all_matched_projects_by_design_episode_ids))
     

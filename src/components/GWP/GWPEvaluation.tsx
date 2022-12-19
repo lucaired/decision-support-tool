@@ -30,7 +30,7 @@ function GWPEvaluation({activeVariant}) {
     // use essential building elements for BoQ
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
         'WHERE (not (element:Space))' +
-        'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal'
+        'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal, element.materials'
     const {loading, records, run,} = useReadCypher(q, {ifcmodel: activeVariant.neo4JReference})
 
     useEffect(() => {
@@ -45,19 +45,20 @@ function GWPEvaluation({activeVariant}) {
     if (loading) return (<div>Loading...</div>)
 
     return <div>
-            <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
-            <BuildingEvaluation
-                records={records}
-                decisionLevel={decisionLevel}
-                handleSetDecisionLevel={handleSetDecisionLevel}
-            />
-        </div>
+        <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
+        <BuildingEvaluation
+            records={records}
+            decisionLevel={decisionLevel}
+            handleSetDecisionLevel={handleSetDecisionLevel}
+        />
+    </div>
 }
 
 // @ts-ignore
 function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
-    let elementsByElementType = new Map<string, number>();
+    let elementAreasByElementType = new Map<string, number>();
+    let elementsMaterialLayerByType = new Map<string, string[]>();
 
     const [elementIndex, setElementIndex] = React.useState(-1);
     const handleElementIndex = (index: number) => {
@@ -82,14 +83,22 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
         const key = `${label}${loadBearing ? ' load-bearing' : ''}${isExternal ? ' external' : ''}`
 
-        let totalElementArea = elementsByElementType.get(key)
+        let totalElementArea = elementAreasByElementType.get(key)
         totalElementArea = totalElementArea ? totalElementArea += totalRecordArea : totalRecordArea
 
-        elementsByElementType.set(key, totalElementArea || 0)
+        elementAreasByElementType.set(key, totalElementArea || 0)
+
+        if (elementsMaterialLayerByType.has(key)) {
+            elementsMaterialLayerByType.set(key, [...elementsMaterialLayerByType.get(key) || [], record.get('element.materials')])
+        } else {
+            elementsMaterialLayerByType.set(key, [record.get('element.materials')])
+        }
 
         totalBuildingArea += totalElementArea || 0
     })
-    
+
+    console.log(elementsMaterialLayerByType)
+
     const chartRef = useRef();
 
     // get element index from the data-series
@@ -115,26 +124,44 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         },
     };
 
+    const getLayersForElementType = () => {
+        const elementType = Array.from(elementAreasByElementType.keys())[elementIndex]
+        const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType) || []
+        // TODO: extract the materials for the layers too
+        // TODO: set right es6 target
+        // @ts-ignore
+        const layers = [...new Set(elementsMaterialLayers
+            .filter((layers: string) => layers !== undefined && layers !== null)
+            .map((layers: string) => {
+                let layersObject = JSON.parse(layers)
+                return Object.keys(layersObject)
+            })
+            .flat())
+            ]
+
+        return layers
+    }
+
     const getLabels = () => {
-        return decisionLevel === 0 ? ['Whole Building']:
-            decisionLevel === 1 ? Array.from(elementsByElementType.keys()):
-            decisionLevel === 2 ? ["Layer 1", "Layer 2", "Layer 3", "Layer 4"]:
-            decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"]:
-                []
+        return decisionLevel === 0 ? ['Whole Building'] :
+            decisionLevel === 1 ? Array.from(elementAreasByElementType.keys()) :
+                decisionLevel === 2 ? getLayersForElementType() :
+                    decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"] :
+                        []
     }
 
     const getData = () => {
-        return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5]:
-            decisionLevel === 1 ? Array.from(elementsByElementType.values()).map(value => [value * Math.random(), value]):
-                decisionLevel === 2 ? ["Wood frame 1", "Wood frame 2", "Wood solid 1", "Wood solid 2"].map(() => {
+        return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5] :
+            decisionLevel === 1 ? Array.from(elementAreasByElementType.values()).map(value => [value * Math.random(), value]) :
+                decisionLevel === 2 ? getLayersForElementType().map(() => {
                         let gwp: number = faker.datatype.number({min: 0, max: 1000})
                         return [gwp, gwp * 2]
-                    }):
+                    }) :
                     decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"].map(() => {
-                        let gwp: number = faker.datatype.number({min: 0, max: 1000})
-                        return [gwp, gwp * 2]
-                    }):
-                    []
+                            let gwp: number = faker.datatype.number({min: 0, max: 1000})
+                            return [gwp, gwp * 2]
+                        }) :
+                        []
     }
 
     const data = {
@@ -157,12 +184,12 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     return (
         <div>
             {decisionLevel !== 0 && <Button onClick={() => handleChartNavigation()}>Back</Button>}
-             <Bar
+            <Bar
                 options={options}
                 data={data}
                 ref={chartRef}
                 onClick={(event) => onClick(event, handleElementIndex)}
-             />
+            />
         </div>
     );
 }

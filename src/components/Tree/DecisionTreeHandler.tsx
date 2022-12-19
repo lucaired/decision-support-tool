@@ -33,14 +33,14 @@ export type DecisionLevel = 'construction' | 'building-part'
 function DecisionTreeHandler({activeVariantHandler}) {
     // node handling
     const [decisionTree, setDecisionTree] = useState({
-        name: 'Building.Lab Project',
+        name: 'V1-1',
         attributes: {
             level: 'Building Level',
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
-        neo4JReference: 'AC-20-Smiley-West-10-Bldg.ifc',
-        bimReference: 'AC-20-Smiley-West-10-Bldg',
+        neo4JReference: 'V1-1.ifc',
+        bimReference: 'enter urn',
         decisionLevel: 'construction' as DecisionLevel,
         children: [],
     })

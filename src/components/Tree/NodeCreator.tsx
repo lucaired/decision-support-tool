@@ -38,7 +38,7 @@ export default function VariantCreatorStepper({
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
-        neo4JReference: 'AC-20-Smiley-West-10-Bldg.ifc',
+        neo4JReference: 'V1-1.ifc',
         decisionLevel: 'construction',
         bimReference: ''
     })

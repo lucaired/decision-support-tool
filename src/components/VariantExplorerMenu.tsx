@@ -14,7 +14,6 @@ function VariantExplorerMenu({activeVariantExplorationHandler, activeVariantExpl
         </Button>;
     }
 
-
     return <div
         style={{
             display: "flex",

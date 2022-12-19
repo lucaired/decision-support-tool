@@ -1,3 +1,4 @@
 .DS_Store
 data/
-backend/app/routers/__pycache__/
+backend/app/routers/__pycache__/*
+backend/app/routers/__pycache__/survey.cpython-310.pyc

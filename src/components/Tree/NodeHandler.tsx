@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
 
-export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: Array<DecisionTree>; neo4JReference: string, forgeReference: string };
+export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: Array<DecisionTree>; neo4JReference: string, bimReference: string };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {
@@ -30,7 +30,6 @@ export const addNodeChild = (tree: DecisionTree, id?: string, child?: DecisionTr
         tree.children = tree.children ? [...tree.children, child] : [child]
     }
 }
-
 export const removeNodeChild = (tree: DecisionTree, nodeId?: string) => {
     if (tree.children) {
         let childIndex = tree.children.findIndex((child: DecisionTree) => child.id === nodeId)
@@ -63,6 +62,7 @@ export function RenderNode({
                 width="20"
                 height="20"
                 x="-10"
+                fill="lightgrey"
                 onClick={() => {
                     handleNodeControl(nodeDatum.id);
                     toggleNode();

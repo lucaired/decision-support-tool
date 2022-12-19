@@ -37,7 +37,7 @@ function DecisionTreeHandler() {
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
         neo4JReference: '',
-        forgeReference: '',
+        bimReference: '',
         children: [
             {
                 name: 'Bricks',
@@ -47,7 +47,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
-                forgeReference: '',
+                bimReference: '',
                 children: []
             },
             {
@@ -58,7 +58,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
-                forgeReference: '',
+                bimReference: '',
                 children: []
             },
             {
@@ -69,7 +69,7 @@ function DecisionTreeHandler() {
                 id: (Math.random() + 1).toString(36).substring(7),
                 showNodeControl: false,
                 neo4JReference: '',
-                forgeReference: '',
+                bimReference: '',
                 children: []
             },
         ],
@@ -108,7 +108,7 @@ function DecisionTreeHandler() {
         setModalActiveAction('')
     }
 
-    const nodeSize = {x: 200, y: 200};
+    const nodeSize = {x: 300, y: 200};
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
 
     return <div id="treeWrapper" style={{height: "500px"}}>

@@ -10,7 +10,11 @@ import Button from "@mui/material/Button";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '5px'
+    }}>
         <Box>
             <Card variant="outlined">
                 <React.Fragment>

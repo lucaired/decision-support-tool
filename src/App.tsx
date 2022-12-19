@@ -13,7 +13,11 @@ function App() {
         <Box>
             <Card variant="outlined">
                 <React.Fragment>
-                    <CardContent>
+                    <CardContent
+                        style={{
+                            height: '440px'
+                        }}
+                    >
                         <DecisionTreeHandler/>
                     </CardContent>
                 </React.Fragment>
@@ -21,22 +25,23 @@ function App() {
         </Box>
         <Box>
             <Card variant="outlined">
-            <React.Fragment>
-                <CardContent>
-                    <ForgeViewer
-                        local={true}
-                        path={'http://localhost:3000/0.svf'}
-                        //urn={urn}
-                        //testing={true}
-                        //token={token}
+                <React.Fragment>
+                    <CardContent
                         style={{
-                            maxWidth: '600px',
-                            maxHeight: '500px'
+                            height: '440px'
                         }}
-                    />
-                </CardContent>
-            </React.Fragment>
-        </Card>
+                    >
+
+                        <ForgeViewer
+                            local={true}
+                            path={'http://localhost:3000/0.svf'}
+                            //urn={urn}
+                            //testing={true}
+                            //token={token}
+                        />
+                    </CardContent>
+                </React.Fragment>
+            </Card>
         </Box>
     </div>
   );

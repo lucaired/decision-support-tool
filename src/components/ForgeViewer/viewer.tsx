@@ -36,7 +36,7 @@ type Props = (ApiProps | LocalProps) & DefaultProps;
 
 export const ForgeViewer = (props: Props): React.ReactElement => {
     const { refs, style } = useHooks(props);
-    return <div id='forgeViewer' ref={refs.viewer}  style={{width:"40px", height:"100px"}} />;
+    return <div id='forgeViewer' ref={refs.viewer} style={style} />;
 };
 
 export { Extension as ForgeExtension } from './extension';

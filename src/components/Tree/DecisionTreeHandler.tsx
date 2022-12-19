@@ -107,7 +107,7 @@ function DecisionTreeHandler() {
     const nodeSize = {x: 200, y: 200};
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
 
-    return <div id="treeWrapper" style={{width: "1200px", height: "800px"}}>
+    return <div id="treeWrapper" style={{height: "500px"}}>
         <Tree
             data={decisionTree}
             orientation={"vertical"}

@@ -172,9 +172,9 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
             setSubjectiveEvaluation((subjectiveEvaluation) => {
-                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user == user)
+                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
                 const factorRatings = subjectiveEvaluation[evaluationIndex].factorRatings || []
-                const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label == factorRating.label)
+                const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label === factorRating.label)
 
                 let update = [...subjectiveEvaluation]
                 let updateRating = [...factorRatings]

@@ -9,6 +9,7 @@ import {ForgeViewer} from "./components/ForgeViewer/viewer";
 import VariantExplorerMenu from "./components/VariantExplorerMenu";
 import GWPEvaluation from "./components/GWP/GWPEvaluation";
 import SubjectiveEvaluationViewer from "./components/SubjectiveEvaluation/SubjectiveEvaluationViewer";
+import DesignEpisode from "./components/DesignRationale/DesignEpisode";
 
 function App() {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
@@ -81,7 +82,7 @@ function App() {
                                         <div
                                             key={"design-rationale-variant-exploration"}
                                         >
-                                            Not implemented
+                                            <DesignEpisode/>
                                         </div>
                                         : activeVariantExplorationIndex === 3 ?
                                             <div

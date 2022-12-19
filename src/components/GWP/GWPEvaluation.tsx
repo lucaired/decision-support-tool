@@ -93,7 +93,9 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     const chartRef = useRef();
 
     // get element index from the data-series
-    const onClick = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>, handleElementIndex: (index: number) => void) => {
+    const onClick = (
+        event: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
+        handleElementIndex: (index: number) => void) => {
         // @ts-ignore
         const element = getElementAtEvent(chartRef.current, event)
         if (element !== undefined) {

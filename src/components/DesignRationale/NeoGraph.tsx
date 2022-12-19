@@ -54,9 +54,8 @@ const NeoGraph = (props) => {
                 },
             },
             initial_cypher:
-                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) IN [286, 80] RETURN s, rel, d\n",
+                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) IN [0] RETURN s, rel, d\n",
         };
-        // @ts-ignore
         const vis = new NeoVis(config);
         vis.render();
     }, [neo4jUri, neo4jUser, neo4jPassword]);
@@ -67,8 +66,8 @@ const NeoGraph = (props) => {
             // @ts-ignore
             ref={visRef}
             style={{
-                width: `${width}px`,
-                height: `${height}px`,
+                width: width,
+                height: height,
                 backgroundColor: `${backgroundColor}`,
             }}
         />
@@ -82,8 +81,8 @@ NeoGraph.defaultProps = {
 };
 
 NeoGraph.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
+    width: PropTypes.string.isRequired,
+    height: PropTypes.string.isRequired,
     containerId: PropTypes.string.isRequired,
     neo4jUri: PropTypes.string.isRequired,
     neo4jUser: PropTypes.string.isRequired,

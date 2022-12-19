@@ -25,7 +25,7 @@ class Tree(BaseModel):
 class Project(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str
-    weights_set: dict[str, float] = Field(..., alias="weightsSet")
+    weights_set: dict[str, int] = Field(..., alias="weightsSets")
     tree: Tree = Field(...)
 
     class Config:
@@ -34,7 +34,7 @@ class Project(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Building.Lab",
-                "weightsSet": {
+                "weightsSets": {
                     "Design Quality": 2.0,
                     "Comfort and health": 1.0,
                     "Functionality": 1.0
@@ -55,7 +55,7 @@ class Project(BaseModel):
 
 class UpdateProject(BaseModel):
     name: str
-    weights_set: dict[str, float]  = Field(..., alias="weightsSet")
+    weights_set: dict  = Field(..., alias="weightsSets")
     tree: Tree = Field(...)
 
     class Config:
@@ -64,7 +64,7 @@ class UpdateProject(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Building.Lab",
-                "weightsSet": {
+                "weightsSets": {
                     "Design Quality": 2.0,
                     "Comfort and health": 1.0,
                     "Functionality": 1.0
@@ -90,6 +90,7 @@ async def get_all_projects():
 
 @router.post("/", response_description="Add new project", response_model=Project)
 async def create_project(project: Project = Body(...)):
+    print(project)
     json_project = jsonable_encoder(project)
     json_project = await crud.create_project(json_project)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=json_project)

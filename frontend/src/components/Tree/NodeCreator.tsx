@@ -36,7 +36,7 @@ export default function VariantCreatorStepper({
         attributes: {
             level: 'Building Part Type',
         },
-        id: (Math.random() + 1).toString(36).substring(7),
+        id: (Math.random() + 1).toString(36).substring(27),
         showNodeControl: false,
         ifcFile: 'V1-1.ifc',
         decisionLevel: 'construction',

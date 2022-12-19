@@ -1,11 +1,25 @@
 import * as React from 'react';
-import { Box, Button, Fade, Modal } from "@mui/material";
+import { Box, Button, Fade, Modal, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import StringPropInput from '../Tree/NodeStringPropInput';
+import { node } from 'prop-types';
+import NodeStringPropInput from '../Tree/NodeStringPropInput';
+import NodeStringPropSelect from '../Tree/NodeStringPropSelect';
 
 interface NewProjectModalProps {
     showModal: boolean; 
     showProjectCreateModalHandler: (state: boolean) => void; 
     saveProjectHandler: (newProject: object)=>void
+}
+
+const steps = ['Enter project information', 'Root variant', 'Upload BIM', 'Enter Neo4j graph reference'];
+const emptyProject = {
+    name: '',
+    "weightsSets Design Quality": '1',
+    "weightsSets Comfort and health": '1',
+    "weightsSets Functionality": '1',
+    treeName: '',
+    treeBimReference: '',
+    treeIfcFile: '',
 }
 
 export function NewProjectModal({
@@ -15,12 +29,8 @@ export function NewProjectModal({
 }: NewProjectModalProps
     ) {
         // local state
-        const [project, setProject] = React.useState({
-            name: '',
-            "Design Quality": '1',
-            "Comfort and health": '1',
-            "Functionality": '1',
-        });
+        //@ts-ignore
+        const [project, setProject] = React.useState(emptyProject);
 
         const modalStyle = {
             position: 'absolute' as 'absolute',
@@ -38,31 +48,38 @@ export function NewProjectModal({
             const newProject = {
                 name: project.name,
                 weightsSets: {
-                    "Design Quality": parseFloat(project["Design Quality"]),
-                    "Comfort and health": parseFloat(project["Comfort and health"]),
-                    "Functionality": parseFloat(project["Functionality"])
+                    "Design Quality": parseFloat(project["weightsSets Design Quality"]),
+                    "Comfort and health": parseFloat(project["weightsSets Comfort and health"]),
+                    "Functionality": parseFloat(project["weightsSets Functionality"])
                 },
-                "tree": {
-                    "name": "V2-2",
-                    "attributes": {
-                        "level": "Building Level"
+                tree: {
+                    name: project.treeName,
+                    bimReference: project.treeBimReference,
+                    ifcFile: project.treeIfcFile,
+                    attributes: {
+                        level: "Building Level"
                     },
-                    "id": "h1aab",
-                    "ifcFile": "V2-2.ifc",
-                    "bimReference": "<some-urn>",
-                    "decisionLevel": "construction",
-                    "children": []
+                    id: (Math.random() + 1).toString(36).substring(8),
+                    decisionLevel: "construction",
+                    children: [],
+                    show_node_control: false
                 }
             }
-            setProject({
-                name: '',
-                "Design Quality": '1',
-                "Comfort and health": '1',
-                "Functionality": '1',
-            })
-            saveProjectHandler(newProject)
-            showProjectCreateModalHandler(false)
+            saveProjectHandler(newProject);
+            setProject(emptyProject);
+            showProjectCreateModalHandler(false);
+            setActiveStep(0);
         }
+
+        const handleNext = () => {
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        };
+    
+        const handleBack = () => {
+            setActiveStep((prevActiveStep) => prevActiveStep - 1);
+        };
+
+        const [activeStep, setActiveStep] = React.useState(0);
     
         return <Modal
             aria-labelledby="transition-modal-title"
@@ -75,35 +92,94 @@ export function NewProjectModal({
         >
             <Fade in={showModal}>
                 <Box sx={modalStyle}>
-                    <h1>Create new project</h1>
-                    <StringPropInput
-                        target={project}
-                        updateFunction={setProject}
-                        property={"name"}
-                        propertyName={"Enter Name"}
-                    />
-                    <h2>Evaluation criteria group weights</h2>
-                    <StringPropInput
-                        target={project}
-                        updateFunction={setProject}
-                        property={"Design Quality"}
-                        propertyName={"Design Quality"}
-                    />
-                    <StringPropInput
-                        target={project}
-                        updateFunction={setProject}
-                        property={"Comfort and health"}
-                        propertyName={"Comfort and health"}
-                    />
-                    <StringPropInput
-                        target={project}
-                        updateFunction={setProject}
-                        property={"Functionality"}
-                        propertyName={"Functionality"}
-                    />
-                    <Button onClick={saveProject}>
-                        Save
-                </Button>
+                    <Stepper activeStep={activeStep}>
+                    {steps.map((label) => {
+                        const stepProps: { completed?: boolean } = {};
+                        const labelProps: {} = {};
+                        return (
+                            <Step key={label} {...stepProps}>
+                                <StepLabel {...labelProps}>{label}</StepLabel>
+                            </Step>
+                        );
+                    })}
+                    </Stepper>
+                    {activeStep === steps.length ? (
+                        <React.Fragment>
+                            <Typography sx={{mt: 2, mb: 1}}>
+                                All steps completed - you&apos;re finished
+                            </Typography>
+                            <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+                                <Box sx={{flex: '1 1 auto'}}/>
+                                <Button onClick={saveProject}>Complete</Button>
+                            </Box>
+                        </React.Fragment>
+                    ) : (
+                        <React.Fragment>
+                                {activeStep === 0 && (<div>
+                                    <h3>Project name</h3>
+                                    <StringPropInput
+                                        target={project}
+                                        updateFunction={setProject}
+                                        property={'name'}
+                                        propertyName={'Name'}
+                                    />
+                                    <h3>Evaluation criteria group weights</h3>
+                                    <StringPropInput
+                                        target={project}
+                                        updateFunction={setProject}
+                                        property={"weightsSets Design Quality"}
+                                        propertyName={"Design Quality"}
+                                    />
+                                    <StringPropInput
+                                        target={project}
+                                        updateFunction={setProject}
+                                        property={"weightsSets Comfort and health"}
+                                        propertyName={"Comfort and health"}
+                                    />
+                                    <StringPropInput
+                                        target={project}
+                                        updateFunction={setProject}
+                                        property={"weightsSets Functionality"}
+                                        propertyName={"Functionality"}
+                                    />
+                                </div>)}
+                                {activeStep === 1 && <StringPropInput
+                                    /* @ts-ignore */
+                                    target={project}
+                                    updateFunction={setProject}
+                                    property={'treeName'}
+                                    propertyName={'Name'}
+                                />}
+                                {activeStep === 2 && <StringPropInput
+                                    /* @ts-ignore */
+                                    target={project}
+                                    updateFunction={setProject}
+                                    property={'treeBimReference'}
+                                    propertyName={'Urn Reference'}
+                                />}
+                                {activeStep === 3 && <StringPropInput
+                                    /* @ts-ignore */
+                                    target={project}
+                                    updateFunction={setProject}
+                                    property={'treeIfcFile'}
+                                    propertyName={'Neo4j Reference'}
+                                />}
+                                <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+                                    <Button
+                                        color="inherit"
+                                        disabled={activeStep === 0}
+                                        onClick={handleBack}
+                                        sx={{mr: 1}}
+                                    >
+                                        Back
+                                    </Button>
+                                    <Box sx={{flex: '1 1 auto'}}/>
+                                    <Button onClick={handleNext}>
+                                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                                    </Button>
+                                </Box>
+                        </React.Fragment>
+                    )}
                 </Box>
             </Fade>
         </Modal>;

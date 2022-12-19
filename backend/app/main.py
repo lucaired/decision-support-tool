@@ -7,8 +7,3 @@ app = FastAPI()
 app.include_router(ifc.router)
 app.include_router(project.router)
 app.include_router(survey.router)
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}

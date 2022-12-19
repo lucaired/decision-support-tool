@@ -6,3 +6,16 @@ services:
       - 80:80
     volumes:
       - ./backend/app:/code/app
+    depends_on:
+      - "mongodb"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/booksData
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    volumes:
+      - ./data/:/data/db
+    ports:
+        - "27017:27017"

@@ -9,6 +9,7 @@ import { DecisionTree } from '../Tree/NodeHandler';
 import SvgIcon from '@mui/icons-material/Menu';
 import { Button } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
@@ -49,6 +50,15 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer
                   color='primary'
                   onClick={() => saveCurrentProject()}
                   component={SaveIcon}
+              />
+          </Button>}
+          {activeVariant && <Button 
+            variant="contained"
+            style={{marginLeft: '15px', backgroundColor: 'white'}}
+          >
+              <SvgIcon
+                  color='primary'
+                  component={AnalyticsIcon}
               />
           </Button>}
         </Toolbar>

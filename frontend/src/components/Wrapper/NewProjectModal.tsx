@@ -4,6 +4,7 @@ import StringPropInput from '../Tree/NodeStringPropInput';
 import { node } from 'prop-types';
 import NodeStringPropInput from '../Tree/NodeStringPropInput';
 import NodeStringPropSelect from '../Tree/NodeStringPropSelect';
+import axios from 'axios';
 
 interface NewProjectModalProps {
     showModal: boolean; 
@@ -11,7 +12,7 @@ interface NewProjectModalProps {
     saveProjectHandler: (newProject: object)=>void
 }
 
-const steps = ['Enter project information', 'Root variant', 'Upload BIM', 'Enter Neo4j graph reference'];
+const steps = ['Project information', 'Building Codes', 'Upload BIM', 'IFC file name', 'Upload IFC file'];
 const emptyProject = {
     name: '',
     "weightsSets Design Quality": '1',
@@ -65,6 +66,7 @@ export function NewProjectModal({
                     showNodeControl: false
                 }
             }
+            sendFile();
             saveProjectHandler(newProject);
             setProject(emptyProject);
             showProjectCreateModalHandler(false);
@@ -81,6 +83,36 @@ export function NewProjectModal({
 
         const [activeStep, setActiveStep] = React.useState(0);
     
+        // file upload
+        const [file, setFile] = React.useState<File>();
+    
+        const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) {
+            return;
+        }
+        const file = e.target.files[0];
+        setFile(file);  
+        };
+
+        const sendFile = () => {
+            const config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+            let formData = new FormData();
+            //@ts-ignore
+            formData.append('file', file)
+            
+            axios.post('http://192.168.2.168:80/ifc/transform', formData, config)
+            .then(function (response) {
+            console.log(JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+            console.log(error);
+            });
+        }
+
         return <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"
@@ -162,8 +194,17 @@ export function NewProjectModal({
                                     target={project}
                                     updateFunction={setProject}
                                     property={'treeIfcFile'}
-                                    propertyName={'Neo4j Reference'}
-                                />}
+                                    propertyName={'Ifc filename'}
+                                    />}
+                                {activeStep === 4 && <Button variant="contained" component="label">
+                                    Upload IFC File
+                                    <input
+                                        type="file"
+                                        hidden
+                                        accept=".ifc"
+                                        onChange={handleFileUpload}
+                                    />
+                                    </Button>}
                                 <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                                     <Button
                                         color="inherit"

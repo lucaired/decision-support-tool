@@ -20,7 +20,7 @@ function App() {
     }
 
     const saveProjectHandler = (project: object) => {
-        axios.post(`http://localhost:80/projects/`, project)
+        axios.post(`http://192.168.2.168:80/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -36,7 +36,7 @@ function App() {
     const updateProjectHandler = (project) => {
         const updateSet = {...project}
         delete updateSet['_id']
-        axios.put(`http://localhost:80/projects/${project._id}`, updateSet)
+        axios.put(`http://192.168.2.168:80/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -53,7 +53,7 @@ function App() {
     }
 
     const removeProjectHandler = (projectId: string) => {
-        axios.delete(`http://localhost:80/projects/${projectId}`)
+        axios.delete(`http://192.168.2.168:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
         })
@@ -66,7 +66,7 @@ function App() {
         setActiveVariant(variant)
     }
 
-    const [drawerState, setDrawerState] = React.useState(false);
+    const [leftDrawerState, setLeftDrawerState] = React.useState(false);
     const toggleDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -78,10 +78,10 @@ function App() {
         return;
         }
 
-        setDrawerState(open);
+        setLeftDrawerState(open);
     };
 
-    const queryProjects = () => axios.get(`http://localhost:80/projects/`)
+    const queryProjects = () => axios.get(`http://192.168.2.168:80/projects/`)
         // @ts-ignore
         .then(function (response) {
             // @ts-ignore
@@ -102,7 +102,7 @@ function App() {
         // @ts-ignore
         .catch((error) => console.log(error));
 
-    useEffect(() => {queryProjects()}, [drawerState]);
+    useEffect(() => {queryProjects()}, [leftDrawerState]);
     
 
     return (
@@ -114,7 +114,7 @@ function App() {
             }}
         >
             <AppDrawer 
-                drawerState={drawerState} 
+                drawerState={leftDrawerState} 
                 toggleDrawer={toggleDrawer}
                 allProjects={allProjects}
                 activeProjectHandler={activeProjectHandler}

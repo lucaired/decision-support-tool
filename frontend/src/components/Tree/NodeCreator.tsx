@@ -8,8 +8,10 @@ import Typography from '@mui/material/Typography';
 import {DecisionTree} from "./NodeHandler";
 import NodeStringPropInput from './NodeStringPropInput';
 import NodeStringPropSelect from "./NodeStringPropSelect";
+import FileUploader from '../Shared/FileUpload';
+import axios from 'axios';
 
-const steps = ['Enter basic information', 'Upload BIM', 'Enter Neo4j graph reference'];
+const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file'];
 
 export default function VariantCreatorStepper({
 // @ts-ignore
@@ -55,10 +57,41 @@ export default function VariantCreatorStepper({
         let tree = {...decisionTree};
         setProperty(tree, activeNode.id, addProperty, node)
         setDecisionTree(tree)
+        sendFile()
         setActiveNodeId({id: undefined})
         setActiveStep(0);
         handleNodeModalClose()
     };
+
+    // file upload
+    const [file, setFile] = React.useState<File>();
+  
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files) {
+        return;
+      }
+      const file = e.target.files[0];
+      setFile(file);  
+    };
+
+    const sendFile = () => {
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+        let formData = new FormData();
+        //@ts-ignore
+        formData.append('file', file)
+          
+        axios.post('http://192.168.2.168:80/ifc/transform', formData, config)
+        .then(function (response) {
+        console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+    }
 
     return (
         <Box sx={{width: '100%'}}>
@@ -111,8 +144,17 @@ export default function VariantCreatorStepper({
                             target={node}
                             updateFunction={setNode}
                             property={'ifcFile'}
-                            propertyName={'Neo4j Reference'}
+                            propertyName={'Ifc filename'}
                         />}
+                        {activeStep === 3 && <Button variant="contained" component="label">
+                            Upload IFC File
+                            <input
+                                type="file"
+                                hidden
+                                accept=".ifc"
+                                onChange={handleFileUpload}
+                            />
+                            </Button>}
                         <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                             <Button
                                 color="inherit"

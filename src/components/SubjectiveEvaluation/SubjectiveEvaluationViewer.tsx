@@ -160,18 +160,57 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         {user: 'Architect Adrian', factorRatings: [mockFactorRating]},
     ]
 
-    const [subjectiveEvaluation, setSubjectiveEvaluation] = React.useState(mockSubjectiveEvaluation);
+    const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState(mockSubjectiveEvaluation);
+    const [totalSubjectiveEvaluation, setTotalSubjectiveEvaluation] =
+        React.useState({'user': 'Total', 'factorRatings': [{'label': 'Social Factors', 'criteriaGroups': []}]});
 
     const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
         user: undefined,
         factorLabel: undefined,
     });
 
+    const computeTotalSubjectiveEvaluation = () => {
+        // @ts-ignore
+        const totalEvaluation = subjectiveEvaluations.reduce((acc, evaluation) => {
+            let update = {...acc}
+            // apply the criteriaGroup array to the accumulator
+            evaluation.factorRatings[0].criteriaGroups.forEach((criteriaGroup) => {
+                // criteriaGroup not accumulator
+                let updateCriteriaGroup = criteriaGroup
+
+                const index = update.factorRatings[0]?.criteriaGroups?.findIndex((updateCriteriaGroup) => updateCriteriaGroup.label === criteriaGroup.label)
+                // criteriaGroup is in the accumulator
+                if (index !== -1 && index !== undefined) {
+                    let right = update.factorRatings[0].criteriaGroups[index].criteria
+                    const updatedCriteria = mergeCriteriaGroupScores(criteriaGroup.criteria, right)
+                    updateCriteriaGroup = {...updateCriteriaGroup, criteria: updatedCriteria}
+                    update.factorRatings[0].criteriaGroups[index] = updateCriteriaGroup
+                } else {
+                    update.factorRatings[0].criteriaGroups = [updateCriteriaGroup, ...update.factorRatings[0].criteriaGroups]
+                }
+            })
+            return update
+        }, totalSubjectiveEvaluation)
+        // @ts-ignore
+        setTotalSubjectiveEvaluation((oldTotal) => totalEvaluation)
+    }
+
+    const mergeCriteriaGroupScores = (left: { label: string, rating: number }[], right: { label: string, rating: number }[]) => {
+        return left.map((score) => {
+            const index = right.findIndex((score) => score.label === score.label)
+            if (index !== -1) {
+                return {...score, rating: score.rating + right[index].rating}
+            } else {
+                return score
+            }
+        })
+    }
+
     // @ts-ignore
     const handleSubjectiveEvaluationUpdate = (factorRating, user: string) => {
-        const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
+        const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
-            setSubjectiveEvaluation((subjectiveEvaluation) => {
+            setSubjectiveEvaluations((subjectiveEvaluation) => {
                 const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
                 const factorRatings = subjectiveEvaluation[evaluationIndex].factorRatings || []
                 const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label === factorRating.label)
@@ -188,26 +227,28 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 return update
             })
         } else {
-            setSubjectiveEvaluation((subjectiveEvaluation) => {
+            setSubjectiveEvaluations((subjectiveEvaluation) => {
                 let update = [...subjectiveEvaluation]
                 update.push({user: user, factorRatings: [factorRating]})
                 return update
             })
         }
+        computeTotalSubjectiveEvaluation()
     }
     const handleSubjectiveEvaluationRemoval = (user: string) => {
-        const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
+        const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
-            setSubjectiveEvaluation((subjectiveEvaluation) => {
+            setSubjectiveEvaluations((subjectiveEvaluation) => {
                 let update = [...subjectiveEvaluation]
                 update.splice(index, 1);
                 return update
             })
         }
+        computeTotalSubjectiveEvaluation()
     }
 
     const getFactorRating = () => {
-        const factor = subjectiveEvaluation
+        const factor = subjectiveEvaluations
             .filter((evaluation) => evaluation.user === currentUserEvaluation.user)
             .map((evaluation) => evaluation.factorRatings)
             .flat()
@@ -238,8 +279,20 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 handleSubjectiveEvaluationUpdate={handleSubjectiveEvaluationUpdate}
             /> :
             <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+                {subjectiveEvaluations.length > 1 &&
+                    // show aggregated score over all users
+                    <SubjectiveEvaluationTable
+                        subjectiveEvaluations={[totalSubjectiveEvaluation]}
+                        toggleShowSubjectiveEvaluationSurvey={() => {
+                        }}
+                        setCurrentUserEvaluation={() => {
+                        }}
+                        handleSubjectiveEvaluationRemoval={() => {
+                        }}
+                    />
+                }
                 <SubjectiveEvaluationTable
-                    subjectiveEvaluation={subjectiveEvaluation}
+                    subjectiveEvaluations={subjectiveEvaluations}
                     toggleShowSubjectiveEvaluationSurvey={toggleShowSubjectiveEvaluationSurvey}
                     setCurrentUserEvaluation={setCurrentUserEvaluation}
                     handleSubjectiveEvaluationRemoval={handleSubjectiveEvaluationRemoval}
@@ -263,7 +316,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
 
 function computeCriteriaGroupScore(criteriaGroup: object): number {
     // @ts-ignore
-    const groupRating =  criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
+    const groupRating = criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
     return Math.round(groupRating * 100) / 100
 }
 
@@ -284,7 +337,7 @@ function computeFactorScore(evaluation: object): number {
 
 function SubjectiveEvaluationTable({
                                        // @ts-ignore
-                                       subjectiveEvaluation,
+                                       subjectiveEvaluations: subjectiveEvaluations,
                                        // @ts-ignore
                                        toggleShowSubjectiveEvaluationSurvey,
                                        // @ts-ignore
@@ -295,7 +348,7 @@ function SubjectiveEvaluationTable({
 
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
         { /* @ts-ignore */}
-        {subjectiveEvaluation?.map((evaluation) => (
+        {subjectiveEvaluations?.map((evaluation) => (
             <Card
                 key={`subjectiveEvaluation-${evaluation.user}`}
                 style={{

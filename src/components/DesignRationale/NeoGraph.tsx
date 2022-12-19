@@ -54,7 +54,7 @@ const NeoGraph = (props) => {
                 },
             },
             initial_cypher:
-                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) = 286 RETURN s, rel, d\n",
+                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) IN [286, 80] RETURN s, rel, d\n",
         };
         // @ts-ignore
         const vis = new NeoVis(config);

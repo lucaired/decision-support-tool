@@ -38,7 +38,7 @@ function GWPEvaluation({activeVariant}) {
         })
     }, [activeVariant])
 
-    const decisionLevelTitle = ['Construction Level', 'Building Part Level', 'Layer Level', 'Layer Level']
+    const decisionLevelTitle = ['Construction Level', 'Building Part Level', 'Layer Level', 'Material Level']
     const [decisionLevel, setDecisionLevel] = useState(0)
     const handleSetDecisionLevel = (level: number) => setDecisionLevel(level)
 

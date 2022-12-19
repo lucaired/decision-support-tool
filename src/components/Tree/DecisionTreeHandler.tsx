@@ -27,6 +27,8 @@ const modalStyle = {
     p: 4,
 };
 
+export type DecisionLevel = 'construction' | 'building-part'
+
 // @ts-ignore
 function DecisionTreeHandler({activeVariantHandler}) {
     // node handling
@@ -39,6 +41,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
         showNodeControl: false,
         neo4JReference: 'AC-20-Smiley-West-10-Bldg.ifc',
         bimReference: 'AC-20-Smiley-West-10-Bldg',
+        decisionLevel: 'construction' as DecisionLevel,
         children: [],
     })
     // node handlers

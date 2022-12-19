@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {DecisionTree} from "./NodeHandler";
 import NodeStringPropInput from './NodeStringPropInput';
+import NodeStringPropSelect from "./NodeStringPropSelect";
 
 const steps = ['Enter basic information', 'Upload BIM', 'Enter Neo4j graph reference'];
 
@@ -38,6 +39,7 @@ export default function VariantCreatorStepper({
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
         neo4JReference: '',
+        decisionLevel: 'construction',
         bimReference: ''
     })
 
@@ -83,12 +85,22 @@ export default function VariantCreatorStepper({
                 </React.Fragment>
             ) : (
                 <React.Fragment>
-                        {activeStep === 0 && <NodeStringPropInput
-                            node={node}
-                            setNode={setNode}
-                            property={'name'}
-                            propertyName={'Name'}
-                        />}
+                        {activeStep === 0 && (<div>
+                            <NodeStringPropInput
+                                node={node}
+                                setNode={setNode}
+                                property={'name'}
+                                propertyName={'Name'}
+                            />
+                            <NodeStringPropSelect
+                                node={node}
+                                setNode={setNode}
+                                property={'decisionLevel'}
+                                propertyName={'Decision Level'}
+                                options={['construction', 'building-part', 'layer-type', 'material-type']}
+                            />
+                        </div>)
+                        }
                         {activeStep === 1 && <NodeStringPropInput
                             node={node}
                             setNode={setNode}

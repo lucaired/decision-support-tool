@@ -88,7 +88,6 @@ def _jaccard_similarity(list1: list[str], list2: list[str]) -> float:
     union = len(set(list1).union(list2))
     return float(intersection) / union if union > 0 else 0
 
-
 def boost_by_weight(all_matchings: list[MatchingResult], weights: dict) -> list[MatchingResult]:
     def boost_similarity(matching: MatchingResult):
         if matching.result_de_id in weights:

@@ -57,10 +57,10 @@ function GWPEvaluation({activeVariant}) {
 // @ts-ignore
 function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
-    let elementAreasByElementType = new Map<string, number>();
-    let elementsMaterialLayerByType = new Map<string, Map<string, Object>>();
+    let elementAreasByBuildingPart = new Map<string, number>();
+    let elementLayerSetByBuildingPart = new Map<string, Map<string, Object>>();
 
-    // internal building part category to Node label
+    // Internal building part category to Node label
     let buildingPartLabelToNodeLabel = new Map<string, string>();
     let nodeLabelToElementTypeAreaSet = new Map<string, Map<string, number>>();
     let nodeLabelToMaterialLayerSet = new Map<string, Map<string, Object>>();
@@ -135,34 +135,34 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         const key = `${label}${loadBearing ? ' load-bearing' : ''}${isExternal ? ' external' : ''} ${elementHasLayersDefined ? ' defined': ' undefined'}`
         buildingPartLabelToNodeLabel.set(key, label)
 
-        let totalElementArea = elementAreasByElementType.get(key)
+        let totalElementArea = elementAreasByBuildingPart.get(key)
         totalElementArea = totalElementArea ? totalElementArea += totalRecordArea : totalRecordArea
 
-        elementAreasByElementType.set(key, totalElementArea || 0)
+        elementAreasByBuildingPart.set(key, totalElementArea || 0)
 
-        if (elementsMaterialLayerByType.has(key)) {
+        if (elementLayerSetByBuildingPart.has(key)) {
             const layersUpdate = new Map([
                 // @ts-ignore
-                ...Array.from(elementsMaterialLayerByType.get(key).entries()), 
+                ...Array.from(elementLayerSetByBuildingPart.get(key).entries()), 
                 ...Array.from(uniqueLayers.entries())
             ]);
-            elementsMaterialLayerByType.set(key, layersUpdate)
+            elementLayerSetByBuildingPart.set(key, layersUpdate)
         } else {
-            elementsMaterialLayerByType.set(key, uniqueLayers)
+            elementLayerSetByBuildingPart.set(key, uniqueLayers)
         }
 
         totalBuildingArea += totalElementArea || 0
     })
 
     // element types without area greater than 0 or no layer set should be removed
-    Array.from(elementAreasByElementType.keys()).forEach((elementType) => {
-        const noArea = elementAreasByElementType.get(elementType) === 0;
+    Array.from(elementAreasByBuildingPart.keys()).forEach((elementType) => {
+        const noArea = elementAreasByBuildingPart.get(elementType) === 0;
         if (noArea) {
-            elementAreasByElementType.delete(elementType)
+            elementAreasByBuildingPart.delete(elementType)
         }
-        const noLayerSet = elementsMaterialLayerByType.get(elementType)?.size == 0;
+        const noLayerSet = elementLayerSetByBuildingPart.get(elementType)?.size == 0;
         if (noLayerSet) {
-            elementsMaterialLayerByType.delete(elementType)
+            elementLayerSetByBuildingPart.delete(elementType)
         }
         if (noArea && noLayerSet) {
             buildingPartLabelToNodeLabel.delete(elementType)
@@ -173,7 +173,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     // build a mapping from the original labels to to sets of buildingParts
     // two sets one with the are infos and one with the layerSets 
     buildingPartLabelToNodeLabel.forEach((nodeLabel, buildingPartLabel, map) => {
-        const area = elementAreasByElementType?.get(buildingPartLabel);
+        const area = elementAreasByBuildingPart?.get(buildingPartLabel);
 
         if (area && area !== 0) {
             if (nodeLabelToElementTypeAreaSet.has(nodeLabel)) {
@@ -188,7 +188,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             }
         }
 
-        const layerSet = elementsMaterialLayerByType?.get(buildingPartLabel);
+        const layerSet = elementLayerSetByBuildingPart?.get(buildingPartLabel);
 
         if (layerSet && layerSet.size !== 0) {
             if (nodeLabelToMaterialLayerSet.has(nodeLabel)) {
@@ -237,7 +237,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         // @ts-ignore
         const elementTypeIndex = elementIndex['2']
         const buildingPart = Array.from(getBuildingParts(buildingPartIndex).keys())[elementTypeIndex]
-        const elementsMaterialLayers = elementsMaterialLayerByType.get(buildingPart)
+        const elementsMaterialLayers = elementLayerSetByBuildingPart.get(buildingPart)
         return elementsMaterialLayers || new Map()
     }
 
@@ -277,14 +277,15 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
     const getGWPForBuildingPart = (buildingPart: string) => {
         // calculate GWP as point value using all layers, if no layers are set we fall back to the area
-        const layers = elementsMaterialLayerByType.get(buildingPart) || new Map()
-        const area = elementAreasByElementType.get(buildingPart) || 1
+        const layers = elementLayerSetByBuildingPart.get(buildingPart) || new Map()
+        const area = elementAreasByBuildingPart.get(buildingPart) || 1
 
         if (buildingPart === 'Proxy  undefined') {
             // TODO: check this
             return  [area / 5, area * 2 / 5]
         }
 
+        // TODO: rationalize this, we don't need this if the layerSet is defined
         let gwpForBuildingPart;
 
         if (Array.from(layers.keys()).length === 0) {

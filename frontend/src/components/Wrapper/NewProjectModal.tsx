@@ -14,7 +14,7 @@ interface NewProjectModalProps {
     saveProjectHandler: (newProject: object)=>void
 }
 
-const steps = ['Project information', 'Root variant name', 'Upload BIM', 'IFC file name', 'Upload IFC file', 'Design Episodes'];
+const steps = ['Project information', 'Variant name', 'Upload BIM', 'IFC file name', 'Upload IFC file', 'Design Episodes'];
 const emptyProject = {
     name: '',
     "weightsSets Design Quality": '1',

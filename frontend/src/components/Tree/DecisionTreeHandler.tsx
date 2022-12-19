@@ -37,7 +37,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
         attributes: {
             level: 'Building Level',
         },
-        id: (Math.random() + 1).toString(36).substring(7),
+        id: 'g9ecb',
         showNodeControl: false,
         neo4JReference: 'V1-1.ifc',
         bimReference: 'enter urn',

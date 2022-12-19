@@ -98,6 +98,14 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
 
 // @ts-ignore
 function SubjectiveEvaluationViewer({activeVariantId}) {
+
+    useEffect(() => {
+        axios.get(`http://localhost:80/surveys/${activeVariantId}`)
+            .then(function (response) {
+                setSubjectiveEvaluations((subjectiveEvaluation) => response.data)
+            }).catch((error) => console.log(error))
+    }, [activeVariantId])
+
     const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState([]);
     useEffect(() => {
         computeTotalSubjectiveEvaluation()

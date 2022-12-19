@@ -24,10 +24,8 @@ services:
     container_name: neo4j    
     environment:
       - NEO4J_AUTH=neo4j/123
-      - NEO4JLABS_PLUGINS=[\"apoc\"\]
-      - NEO4J_apoc_import_file_use__neo4j__config=true
-      - NEO4J_apoc_import_file_enabled=true
-      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_PLUGINS=["graph-data-science", "apoc"]
+      - NEO4J_dbms_security_procedures_allowlist=gds.*, apoc.*
     volumes:
       - ./neo4j/data:/data
       - ./neo4j/logs:/logs

@@ -1,3 +1,5 @@
+import Button from "@mui/material/Button";
+
 export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: any; neo4JReference: string };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
@@ -67,23 +69,23 @@ export function RenderNode({
             <foreignObject {...foreignObjectProps}>
                 <p>{nodeDatum.name}</p>
                 {nodeDatum.showNodeControl &&
-                    <button onClick={() => {
+                    <Button variant="outlined" size="small" onClick={() => {
                         handleNodeControl(nodeDatum.id);
                         handleAddChild(nodeDatum.id);
-                    }}>↓</button>}
+                    }}>↓</Button>}
                 {nodeDatum.showNodeControl &&
-                    <button onClick={() => {
+                    <Button variant="outlined" size="small" onClick={() => {
                         handleNodeControl(nodeDatum.id);
                         handleAddSibling(nodeDatum.id);
-                    }}>↔</button>}
+                    }}>↔</Button>}
                 {nodeDatum.showNodeControl &&
-                    <button onClick={() => {
-                    }}>G</button>}
+                    <Button variant="outlined" size="small" onClick={() => {
+                    }}>G</Button>}
                 {nodeDatum.showNodeControl && nodeDatum.children?.length === 0 &&
-                    <button onClick={() => {
+                    <Button variant="outlined" size="small" onClick={() => {
                         handleNodeControl(nodeDatum.id);
                         handleRemoveChild(nodeDatum.id);
-                    }}>X</button>}
+                    }}>X</Button>}
             </foreignObject>
         </g>
     )

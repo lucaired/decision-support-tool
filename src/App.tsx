@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import './App.css';
 import DecisionTreeHandler from './components/Tree/DecisionTreeHandler';
 import {ForgeViewer} from "./components/ForgeViewer/viewer";
+import Button from "@mui/material/Button";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
                 <React.Fragment>
                     <CardContent
                         style={{
-                            height: '440px'
+                            height: '430px'
                         }}
                     >
                         <DecisionTreeHandler/>
@@ -31,6 +32,18 @@ function App() {
                             height: '440px'
                         }}
                     >
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                marginBottom: '15px'
+                            }}>
+                                <Button variant="contained">BIM visualization</Button>
+                                <Button variant="contained">Design Rationale</Button>
+                                <Button variant="contained">Building Performance Evaluation</Button>
+                                <Button variant="contained">Objective Evaluation</Button>
+                        </div>
 
                         <ForgeViewer
                             local={true}

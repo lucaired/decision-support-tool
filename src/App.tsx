@@ -63,6 +63,7 @@ function App() {
                         >
                             <VariantExplorerMenu
                                 activeVariantExplorationHandler={activeVariantExplorationHandler}
+                                activeVariantExplorationIndex={activeVariantExplorationIndex}
                             />
                             {activeVariantExplorationIndex === 0 ?
                                 <ForgeViewer

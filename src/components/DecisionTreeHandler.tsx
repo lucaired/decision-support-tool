@@ -13,11 +13,25 @@ const setNodeProperty = (tree: DecisionTree, id: number, func: (tree: DecisionTr
     }
 }
 
+const setParentNodeProperty = (tree: DecisionTree, id: number, func: (tree: DecisionTree) => void) => {
+    if (tree.children){
+        if (tree.children.some((child: DecisionTree) => child.id === id)) {
+            func(tree)
+        } else {
+            if (tree.children) {
+                tree.children.map((child: any) => setParentNodeProperty(child, id, func))
+            }
+        }
+    }
+}
+
+
 const setNodeControl = (tree: DecisionTree) => {
-        tree.showNodeControl = !tree.showNodeControl;
+    tree.showNodeControl = !tree.showNodeControl;
 }
 
 const addNodeChild = (tree: DecisionTree) => {
+    // TODO: make this collision-proof
     const id = (Math.random() + 1).toString(36).substring(7);
     const child = {
         name: 'Wood frame 1',
@@ -31,7 +45,7 @@ const addNodeChild = (tree: DecisionTree) => {
 }
 
 // @ts-ignore
-function RenderNode({nodeDatum, toggleNode, foreignObjectProps, handleNodeControl, handleAddChild}) {
+function RenderNode({nodeDatum, toggleNode, foreignObjectProps, handleNodeControl, handleAddChild, handleAddSibling}) {
     return (
         <g>
             <rect
@@ -39,17 +53,26 @@ function RenderNode({nodeDatum, toggleNode, foreignObjectProps, handleNodeContro
                 height="20"
                 x="-10"
                 onClick={() => {
-                    toggleNode();
                     handleNodeControl(nodeDatum.id);
+                    toggleNode();
                 }}
             />
             <foreignObject {...foreignObjectProps}>
                 <p>{nodeDatum.name}</p>
                 {nodeDatum.showNodeControl &&
                     <button onClick={() => {
-                        handleAddChild(nodeDatum.id);
                         handleNodeControl(nodeDatum.id);
-                    }}>+</button>}
+                        handleAddChild(nodeDatum.id);
+                    }}>↓</button>}
+                {nodeDatum.showNodeControl &&
+                    <button onClick={() => {
+                        handleNodeControl(nodeDatum.id);
+                        handleAddSibling(nodeDatum.id);
+                    }}>↔</button>}
+                {nodeDatum.showNodeControl && !nodeDatum.children &&
+                    <button onClick={() => {
+                        handleNodeControl(nodeDatum.id);
+                    }}>X</button>}
             </foreignObject>
         </g>
     )
@@ -90,31 +113,42 @@ function DecisionTreeHandler() {
             },
         ],
     })
+
     const handleNodeControl = (id: number) => {
-        var tree = {...decisionTree}
+        let tree = {...decisionTree};
         setNodeProperty(tree, id, setNodeControl)
         setDecisionTree(tree)
     }
-    const handleAddChild = (parentId: number) => {
-        var tree = {...decisionTree}
-        setNodeProperty(tree, parentId, addNodeChild)
+    const handleAddChild = (nodeId: number) => {
+        let tree = {...decisionTree};
+        setNodeProperty(tree, nodeId, addNodeChild)
         setDecisionTree(tree)
     }
 
-    const nodeSize = { x: 200, y: 200 };
-    const foreignObjectProps = { width: nodeSize.x, height: nodeSize.y, x: 20 };
+    const handleAddSibling = (nodeId: number) => {
+        let tree = {...decisionTree};
+        setParentNodeProperty(tree, nodeId, addNodeChild)
+        setDecisionTree(tree)
+    }
 
-    return <div id="treeWrapper" style={{width: "100em", height: "50em"}}>
+    const nodeSize = {x: 200, y: 200};
+    const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
+
+    return <div id="treeWrapper" style={{width: "1200px", height: "800px"}}>
         <Tree
             data={decisionTree}
             orientation={"vertical"}
             dimensions={{
-                "width": 800,
-                "height": 500
+                "width": 1200,
+                "height": 800
             }}
             renderCustomNodeElement={(rd3tProps) =>
                 RenderNode({
-                    ...rd3tProps, foreignObjectProps, handleNodeControl: handleNodeControl, handleAddChild: handleAddChild
+                    ...rd3tProps,
+                    foreignObjectProps,
+                    handleNodeControl: handleNodeControl,
+                    handleAddChild: handleAddChild,
+                    handleAddSibling: handleAddSibling,
                 })
             }
         />

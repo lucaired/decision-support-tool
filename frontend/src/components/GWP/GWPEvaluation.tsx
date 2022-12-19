@@ -14,8 +14,7 @@ import {
 import {Bar, getElementAtEvent} from 'react-chartjs-2';
 import Button from "@mui/material/Button";
 import * as React from "react";
-import {faker} from '@faker-js/faker';
-import { number } from "prop-types";
+import { Stack, Chip } from "@mui/material";
 
 ChartJS.register(
     CategoryScale,
@@ -205,7 +204,6 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         }
     })
 
-
     const chartRef = useRef();
 
     // get element index from the data-series
@@ -228,6 +226,9 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                 display: true,
                 text: 'Global Warming Potential',
             },
+            legend: {
+                display: false,
+            }
         },
     };
 
@@ -420,28 +421,56 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         return fillColor
     }
 
-    const generated_data = getData()
+    const generatedData = getData()
+
 
     const data = {
         labels: getLabels(),
         datasets: [
             {
-                label: 'GWP in t CO2-eq',
-                data: generated_data,
-                backgroundColor: getBarFillColor(generated_data),
+                data: generatedData,
+                backgroundColor: getBarFillColor(generatedData),
             },
         ],
     };
 
+    interface GeneratedLegendProps {
+        hasHighestGWP: boolean;
+        hasNormalGWP: boolean;
+    }
+    // also generate custom legend - #E3E3E3 element with highest potential, rest is #FF000080
+    const GeneratedLegend = ({hasHighestGWP, hasNormalGWP}: GeneratedLegendProps) => {
+        return (
+            <>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+                <Stack direction="row" spacing={1}>
+                    {hasHighestGWP && <Chip label="Highest GWP" style={{backgroundColor: "#FF000080"}} />}
+                    {hasNormalGWP &&<Chip label="GWP" style={{backgroundColor: "#E3E3E3"}} />}
+                </Stack>
+            </div>
+            </>
+        )
+    }
+
+    const showHighestGWPLabel = () => (new Set(data.datasets[0].backgroundColor)).has("#FF000080")
+    const showNormalGWPLabel = () => (new Set(data.datasets[0].backgroundColor)).has("#E3E3E3")
+
     return (
         <div>
             {decisionLevel !== 0 && <Button onClick={() => handleChartNavigation()}>Back</Button>}
-            {data.datasets[0].data.length > 0 ? <Bar
-                options={options}
-                data={data}
-                ref={chartRef}
-                onClick={(event) => onClick(event, handleElementIndex)}
-            /> : <p>Level of Development contains no layer information</p>}
+            {data.datasets[0].data.length > 0 ? 
+            <div>
+                <GeneratedLegend    
+                    hasHighestGWP={decisionLevel !== 0 && showHighestGWPLabel()}
+                    hasNormalGWP={showNormalGWPLabel()}
+                />
+                <Bar
+                    options={options}
+                    data={data}
+                    ref={chartRef}
+                    onClick={(event) => onClick(event, handleElementIndex)}
+                />
+            </div> : <p>Level of Development contains no layer information</p>}
         </div>
     );
 }

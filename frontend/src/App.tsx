@@ -6,6 +6,7 @@ import { DecisionTree } from './components/Tree/NodeHandler';
 import VariantViewer from './components/Variant/VariantViewer';
 import ProjectsDrawer from './components/Wrapper/ProjectsDrawer';
 import SimilarProjectsDrawer from './components/Wrapper/SimilarProjectsDrawer';
+import { DesignEpisodeMatchingModal } from './components/Wrapper/DesignEpisodeMatchingModal';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
 
@@ -185,7 +186,6 @@ function App() {
     const toggleRightDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
-        console.log("hi")
         if (
         event.type === 'keydown' &&
         ((event as React.KeyboardEvent).key === 'Tab' ||
@@ -194,6 +194,19 @@ function App() {
         return;
         }
         setRightDrawerState(open);
+    };
+    const [showDesignEpisodeMatchingModal, setShowDesignEpisodeMatchingModal] = React.useState(false);
+    const showDesignEpisodeMatchingModalHandler =
+    (open: boolean) =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (
+        event.type === 'keydown' &&
+        ((event as React.KeyboardEvent).key === 'Tab' ||
+            (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+        return;
+        }
+        setShowDesignEpisodeMatchingModal(open);
     };
 
     useEffect(() => {queryProjects()}, [leftDrawerState]);
@@ -218,6 +231,12 @@ function App() {
                 allSimilarProjectsByDE={allSimilarProjects}
                 allSimilarProjectsByBuildingCode={allProjects}
             />
+            <DesignEpisodeMatchingModal 
+                showDesignEpisodeMatchingModal={showDesignEpisodeMatchingModal} 
+                showDesignEpisodeMatchingModalHandler={showDesignEpisodeMatchingModalHandler} 
+                queryProjects={()=>{}}
+                activeProjectTree={activeProject?.tree}            
+            />
             <ProjectsDrawer 
                 drawerState={leftDrawerState} 
                 toggleLeftDrawer={toggleLeftDrawer}
@@ -230,7 +249,7 @@ function App() {
                 activeVariant={activeVariant}
                 activeProject={activeProject}
                 toggleLeftDrawer={toggleLeftDrawer}
-                querySimilarProjects={querySimilarProjects}
+                showDesignEpisodeMatchingModalHandler={showDesignEpisodeMatchingModalHandler}
                 saveCurrentProject={saveCurrentProject}
             />
             {activeProject && <VariantViewer 

@@ -20,12 +20,12 @@ class Tree(BaseModel):
     bim_reference: str = Field(..., alias="bimReference")
     decision_level: str = Field(..., alias="decisionLevel")
     children: list['Tree']
-    show_node_control: bool = Field(bool, alias="showNodeControl")
+    show_node_control: bool = Field(alias="showNodeControl")
 
 class Project(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str
-    weights_set: dict[str, int] = Field(..., alias="weightsSets")
+    weights_set: dict[str, float] = Field(..., alias="weightsSets")
     tree: Tree = Field(...)
 
     class Config:
@@ -55,7 +55,7 @@ class Project(BaseModel):
 
 class UpdateProject(BaseModel):
     name: str
-    weights_set: dict  = Field(..., alias="weightsSets")
+    weights_set: dict[str, float]  = Field(..., alias="weightsSets")
     tree: Tree = Field(...)
 
     class Config:

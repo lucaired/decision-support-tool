@@ -62,7 +62,7 @@ export function NewProjectModal({
                     id: (Math.random() + 1).toString(36).substring(8),
                     decisionLevel: "construction",
                     children: [],
-                    show_node_control: false
+                    showNodeControl: false
                 }
             }
             saveProjectHandler(newProject);

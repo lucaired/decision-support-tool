@@ -165,9 +165,14 @@ function ObjectiveEvaluationViewer({activeVariantId}) {
 }
 
 
-function computeOverallScore(factorEvaluation: object): number {
-    // TODO: go over the criteriaGroups and sum up the values and the rating
-    return 6.6
+function computeCriteriaGroupScore(criteriaGroup: object[]): number {
+    // @ts-ignore
+    return criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
+}
+
+function computeFactorScore(evaluation: object): number {
+    // @ts-ignore
+    return evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => acc + computeCriteriaGroupScore(criteriaGroup), 0) / evaluation.criteriaGroups?.length
 }
 
 // @ts-ignore
@@ -203,81 +208,121 @@ function ObjectiveEvaluationTable({
                     <Avatar {...stringAvatar(evaluation.user)} />
                     <p>{evaluation.user}</p>
                 </Card>
-                <div style={{display: "flex", gap: "5px"}}>
-                    <Paper
-                        elevation={1}
-                        style={{
-                            width: "125px",
-                            padding: "5px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-around",
-                        }}
-                    >
-                        <p style={{textAlign: "center"}}>Overall score</p>
-                        <Chip label={computeOverallScore(evaluation)}/>
-                    </Paper>
-                    <Paper
-                        variant="outlined"
-                        style={{
-                            cursor: "pointer",
-                            width: "125px",
-                            padding: "5px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-around",
-                        }}
-                        onClick={() => {
-                            toggleShowObjectiveEvaluationSurvey(true)
-                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Social Factors'})
-                        }}
-                    >
-                        <p style={{textAlign: "center"}}>Social Factors</p>
-                        <Chip label={computeOverallScore(evaluation)}/>
-                    </Paper>
-                    <Paper
-                        variant="outlined"
-                        style={{
-                            cursor: "pointer",
-                            width: "125px",
-                            padding: "5px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-around",
-                        }}
-                        onClick={() => {
-                            toggleShowObjectiveEvaluationSurvey(true)
-                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Economic Factors'})
-                        }}
-                    >
-                        <p style={{textAlign: "center"}}>Economic Factors</p>
-                        <Chip label={computeOverallScore(evaluation)}/>
-                    </Paper>
-                    <Paper variant="outlined"
-                           style={{
-                               cursor: "pointer",
-                               width: "125px",
-                               padding: "5px",
-                               display: "flex",
-                               flexDirection: "column",
-                               justifyContent: "space-around",
-                           }}
-                           onClick={() => {
-                               toggleShowObjectiveEvaluationSurvey(true)
-                               setCurrentUserEvaluation({user: evaluation.user, factorLabel: 'Environmental Factors'})
-                           }}
-                    >
-                        <p style={{textAlign: "center"}}>Environmental Factors</p>
-                        <Chip label={computeOverallScore(evaluation)}/>
-                    </Paper>
+                    {/* @ts-ignore */}
+                    {evaluation.factorRatings?.map((factorRating) =>
+                        <div
+                            style={{display: "flex", flexDirection: "row", gap: "5px"}}
+                            key={`${factorRating.label}`}
+                        >
+                            <Paper
+                                elevation={1}
+                                style={{
+                                    width: "90px",
+                                    padding: "5px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-around",
+                                }}
+                            >
+                                <p style={{textAlign: "center"}}>{factorRating.label}</p>
+                                <Chip label={computeFactorScore(factorRating)}/>
+                            </Paper>
+                            <div style={{display: "flex", gap: "5px"}}>
+                                {/* @ts-ignore */}
+                                {factorRating.criteriaGroups.map((criteriaGroup) =>
+                                    <Paper
+                                        key={`${criteriaGroup.label}`}
+                                        variant="outlined"
+                                        style={{
+                                            cursor: "pointer",
+                                            width: "90px",
+                                            padding: "5px",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            justifyContent: "space-around",
+                                        }}
+                                        onClick={() => {
+                                            toggleShowObjectiveEvaluationSurvey(true)
+                                            setCurrentUserEvaluation({user: evaluation.user, factorLabel: factorRating.label})
+                                        }}
+                                    >
+                                        <p style={{textAlign: "center"}}>{criteriaGroup.label}</p>
+                                        <Chip label={computeCriteriaGroupScore(criteriaGroup)}/>
+                                    </Paper>
+                                )}
+                            </div>
+                    </div>)}
                     <Button startIcon={<DeleteIcon/>}/>
-                </div>
             </Card>
         ))}
         <Button variant="outlined" startIcon={<AddIcon/>}>
             Rate variant
         </Button>
     </div>
+}
+
+function RatingConstructor(factorLabel: string) {
+    switch (factorLabel) {
+        case 'Social Factors':
+            return {
+                label: 'Social Factors',
+                criteriaGroups: [
+                    {
+                        label: 'Design Quality',
+                        criteria: [
+                            {
+                                label: 'Urban integration',
+                                rating: 3
+                            },
+                            {
+                                label: 'External space quality',
+                                rating: 3
+                            },
+                            {
+                                label: 'Building quality',
+                                rating: 3
+                            }
+                        ]
+                    },
+                    {
+                        label: 'Functionality',
+                        criteria: [
+                            {
+                                label: 'Accessibility',
+                                rating: 2
+                            },
+                            {
+                                label: 'Public accessibility',
+                                rating: 3
+                            },
+                            {
+                                label: 'Barrier-free access',
+                                rating: 2
+                            },
+                            {
+                                label: 'Social integration spaces',
+                                rating: 3
+                            },
+                        ]
+                    },
+                    {
+                        label: 'Comfort and health',
+                        criteria: [
+                            {
+                                label: 'Safety',
+                                rating: 1
+                            },
+                            {
+                                label: 'Sound insulation',
+                                rating: 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        default:
+            return {}
+    }
 }
 
 function ObjectiveEvaluationSurvey({
@@ -295,6 +340,10 @@ function ObjectiveEvaluationSurvey({
 
     const [rating, setRating] = React.useState(factorRating);
 
+    if (!rating) {
+        setRating(RatingConstructor(currentUserEvaluation.factorLabel))
+    }
+
     function handleChange(newValue: number, criteriaGroupLabel: string, criterionLabel: string) {
         // @ts-ignore
         const criteriaGroupIndex = rating.criteriaGroups.findIndex((criteriaGroup) => criteriaGroup.label === criteriaGroupLabel)
@@ -302,7 +351,7 @@ function ObjectiveEvaluationSurvey({
             // @ts-ignore
             let criteriaGroup = rating.criteriaGroups[criteriaGroupIndex]
             const criterionIndex = criteriaGroup.criteria.findIndex((criterion: { label: string; }) => criterion.label === criterionLabel)
-            if (criterionIndex !== -1 ) {
+            if (criterionIndex !== -1) {
                 // @ts-ignore
                 setRating(rating => {
                     let update = {...rating}
@@ -327,7 +376,7 @@ function ObjectiveEvaluationSurvey({
                         }}
                         component={CloseIcon}/></Button>
             </div>
-            <h3 style={{textAlign: "center"}}>{currentUserEvaluation.factor}</h3>
+            <h3 style={{textAlign: "center"}}>{currentUserEvaluation.factorLabel}</h3>
         </div>
         <div
             style={{

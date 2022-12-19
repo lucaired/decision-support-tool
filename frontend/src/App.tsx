@@ -7,7 +7,10 @@ import VariantViewer from './components/Variant/VariantViewer';
 import ProjectsDrawer from './components/Wrapper/ProjectsDrawer';
 import SimilarProjectsDrawer from './components/Wrapper/SimilarProjectsDrawer';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+
 function App() {
+
 
     const [allProjects, setAllProjects] = React.useState<any>([]);
     const [activeProject, setActiveProject] = React.useState<any>();
@@ -21,7 +24,7 @@ function App() {
     }
 
     const saveProjectHandler = (project: object) => {
-        axios.post(`http://192.168.2.168:80/projects/`, project)
+        axios.post(`http://${backendUrl}:80/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -37,7 +40,7 @@ function App() {
     const updateProjectHandler = (project) => {
         const updateSet = {...project}
         delete updateSet['_id']
-        axios.put(`http://192.168.2.168:80/projects/${project._id}`, updateSet)
+        axios.put(`http://${backendUrl}:80/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -54,7 +57,7 @@ function App() {
     }
 
     const removeProjectHandler = (projectId: string) => {
-        axios.delete(`http://192.168.2.168:80/projects/${projectId}`)
+        axios.delete(`http://${backendUrl}:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
         })
@@ -95,7 +98,7 @@ function App() {
         setRightDrawerState(open);
     };
 
-    const queryProjects = () => axios.get(`http://192.168.2.168:80/projects/`)
+    const queryProjects = () => axios.get(`http://${backendUrl}:80/projects/`)
         // @ts-ignore
         .then(function (response) {
             // @ts-ignore

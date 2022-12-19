@@ -5,7 +5,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const driver = createDriver('neo4j', '192.168.2.168', 7687, 'neo4j', '123')
+const variantNeo4J = process.env.REACT_APP_VARIANT_NEO4J_URL || 'localhost'
+const driver = createDriver('neo4j', variantNeo4J, 7687, 'neo4j', '123')
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

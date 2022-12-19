@@ -6,6 +6,8 @@ import NodeStringPropInput from '../Tree/NodeStringPropInput';
 import NodeStringPropSelect from '../Tree/NodeStringPropSelect';
 import axios from 'axios';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+
 interface NewProjectModalProps {
     showModal: boolean; 
     showProjectCreateModalHandler: (state: boolean) => void; 
@@ -104,7 +106,7 @@ export function NewProjectModal({
             //@ts-ignore
             formData.append('file', file)
             
-            axios.post('http://192.168.2.168:80/ifc/transform', formData, config)
+            axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
             .then(function (response) {
             console.log(JSON.stringify(response.data));
             })

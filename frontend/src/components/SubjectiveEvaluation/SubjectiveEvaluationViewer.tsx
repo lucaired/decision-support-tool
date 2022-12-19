@@ -16,6 +16,8 @@ import StringPropInput from "../Tree/NodeStringPropInput";
 import Typography from "@mui/material/Typography";
 import {useEffect} from "react";
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+
 function stringToColor(string: string) {
     let hash = 0;
     let i;
@@ -100,7 +102,7 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
 function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
 
     useEffect(() => {
-        axios.get(`http://192.168.2.168:80/surveys/${activeVariantId}`)
+        axios.get(`http://${backendUrl}:80/surveys/${activeVariantId}`)
             .then(function (response) {
                 setSubjectiveEvaluations((subjectiveEvaluation) => response.data)
             }).catch((error) => console.log(error))
@@ -201,7 +203,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
             // @ts-ignore
             const surveyId = update[evaluationIndex]._id
 
-            axios.put(`http://192.168.2.168:80/surveys/${surveyId}`, update[evaluationIndex])
+            axios.put(`http://${backendUrl}:80/surveys/${surveyId}`, update[evaluationIndex])
                 .then(function (response) {
                     setSubjectiveEvaluations((subjectiveEvaluations) => {
                         return update
@@ -212,7 +214,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
                 });
         } else {
             const survey = {variantId: activeVariantId, user: userName, factorRatings: [factorRating]}
-            axios.post('http://192.168.2.168:80/surveys/', survey)
+            axios.post(`http://${backendUrl}:80/surveys/`, survey)
                 .then(function (response) {
                     const surveyId = response.data._id
                     setSubjectiveEvaluations((subjectiveEvaluation) => {
@@ -239,7 +241,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
             // @ts-ignore
             const surveyId = subjectiveEvaluations[index]._id
 
-            axios.delete(`http://192.168.2.168:80/surveys/${surveyId}`)
+            axios.delete(`http://${backendUrl}:80/surveys/${surveyId}`)
                 .then(function (response) {
                     setSubjectiveEvaluations((subjectiveEvaluation) => {
                         let update = [...subjectiveEvaluation]

@@ -11,6 +11,8 @@ import NodeStringPropSelect from "./NodeStringPropSelect";
 import FileUploader from '../Shared/FileUpload';
 import axios from 'axios';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+
 const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file'];
 
 export default function VariantCreatorStepper({
@@ -84,7 +86,7 @@ export default function VariantCreatorStepper({
         //@ts-ignore
         formData.append('file', file)
           
-        axios.post('http://192.168.2.168:80/ifc/transform', formData, config)
+        axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
         .then(function (response) {
         console.log(JSON.stringify(response.data));
         })

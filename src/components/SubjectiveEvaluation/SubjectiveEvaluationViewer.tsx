@@ -10,6 +10,7 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Box from "@mui/material/Box";
 import StringPropInput from "../Tree/NodeStringPropInput";
+import Typography from "@mui/material/Typography";
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -32,11 +33,12 @@ function stringToColor(string: string) {
 }
 
 function stringAvatar(name: string) {
+    const nameSplit = name.split(' ')
     return {
         sx: {
             bgcolor: stringToColor(name),
         },
-        children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+        children: nameSplit.length === 2 ? `${nameSplit[0][0]}${nameSplit[1][0]}` : nameSplit[0][0],
     };
 }
 
@@ -78,7 +80,7 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
                         target={user}
                         updateFunction={setUser}
                         property={"name"}
-                        propertyName={"Name"}
+                        propertyName={"Enter your Name"}
                     />
                     <Button onClick={() => handleSave()}>
                         Save
@@ -151,8 +153,6 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
 
     const mockSubjectiveEvaluation = [
         {user: 'Architect Adrian', factorRatings: [mockFactorRating]},
-        {user: 'Architect Bertha'},
-        {user: 'Architect Chris'}
     ]
 
     const [subjectiveEvaluation, setSubjectiveEvaluation] = React.useState(mockSubjectiveEvaluation);
@@ -232,7 +232,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 currentUserEvaluation={currentUserEvaluation}
                 handleSubjectiveEvaluationUpdate={handleSubjectiveEvaluationUpdate}
             /> :
-            <div>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                 <SubjectiveEvaluationTable
                     subjectiveEvaluation={subjectiveEvaluation}
                     toggleShowSubjectiveEvaluationSurvey={toggleShowSubjectiveEvaluationSurvey}
@@ -256,28 +256,27 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     </div>
 }
 
-
 function computeCriteriaGroupScore(criteriaGroup: object[]): number {
     // @ts-ignore
-    return criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
+    return Math.round(criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0) * 100) / 100
 }
 
 function computeFactorScore(evaluation: object): number {
     // @ts-ignore
-    return evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => acc + computeCriteriaGroupScore(criteriaGroup), 0) / evaluation.criteriaGroups?.length
+    const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => acc + computeCriteriaGroupScore(criteriaGroup), 0) / evaluation.criteriaGroups?.length
+    return Math.round( score   * 100) / 100
 }
 
-// @ts-ignore
 function SubjectiveEvaluationTable({
-// @ts-ignore
-                                      subjectiveEvaluation,
-                                      // @ts-ignore
-                                      toggleShowSubjectiveEvaluationSurvey,
-                                      // @ts-ignore
-                                      setCurrentUserEvaluation,
-                                       // @ts-ignore
-                                       handleSubjectiveEvaluationRemoval
-                                  }) {
+    // @ts-ignore
+    subjectiveEvaluation,
+    // @ts-ignore
+    toggleShowSubjectiveEvaluationSurvey,
+    // @ts-ignore
+    setCurrentUserEvaluation,
+    // @ts-ignore
+    handleSubjectiveEvaluationRemoval
+}) {
 
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
         { /* @ts-ignore */}
@@ -297,7 +296,8 @@ function SubjectiveEvaluationTable({
                         marginRight: "5px",
                         display: "flex",
                         alignItems: "center",
-                        gap: "5px"
+                        gap: "5px",
+                        width: "155px"
                     }}
                 >
                     <Avatar {...stringAvatar(evaluation.user)} />
@@ -468,7 +468,9 @@ function SubjectiveEvaluationSurvey({
                         }}
                         component={CloseIcon}/></Button>
             </div>
-            <h3 style={{textAlign: "center"}}>{currentUserEvaluation.factorLabel}</h3>
+            <Typography style={{textAlign: "center"}} gutterBottom variant="h5">
+                {currentUserEvaluation.factorLabel}
+            </Typography>
         </div>
         <div
             style={{
@@ -490,7 +492,9 @@ function SubjectiveEvaluationSurvey({
                             gap: "5px"
                         }}
                     >
-                        <h4>{criteriaGroup.label}</h4>
+                        <Typography style={{paddingTop: "5px"}} gutterBottom variant="subtitle1">
+                            {criteriaGroup.label}
+                        </Typography>
                         {/* @ts-ignore */}
                         {criteriaGroup.criteria?.map((criterion) =>
                             <Paper
@@ -500,7 +504,9 @@ function SubjectiveEvaluationSurvey({
                                     paddingRight: "10px",
                                 }}
                             >
-                                <p>{criterion.label}</p>
+                                <Typography style={{paddingTop: "5px"}} gutterBottom variant="subtitle2">
+                                    {criterion.label}
+                                </Typography>
                                 <Stack style={{minWidth: "160px"}} spacing={2} direction="row" sx={{mb: 1}}
                                        alignItems="center">
                                     <p>poor</p>

@@ -43,7 +43,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
         bimReference: 'AC-20-Smiley-West-10-Bldg',
         decisionLevel: 'construction' as DecisionLevel,
         children: [],
-        objectiveEvaluation: [{user: 'Architect A'},{user: 'Architect B'},{user: 'Architect C'}]
+        objectiveEvaluation: [{user: 'Architect Adrian'},{user: 'Architect Bertha'},{user: 'Architect Chris'}]
     })
     // node handlers
     const [activeNode, setActiveNode] = useState({})

@@ -76,7 +76,7 @@ function DecisionTreeHandler({activeVariantHandler, activeVariant, activeProject
     const nodeSize = {x: 300, y: 200};
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
 
-    return <div id="treeWrapper" style={{height: "500px"}}>
+    return <div id="treeWrapper" style={{height: "308px"}}>
         {activeProjectTree && <Tree
             data={activeProjectTree}
             orientation={"vertical"}

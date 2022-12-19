@@ -43,7 +43,7 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                     <React.Fragment>
                         <CardContent
                             style={{
-                                height: '430px'
+                                height: '310px'
                             }}
                         >
                             <DecisionTreeHandler
@@ -61,7 +61,7 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                     <React.Fragment>
                         <CardContent
                             style={{
-                                minHeight: '630px'
+                                minHeight: '600px'
                             }}
                         >
                             <VariantExplorerMenu
@@ -75,7 +75,7 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                                     // testing={true}
                                     // path={'http://192.168.2.168:3000/0.svf'}
                                     urn={'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGVjaXNpb24tc3VwcG9ydC1idWNrZXQvVjItMS5pZmM'}
-                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6InZTRE9GdnYydzZIZzNnMnhHTktQTkhiOW5XTHdwaDFRMzZpamtwV2xRbU5MVFFzeTFGbFN0bXg1eXFtdWZRSDciLCJleHAiOjE2NzE0NDY4MTV9.NSrQmgcnKTtqMVj_LbhdNeqCqMkzOGpgBAFmGWxYrnVmbHG6f15iVnESPqrZqAnBLHEYmrt9anS8PyYMzI2fRjJdqk0waPLaEiPMtW_uHL8XuQgEoydKm73I_y7EMnrSF-LxhFJvPm-Gj78GuYA4Z_pGE88Cb1w22SIa7RV5aXU_3Pkcs6phCQR5dRZq-fZhsZqvv0SBIOY6Exy7lzNK1ySdhx-FrMrvHNuLlm90TTzcwU-7q_MSno0SC8H4g_2xL_eiSG8textsFRHQlWSky4hFkGXvgjwh-0DnJjdW3wLCVAAQ6gzMWQrX_5JYTb1yCU8OTuYIV2fK8sVZzuyY3w'}
+                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6IlFqSUxXSVd6akdmNHlRRTA4TkdmZmxpN1F3UWcxbDBadHU2MXV1Y21GdHJiSkFSdzJId3lXVFpFOHRmemNvYVYiLCJleHAiOjE2NzE0NjkxNjh9.R--t13tAIVsfuYeJsYqqJAfUBZjZJjs0i2q5G3mBEIyXQxe7ShOmfXUhHamFQNdXvnWZAE_mEv3lVgvPUe3RHUaAtLSr1EFJZJmssk5LSEMG0YgYjLnICjKBYT_kw5kSDDVQUAbR3r0Y16S9zzsYXc--we3NVuAHRRz1EsTKtKfYkk30kf4JnQmuQBLfKJVfsy2E3Ism70YyjV3gTym89UeRnDhI5cB3wIF4xRy_-YSKXyjUXkl3gwJ2KogiWtMU9g4wPrnBpEsysh6RTaASv0tHE3Nx81_1Sqws0mkxw6E_TwlLEmDHlXfFeigG49ILFI5Q-GO0jE_FOlmVV3YZmw'}
                                 /> :
                                 activeVariantExplorationIndex === 1 ?
                                     <GWPEvaluation

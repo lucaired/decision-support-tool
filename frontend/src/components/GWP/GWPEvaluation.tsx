@@ -59,6 +59,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
     let elementAreasByBuildingPart = new Map<string, number>();
     let elementLayerSetByBuildingPart = new Map<string, Map<string, Object>>();
+    let elementLayerSetByBuildingPartCount = new Map<string, number>();
 
     // Internal building part category to Node label
     let buildingPartLabelToNodeLabel = new Map<string, string>();
@@ -140,6 +141,13 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
         elementAreasByBuildingPart.set(key, totalElementArea || 0)
 
+        if (elementLayerSetByBuildingPartCount !== undefined && elementLayerSetByBuildingPartCount.has(key)) {
+            // @ts-ignore
+            elementAreasByBuildingPartCount.set(key, elementAreasByBuildingPartCount.get(key)+1)
+        } else {
+            elementLayerSetByBuildingPartCount.set(key, 1)
+        }
+
         if (elementLayerSetByBuildingPart.has(key)) {
             const layersUpdate = new Map([
                 // @ts-ignore
@@ -168,10 +176,9 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             buildingPartLabelToNodeLabel.delete(elementType)
         }
     })
-
     
     // build a mapping from the original labels to to sets of buildingParts
-    // two sets one with the are infos and one with the layerSets 
+    // two sets one with the area infos and one with the layerSets 
     buildingPartLabelToNodeLabel.forEach((nodeLabel, buildingPartLabel, map) => {
         const area = elementAreasByBuildingPart?.get(buildingPartLabel);
 
@@ -285,32 +292,38 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             return  [area / 5, area * 2 / 5]
         }
 
-        // TODO: rationalize this, we don't need this if the layerSet is defined
         let gwpForBuildingPart;
 
+        // only use the area if we don't have layer information available with an early return
         if (Array.from(layers.keys()).length === 0) {
             gwpForBuildingPart = [area, area * 2]
             return gwpForBuildingPart
         }
 
+        // otherwise use the layer information
+
         const gwpSumOfLayers = Array.from(layers.entries()).map((layer) => getGWPForLayer(layer[0], layer[1]))
         
+        // number elements of the buildingPart type with this specific layer set
+        const elementCount = elementLayerSetByBuildingPartCount.get(buildingPart) || 0
+
         for (const gwpResult of gwpSumOfLayers) {
             if (typeof gwpResult === 'number') {
                 if (!gwpForBuildingPart) {
                     gwpForBuildingPart = 0
                 }
                 // @ts-ignore
-                gwpForBuildingPart += gwpResult
+                gwpForBuildingPart += gwpResult * elementCount
             } else {
                 if (!gwpForBuildingPart) {
                     gwpForBuildingPart = [0,0]
                 }
                 // @ts-ignore
-                gwpForBuildingPart = [gwpForBuildingPart[0] + gwpResult[0] * area, gwpForBuildingPart[1] + gwpResult[1] * area]
+                gwpForBuildingPart = [gwpForBuildingPart[0] + gwpResult[0] * elementCount, gwpForBuildingPart[1] + gwpResult[1] * elementCount]
             }
         }
 
+        // return gwp from layers
         return gwpForBuildingPart || 0
     }
 
@@ -371,12 +384,23 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                     largestValue += gwp[1] 
                 }
             });
+
         smallestValue = smallestValue !== undefined ? smallestValue : 0;
         if (smallestValue !== 0) {
             smallestValue += totalPointValues
         }
         largestValue += totalPointValues
         return [smallestValue, largestValue]
+    }
+
+    const getGWPForWholeBuilding = () => {
+        const totalGWP = [0,0]
+        const gwpArray = getGeneralBuildingPartLabels().map((generalBuildingPartName) => getGWPForGeneralBuildingPart(generalBuildingPartName))
+        return gwpArray.reduce((acc, curr) => {
+            acc[0] += curr[0]
+            acc[1] += curr[1]
+            return acc
+        }, totalGWP)
     }
 
     const getLabels = () => {
@@ -390,13 +414,17 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     }
 
     const getData = () => {
-        // element types without area greater than 0 or no layer set are not shown
-        return decisionLevel === 0 ? [totalBuildingArea, totalBuildingArea * 1.5] :
-            decisionLevel === 1 ? getGeneralBuildingPartLabels().map((label) => getGWPForGeneralBuildingPart(label)) :
+        // element types without area greater than 0
+        // or no layer set are not shown
+        return decisionLevel === 0 ? getGWPForWholeBuilding() :
+            decisionLevel === 1 ? getGeneralBuildingPartLabels()
+                .map((label) => getGWPForGeneralBuildingPart(label)) :
             // @ts-ignore
-            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys()).map(buildingPart => getGWPForBuildingPart(buildingPart)) :
+            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys())
+                .map(buildingPart => getGWPForBuildingPart(buildingPart)) :
                 // @ts-ignore
-                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).entries()).map((entry) => getGWPForLayer(entry[0], entry[1])) :
+                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).entries())
+                    .map((entry) => getGWPForLayer(entry[0], entry[1])) :
                         []
     }
 
@@ -423,7 +451,6 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     }
 
     const generatedData = getData()
-
 
     const data = {
         labels: getLabels(),
@@ -475,6 +502,5 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         </div>
     );
 }
-
 
 export default GWPEvaluation

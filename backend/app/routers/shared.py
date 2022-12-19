@@ -14,3 +14,6 @@ class PyObjectId(ObjectId):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
+    
+def flatten(l):
+    return [item for sublist in l for item in sublist]

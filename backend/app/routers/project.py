@@ -1,87 +1,14 @@
-from bson import ObjectId
+from app.mongodb.crud.project import Project, UpdateProject
 from fastapi import APIRouter, Body, status, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, Field
-from typing import ForwardRef
 
+from app.routers.shared import flatten
 import app.mongodb.crud.project as crud
-from .shared import PyObjectId
 
 router = APIRouter(
     prefix="/projects",
 )
-
-class Tree(BaseModel):
-    name: str
-    attributes: dict[str, object]
-    id: str
-    ifc_file: str = Field(..., alias="ifcFile")
-    bim_reference: str = Field(..., alias="bimReference")
-    decision_level: str = Field(..., alias="decisionLevel")
-    children: list['Tree']
-    show_node_control: bool = Field(alias="showNodeControl")
-
-class Project(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str
-    weights_set: dict[str, float] = Field(..., alias="weightsSets")
-    tree: Tree = Field(...)
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Building.Lab",
-                "weightsSets": {
-                    "Design Quality": 2.0,
-                    "Comfort and health": 1.0,
-                    "Functionality": 1.0
-                },
-                "tree": {
-                    "name": "V1-1",
-                    "attributes": {
-                        "level": "Building Level"
-                    },
-                    "id": "g9ecb",
-                    "ifcFile": "V1-1.ifc",
-                    "bimReference": "<some-urn>",
-                    "decisionLevel": "construction",
-                    "children": []
-                }
-            }
-        }
-
-class UpdateProject(BaseModel):
-    name: str
-    weights_set: dict[str, float]  = Field(..., alias="weightsSets")
-    tree: Tree = Field(...)
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Building.Lab",
-                "weightsSets": {
-                    "Design Quality": 2.0,
-                    "Comfort and health": 1.0,
-                    "Functionality": 1.0
-                },
-                "tree": {
-                    "name": "V1-1",
-                    "attributes": {
-                        "level": "Building Level"
-                    },
-                    "id": "g9ecb",
-                    "ifcFile": "V1-1.ifc",
-                    "bimReference": "<some-urn>",
-                    "decisionLevel": "construction",
-                    "children": []
-                }
-            }
-        }
 
 @router.get("/", response_model=list[Project])
 async def get_all_projects():

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import ifc, project, survey
+from .routers import ifc, project, survey, matching
 
 app = FastAPI()
 
@@ -23,3 +23,4 @@ app.add_middleware(
 app.include_router(ifc.router)
 app.include_router(project.router)
 app.include_router(survey.router)
+app.include_router(matching.router)

@@ -6,7 +6,8 @@ function VariantExplorerMenu() {
         style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-evenly",
+            justifyContent: "start",
+            gap: "5px",
             marginBottom: "15px"
         }}>
         <Button variant="contained">BIM visualization</Button>

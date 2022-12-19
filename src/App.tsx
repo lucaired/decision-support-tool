@@ -34,7 +34,7 @@ function App() {
                 <React.Fragment>
                     <CardContent
                         style={{
-                            height: '440px'
+                            height: '640px'
                         }}
                     >
                         <VariantExplorerMenu/>

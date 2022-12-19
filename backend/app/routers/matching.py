@@ -21,16 +21,20 @@ router = APIRouter(
     prefix="/matchings",
 )
 
-@router.get(
+    
+
+@router.post(
     "/project/{id}/match_by_design_episodes",
     response_description="Get matching projects by DE matching",
     response_model=list[Project]
 ) 
-async def query_matching_projects(id: str):
+async def create_project_matching_result(id: str, design_episode_ids: dict):
     project_dict = await crud.query_project_by_id(id)
     if project_dict:
         project = Project.parse_obj(project_dict)
-        all_design_episode_ids = project.tree.extract_all_design_episode_ids()
+        all_design_episode_ids = []
+        for design_episode_ids in design_episode_ids.values():
+            all_design_episode_ids.extend(design_episode_ids)
         all_unique_design_episode_ids = list(set(all_design_episode_ids))
         # Containes up to three tuples with the three most similiar 
         # design episodes per search design episode

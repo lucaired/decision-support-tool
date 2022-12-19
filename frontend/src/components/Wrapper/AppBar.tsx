@@ -15,7 +15,7 @@ interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
     activeProject?: object;
     toggleLeftDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
-    showDesignEpisodeMatchingModalHandler: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
+    showDesignEpisodeMatchingModalHandler: (open: boolean) => void;
     // @ts-ignore
     saveCurrentProject: () => void;
 }
@@ -59,7 +59,7 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDr
           >
               <SvgIcon
                   color='primary'
-                  onClick={showDesignEpisodeMatchingModalHandler(true)}
+                  onClick={() => showDesignEpisodeMatchingModalHandler(true)}
                   component={AnalyticsIcon}
               />
           </Button>}

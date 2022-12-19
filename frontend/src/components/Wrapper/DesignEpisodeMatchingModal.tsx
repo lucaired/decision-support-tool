@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Checkbox, Fade, FormControlLabel, Modal, Step, StepLabel, Stepper, Typography } from "@mui/material";
+import { Box, Button, Card, Checkbox, Divider, Fade, FormControlLabel, Modal, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
@@ -60,7 +60,7 @@ export function DesignEpisodeMatchingModal({
         const isDesignEpisodeSetInVariant = (variantName: string, designEpisodeId: string) => {
           if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
             // @ts-ignore
-            return variantsToDesignEpisodes[variantName].some(designEpisodeId => designEpisodeId === designEpisodeId)
+            return variantsToDesignEpisodes[variantName].findIndex((id: string) => id === designEpisodeId) !== -1
           }
           return false;
         }
@@ -77,7 +77,13 @@ export function DesignEpisodeMatchingModal({
             update[variantName] = designEpisodeIds
           } else {
             // @ts-ignore
-            update[variantName] = [designEpisodeId]
+            if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
+              // @ts-ignore
+              update[variantName] = [...variantsToDesignEpisodes[variantName], designEpisodeId]
+            } else {
+              // @ts-ignore
+              update[variantName] = [designEpisodeId]
+            }
           }
           setVariantsToDesignEpisodes((state) => {
             return {
@@ -139,32 +145,37 @@ export function DesignEpisodeMatchingModal({
                 <FormGroup>    
                   {activeProjectTree && Array.from(getVariantsAndDesignEpisodes(activeProjectTree))
                   .filter((entry) => entry[1].length > 0)
-                  .map((entry) => <Stack direction="row" spacing={1} alignItems="center" key={entry[0]}>
-                                    <Android12Switch
-                                      checked={
-                                        Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
-                                        /* @ts-ignore */
-                                        variantsToDesignEpisodes[entry[0]].length > 0
-                                      } 
-                                      onChange={(event)=> addOrRemoveAllDesignEpisodeFromVariant(entry[0], entry[1])}
-                                    />
-                                    <Typography>{entry[0]}</Typography>
-                                    <div style={{display: 'flex', flexDirection: 'column'}}>
-                                    <FormGroup>
-                                      {entry[1].map((designEpisodeId) => 
-                                        <FormControlLabel 
-                                            key={`${designEpisodeId}-designEpisode-checkbox`}
-                                            label={designEpisodeId}
-                                            control={
-                                              <Checkbox 
-                                                checked={isDesignEpisodeSetInVariant(entry[0], designEpisodeId)} 
-                                                onChange={()=>addOrRemoveDesignEpisodeFromVariant(entry[0], designEpisodeId)}
-                                              />
-                                            }
-                                        />)}
-                                    </FormGroup>
-                                    </div>
-                                  </Stack>
+                  .map((entry) => <div>
+                    <Stack direction="row" spacing={1} alignItems="center" key={entry[0]}>
+                      <Card style={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                        <Typography style={{textAlign: 'center'}}>{entry[0]}</Typography>
+                        <Android12Switch
+                                        checked={
+                                          Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
+                                          /* @ts-ignore */
+                                          variantsToDesignEpisodes[entry[0]].length > 0
+                                        } 
+                                        onChange={(event)=> addOrRemoveAllDesignEpisodeFromVariant(entry[0], entry[1])}
+                                      />
+                      </Card>
+                        <div style={{display: 'flex', flexDirection: 'column'}}>
+                        <FormGroup>
+                          {entry[1].map((designEpisodeId) => 
+                            <FormControlLabel 
+                                key={`${designEpisodeId}-designEpisode-checkbox`}
+                                label={designEpisodeId}
+                                control={
+                                  <Checkbox 
+                                    checked={isDesignEpisodeSetInVariant(entry[0], designEpisodeId)} 
+                                    onChange={()=>addOrRemoveDesignEpisodeFromVariant(entry[0], designEpisodeId)}
+                                  />
+                                }
+                            />)}
+                        </FormGroup>
+                        </div>
+                      </Stack>
+                      <Divider/>
+                    </div>
                   )}
                 </FormGroup>
                 <div style={{display: 'flex', justifyContent: 'end'}}>

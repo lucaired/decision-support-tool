@@ -196,18 +196,9 @@ function App() {
         setRightDrawerState(open);
     };
     const [showDesignEpisodeMatchingModal, setShowDesignEpisodeMatchingModal] = React.useState(false);
-    const showDesignEpisodeMatchingModalHandler =
-    (open: boolean) =>
-    (event: React.KeyboardEvent | React.MouseEvent) => {
-        if (
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-            (event as React.KeyboardEvent).key === 'Shift')
-        ) {
-        return;
-        }
-        setShowDesignEpisodeMatchingModal(open);
-    };
+    const showDesignEpisodeMatchingModalHandler = (state: boolean) => {
+        setShowDesignEpisodeMatchingModal(state)
+      }
 
     useEffect(() => {queryProjects()}, [leftDrawerState]);
     useEffect(() => {

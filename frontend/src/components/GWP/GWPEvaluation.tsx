@@ -30,7 +30,7 @@ function GWPEvaluation({activeVariant}) {
     // use essential building elements for BoQ
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
         'WHERE (not (element:Space))' +
-        'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal, element.materials'
+        'RETURN labels(element), element.Area, element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.NetSurfaceArea, element.OuterSurfaceArea, element.LoadBearing, element.IsExternal, element.materials'
     const {loading, records, run,} = useReadCypher(q, {ifcmodel: activeVariant.ifcFile})
 
     useEffect(() => {
@@ -91,10 +91,14 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     records?.forEach(record => {
         const totalSurfaceArea = record.get('element.TotalSurfaceArea')
         const grossArea = record.get('element.GrossArea')
+        const netSurfaceArea = record.get('element.NetSurfaceArea')
+        const outerSurfaceArea = record.get('element.OuterSurfaceArea')
+        const area = record.get('element.Area')
         const grossSideArea = record.get('element.GrossSideArea')
 
-        const totalRecordArea = totalSurfaceArea ? totalSurfaceArea : grossArea ? grossArea : grossSideArea ? grossSideArea : 0
+        const totalRecordArea = totalSurfaceArea ? totalSurfaceArea : grossArea ? grossArea : netSurfaceArea ? netSurfaceArea : outerSurfaceArea ? outerSurfaceArea : area? area : grossSideArea ? grossSideArea :0
         const label = record.get('labels(element)')[0]
+
         const loadBearing = record.get('element.LoadBearing')
         const isExternal = record.get('element.IsExternal')
 
@@ -163,6 +167,22 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         return uniqueLayers
     }
 
+    const getGWPForLayer = (layerName: string, layer: Object): number|Array<number> => {
+        if (layerName === '<Unnamed>') {
+            console.log(layer)
+        }
+        let gwp: number|Array<number> = layerName.length * 100
+        if (!layer.hasOwnProperty('LayerThickness')) {
+            console.log(layer)
+            gwp = [gwp, gwp * 2]
+        } else {
+            // @ts-ignore
+            gwp = gwp * layer['LayerThickness']
+        }
+
+        return gwp
+    }
+
     const getLabels = () => {
         return decisionLevel === 0 ? ['Whole Building'] :
             decisionLevel === 1 ? Array.from(elementAreasByElementType.keys()) :
@@ -176,14 +196,11 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             decisionLevel === 1 ? Array.from(elementAreasByElementType.values()).map(value => [value * Math.random(), value]) :
                 // TODO: get data from oracle
                 // @ts-ignore
-                decisionLevel === 2 ? Array.from(getLayersForElementType().keys()).map(() => {
-                        let gwp: number = faker.datatype.number({min: 0, max: 1000})
-                        return [gwp, gwp * 2]
-                    }) :
+                decisionLevel === 2 ? Array.from(getLayersForElementType().entries()).map((entry) => getGWPForLayer(entry[0], entry[1])) :
                         []
     }
 
-    const getBarFillColor = (data: Array<number>|Array<Array<number>>) => {
+    const getBarFillColor = (data: Array<number|Array<number>>) => {
         let largestValue = 0;
         let index = -1;
         let fillColor = data.map((datum: number | Array<number>, current_index: number) => {

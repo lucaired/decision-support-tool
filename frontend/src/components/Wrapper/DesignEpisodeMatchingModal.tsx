@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Card, Checkbox, Divider, Fade, FormControlLabel, Modal, Step, StepLabel, Stepper, Typography } from "@mui/material";
+import { Box, Button, Card, Checkbox, Divider, Fade, FormControlLabel, Modal, Step, StepLabel, Stepper, TextField, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
@@ -60,29 +60,29 @@ export function DesignEpisodeMatchingModal({
         const isDesignEpisodeSetInVariant = (variantName: string, designEpisodeId: string) => {
           if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
             // @ts-ignore
-            return variantsToDesignEpisodes[variantName].findIndex((id: string) => id === designEpisodeId) !== -1
+            return variantsToDesignEpisodes[variantName]['designEpisodeIds'].findIndex((id: string) => id === designEpisodeId) !== -1
           }
           return false;
         }
 
         const addOrRemoveDesignEpisodeFromVariant = (variantName: string, designEpisodeId: string) => {
-          let update = variantsToDesignEpisodes
+          let update = {...variantsToDesignEpisodes}
 
           if (isDesignEpisodeSetInVariant(variantName, designEpisodeId)) {
             // @ts-ignore
-            let designEpisodeIds = variantsToDesignEpisodes[variantName]
+            let designEpisodeIds = variantsToDesignEpisodes[variantName]['designEpisodeIds']
             let index = designEpisodeIds.findIndex((id: string) => id === designEpisodeId)
             designEpisodeIds.splice(index, 1)
             // @ts-ignore
-            update[variantName] = designEpisodeIds
+            update[variantName]['designEpisodeIds'] = designEpisodeIds
           } else {
             // @ts-ignore
             if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
               // @ts-ignore
-              update[variantName] = [...variantsToDesignEpisodes[variantName], designEpisodeId]
+              update[variantName]['designEpisodeIds'] = [...variantsToDesignEpisodes[variantName]['designEpisodeIds'], designEpisodeId]
             } else {
               // @ts-ignore
-              update[variantName] = [designEpisodeId]
+              update[variantName] = {designEpisodeIds: [designEpisodeId], variantWeight: 1}
             }
           }
           setVariantsToDesignEpisodes((state) => {
@@ -99,7 +99,7 @@ export function DesignEpisodeMatchingModal({
             delete update[variantName]
           } else {
             // @ts-ignore
-            update[variantName] = designEpisodeIds
+            update[variantName] = {designEpisodeIds: designEpisodeIds, variantWeight: 1}
           }
           setVariantsToDesignEpisodes((state) => {
             return {
@@ -131,6 +131,20 @@ export function DesignEpisodeMatchingModal({
           return variantsAndDesignEpisodes;
         }
 
+        const handleVariantWeightChange = (variantName: string, weight: string) => {
+          console.log(weight)
+          if (Object.hasOwn(variantsToDesignEpisodes, variantName)) {
+            let update = {...variantsToDesignEpisodes}
+            // @ts-ignore
+            update[variantName]['variantWeight'] = Math.max(weight,1)
+            setVariantsToDesignEpisodes((state) => {
+              return {
+                ...update 
+              }}
+            )
+          }
+      };
+
         return <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"
@@ -147,20 +161,45 @@ export function DesignEpisodeMatchingModal({
                   .filter((entry) => entry[1].length > 0)
                   .map((entry) => <div>
                     <Stack direction="row" spacing={1} alignItems="center" key={entry[0]}>
-                      <Card style={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                        <Typography style={{textAlign: 'center'}}>{entry[0]}</Typography>
+                      <Card>
+                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <Typography style={{fontWeight: '600', paddingLeft: '5px'}}>{entry[0]}</Typography>
                         <Android12Switch
-                                        checked={
-                                          Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
-                                          /* @ts-ignore */
-                                          variantsToDesignEpisodes[entry[0]].length > 0
-                                        } 
-                                        onChange={(event)=> addOrRemoveAllDesignEpisodeFromVariant(entry[0], entry[1])}
-                                      />
+                          checked={
+                            Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
+                            /* @ts-ignore */
+                            variantsToDesignEpisodes[entry[0]]['designEpisodeIds'].length > 0
+                          } 
+                          onChange={(event)=> addOrRemoveAllDesignEpisodeFromVariant(entry[0], entry[1])}
+                        />
+                        </div>
+                        { Object.hasOwn(variantsToDesignEpisodes, entry[0]) && 
+                            /* @ts-ignore */
+                            variantsToDesignEpisodes[entry[0]]['designEpisodeIds'].length > 0 &&                       <Box
+                          component="form"
+                          sx={{
+                            '& .MuiTextField-root': { m: 1, width: '12ch' },
+                          }}
+                        autoComplete="off"
+                      >
+                        <TextField
+                          id="outlined-number"
+                          label="Weight"
+                          // @ts-ignore
+                          value={variantsToDesignEpisodes[entry[0]]['variantWeight']}
+                          type="number"
+                          size="small"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={(event) => handleVariantWeightChange(entry[0], event.target.value)}
+                        />               
+                      </Box>}
                       </Card>
                         <div style={{display: 'flex', flexDirection: 'column'}}>
                         <FormGroup>
-                          {entry[1].map((designEpisodeId) => 
+                          {entry[1].map((designEpisodeId) =>
+                          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                             <FormControlLabel 
                                 key={`${designEpisodeId}-designEpisode-checkbox`}
                                 label={designEpisodeId}
@@ -170,7 +209,27 @@ export function DesignEpisodeMatchingModal({
                                     onChange={()=>addOrRemoveDesignEpisodeFromVariant(entry[0], designEpisodeId)}
                                   />
                                 }
-                            />)}
+                            />
+                                                    {isDesignEpisodeSetInVariant(entry[0], designEpisodeId) && <Box
+                          component="form"
+                          sx={{
+                            '& .MuiTextField-root': { m: 1, width: '12ch' },
+                          }}
+                        autoComplete="off"
+                      >
+                        <TextField
+                          id="outlined-number"
+                          label="Weight"
+                          type="number"
+                          size="small"
+                          defaultValue={"1"}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />               
+                      </Box>}
+                          </div> 
+                            )}
                         </FormGroup>
                         </div>
                       </Stack>
@@ -183,7 +242,7 @@ export function DesignEpisodeMatchingModal({
                       showDesignEpisodeMatchingModalHandler(false);
                       queryMatchingProjects(variantsToDesignEpisodes);
                     }}>
-                        Match
+                        Match Projects
                     </Button>    
                 </div>
                 </Box>

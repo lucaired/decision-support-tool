@@ -21,7 +21,6 @@ router = APIRouter(
     prefix="/matchings",
 )
 
-    
 
 @router.post(
     "/project/{id}/match_by_design_episodes",
@@ -29,9 +28,7 @@ router = APIRouter(
     response_model=list[Project]
 ) 
 async def create_project_matching_result(id: str, design_episode_ids: dict):
-    project_dict = await crud.query_project_by_id(id)
-    if project_dict:
-        project = Project.parse_obj(project_dict)
+    if project_dict := await crud.query_project_by_id(id):
         all_design_episode_ids = []
         for design_episode_ids in design_episode_ids.values():
             all_design_episode_ids.extend(design_episode_ids)

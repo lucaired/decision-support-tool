@@ -79,6 +79,30 @@ def _parse_description(nlp, source_de):
         logger.error(f'Could not parse description {exception}')
         return None
 
+def boost_by_weight(all_matchings: list[MatchingResult], weights: dict) -> list[MatchingResult]:
+    def boost_similarity(matching: MatchingResult):
+        if matching.result_de_id in weights:
+            matching.similarity = matching.similarity + matching.similarity * 0.1 * weights[matching.result_de_id]
+        return matching
+
+    return list(map(boost_similarity, all_matchings))
+
+def boost_similiarity_ranking_based_on_frequency(all_matchings: list[MatchingResult]) -> list[MatchingResult]:
+    frequency_map = {}
+
+    for matching in all_matchings:
+        if matching.result_de_id in frequency_map:
+            frequency_map[matching.result_de_id] = frequency_map[matching.result_de_id]+1
+        else:
+            frequency_map[matching.result_de_id] = 1
+
+    def boost_similarity(matching: MatchingResult):
+        logger.info(f'DE:  {matching.result_de_id} was matched {frequency_map[matching.result_de_id]} times.')
+        matching.similarity = matching.similarity + matching.similarity * 0.1 * frequency_map[matching.result_de_id]
+        return matching
+
+    return list(map(boost_similarity, all_matchings))
+
 def get_best_matching_design_episodes(all_matchings: list[MatchingResult]) -> list[MatchingResult]:
     def useSimilarity(matching_result: MatchingResult):
         return matching_result.similarity

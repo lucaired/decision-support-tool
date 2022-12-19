@@ -194,6 +194,7 @@ export function DesignEpisodeMatchingModal({
         >
             <Fade in={showDesignEpisodeMatchingModal}>
                 <Box sx={modalStyle}>
+                <Typography style={{fontSize: '24px', fontWeight: '600', paddingBottom: '15px'}}>Configure project matching</Typography>
                 <FormGroup>    
                   {activeProjectTree && Array.from(getVariantsAndDesignEpisodes(activeProjectTree))
                   .filter((entry) => entry[1].length > 0)
@@ -280,9 +281,10 @@ export function DesignEpisodeMatchingModal({
                 <div style={{display: 'flex', justifyContent: 'end'}}>
                     <Button onClick={() => {
                       showDesignEpisodeMatchingModalHandler(false);
+                      setVariantsToDesignEpisodes({});
                       queryMatchingProjects(variantsToDesignEpisodes);
                     }}>
-                        Match Projects
+                        Match
                     </Button>    
                 </div>
                 </Box>

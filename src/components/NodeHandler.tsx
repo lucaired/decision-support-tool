@@ -1,21 +1,21 @@
 export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; children: any };
 
-export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree) => void) => {
+export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, newNode?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {
-        func(tree)
+        func(tree, newNode)
     } else {
         if (tree.children) {
-            tree.children.map((child: any) => setNodeProperty(child, id, func))
+            tree.children.map((child: any) => setNodeProperty(child, id, func, newNode))
         }
     }
 }
-export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string) => void) => {
+export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.children) {
         if (tree.children.some((child: DecisionTree) => child.id === id)) {
-            func(tree, id)
+            func(tree, id, newNode)
         } else {
             if (tree.children) {
-                tree.children.map((child: any) => setParentNodeProperty(child, id, func))
+                tree.children.map((child: any) => setParentNodeProperty(child, id, func, newNode))
             }
         }
     }
@@ -23,17 +23,7 @@ export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tre
 export const setNodeControl = (tree: DecisionTree) => {
     tree.showNodeControl = !tree.showNodeControl;
 }
-export const addNodeChild = (tree: DecisionTree) => {
-    // TODO: make this collision-proof
-    const id = (Math.random() + 1).toString(36).substring(7);
-    const child = {
-        name: id,
-        attributes: {
-            level: 'Building Part Type',
-        },
-        id: id,
-        showNodeControl: false,
-    }
+export const addNodeChild = (tree: DecisionTree, child?: DecisionTree) => {
     tree.children = tree.children ? [...tree.children, child] : [child]
 }
 export const removeNodeChild = (tree: DecisionTree, nodeId?: string) => {

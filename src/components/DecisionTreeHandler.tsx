@@ -81,9 +81,9 @@ function DecisionTreeHandler() {
         setDecisionTree(tree)
     }
     const handleAddSibling = (nodeId: string) => {
-        let tree = {...decisionTree};
-        setParentNodeProperty(tree, nodeId, addNodeChild)
-        setDecisionTree(tree)
+        // let tree = {...decisionTree};
+        // setParentNodeProperty(tree, nodeId, addNodeChild)
+        // setDecisionTree(tree)
     }
 
     // modal handling

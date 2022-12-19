@@ -610,8 +610,8 @@ def run(path: str, model_name: str):
     
     #### Finish creating the graph content ####
     
-    #conn = get_connection()
-    #_ifcgraph.load_to_neo4j(conn)
+    conn = get_connection()
+    _ifcgraph.load_to_neo4j(conn)
     logger.info("--End--")
 
     return
@@ -648,23 +648,10 @@ def open_ifc_file(ifc_path: str):
 
 # Connect to desired Neo4j database                
 def get_connection(default_uri = "localhost:7687", default_username = "neo4j", default_password = "123"):
-    while (True):         
-        uri = input("Please input desired Neo4j URI (default: {}): ".format(default_uri))
-        uri = check_using_default(uri, default_uri, "URI invalid. Default value is applied.")
-        
-        username = input("Please input username (default: {}): ".format(default_username))
-        username = check_using_default(username, default_username, "Username invalid. Default value is applied.")
-
-        password = getpass("Please input password (default: {}): ".format(default_password))
-        password = check_using_default(password, default_password, "Password invalid. Default value is applied.")
-
-        try:
-            logger.info(uri, username, password)
-            conn = Graph(auth=(username, password), address=uri) 
-            logger.info("Connection Successfull.")
-            return conn
-        except:
-            logger.info("Auth error, please try again.")
-            ifc_path = ""
-            username = ""
-            uri = ""
+    try:
+        conn = Graph(auth=(default_username, default_password), address=default_uri) 
+        logger.info("Connection Successfull.")
+        return conn
+    except:
+        logger.error("Could not connected to Neo4J server")
+        return None

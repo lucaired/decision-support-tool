@@ -24,13 +24,28 @@ const NeoGraph = (props) => {
         const config = {
             // @ts-ignore
             container_id: visRef.current.id,
-            server_url: "neo4j://localhost:7687",
-            server_user: 'neo4j',
-            server_password: '123',
-            labels: {
-                Building: {
-                    caption: "Name",
+            server_url: neo4jUri,
+            server_user: neo4jUser,
+            server_password: neo4jPassword,
+            nodes: {
+                shape: 'hexagon',
+                font: {
+                    color: 'white',
                 },
+            },
+            labels: {
+                "DesignEpisode": {
+                    "caption": "Name",
+                    "size": "pagerank",
+                    "community": "community"
+                    //"sizeCypher": "defaultSizeCypher"
+                },
+                "Rooms": {
+                    "caption": "Name",
+                    "size": "pagerank",
+                    "shape": 'square'
+                    //"sizeCypher": "defaultSizeCypher"
+                }
             },
             relationships: {
                 RETWEETS: {
@@ -39,7 +54,7 @@ const NeoGraph = (props) => {
                 },
             },
             initial_cypher:
-                "MATCH (n:Building) RETURN n LIMIT 25",
+                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) = 286 RETURN s, rel, d\n",
         };
         // @ts-ignore
         const vis = new NeoVis(config);

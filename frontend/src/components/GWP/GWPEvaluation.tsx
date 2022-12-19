@@ -280,6 +280,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         const area = elementAreasByElementType.get(buildingPart) || 1
 
         if (buildingPart === 'Proxy  undefined') {
+            // TODO: check this
             return  [area / 5, area * 2 / 5]
         }
 
@@ -291,6 +292,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         }
 
         const gwpSumOfLayers = Array.from(layers.entries()).map((layer) => getGWPForLayer(layer[0], layer[1]))
+        
         for (const gwpResult of gwpSumOfLayers) {
             if (typeof gwpResult === 'number') {
                 if (!gwpForBuildingPart) {
@@ -306,6 +308,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                 gwpForBuildingPart = [gwpForBuildingPart[0] + gwpResult[0] * area, gwpForBuildingPart[1] + gwpResult[1] * area]
             }
         }
+
         return gwpForBuildingPart || 0
     }
 
@@ -332,29 +335,23 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             ...buildPartsWithLayerSetKeys,
         ]))
         
-        let totalSum = 0;
+        let largestValue = 0;
         // @ts-ignore
         let smallestValue = undefined;
+
+        let totalPointValues = 0;
+
         // do not predefine min,max
         buildingParts
-            .map((buildingPart) => getGWPForBuildingPart(buildingPart))
-            .forEach((gwp) => {
+            .map((buildingPart) => [buildingPart, getGWPForBuildingPart(buildingPart)])
+            .forEach((buildingPartAndGwp) => {
                 // gwp is either a point value or a min,max tuple
                 // hence the totalGWP will be either the sum of all point values or a range that
                 // includes the lowest point or range minimum and also the largest point or range value
+                const gwp = buildingPartAndGwp[1]
+
                 if (typeof(gwp)==='number') {
-                    console.log(gwp)
-                    // @ts-ignore
-                    totalSum += gwp
-                    // @ts-ignore
-                    if (!smallestValue) {
-                        // @ts-ignore
-                        smallestValue = gwp
-                    }
-                    if (gwp < smallestValue) {
-                        // @ts-ignore
-                        smallestValue = gwp
-                    }
+                    totalPointValues += gwp
                 } else {
                     // @ts-ignore
                     const minimum = gwp[0]
@@ -368,15 +365,16 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                         // @ts-ignore
                         smallestValue = minimum
                     }
-                    // @ts-ignore
-                    const maximum = gwp[1]
                     // add the size of the intervall
-                    totalSum += maximum - minimum
-       
+                    largestValue += gwp[1] 
                 }
             });
         smallestValue = smallestValue !== undefined ? smallestValue : 0;
-        return [smallestValue, totalSum]
+        if (smallestValue !== 0) {
+            smallestValue += totalPointValues
+        }
+        largestValue += totalPointValues
+        return [smallestValue, largestValue]
     }
 
     const getLabels = () => {

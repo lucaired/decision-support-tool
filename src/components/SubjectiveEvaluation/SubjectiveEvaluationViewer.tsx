@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 import StringPropInput from "../Tree/NodeStringPropInput";
 import Typography from "@mui/material/Typography";
+import {useEffect} from "react";
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -163,6 +164,9 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     ]
 
     const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState(mockSubjectiveEvaluation);
+    useEffect(() => {
+        computeTotalSubjectiveEvaluation()
+    }, [subjectiveEvaluations])
     const [totalSubjectiveEvaluation, setTotalSubjectiveEvaluation] =
         React.useState({});
 
@@ -185,7 +189,6 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 if (index !== -1 && index !== undefined) {
                     let right = update.factorRatings[0].criteriaGroups[index].criteria
                     const updatedCriteria = mergeCriteriaGroupScores(criteriaGroup.criteria, right)
-                    console.log(updatedCriteria)
                     updateCriteriaGroup = {label: criteriaGroup.label, criteria: updatedCriteria}
                     update.factorRatings[0].criteriaGroups[index] = updateCriteriaGroup
                 } else {
@@ -244,7 +247,6 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 return update
             })
         }
-        computeTotalSubjectiveEvaluation()
     }
     const handleSubjectiveEvaluationRemoval = (user: string) => {
         const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
@@ -276,7 +278,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     const handleRatingModalOpen = () => setShowRatingModal(true);
     const handleRatingModalClose = () => setShowRatingModal(false);
     const handleRatingModalUpdate = (rating: object, name: string) => {
-        handleSubjectiveEvaluationUpdate(rating, name)
+        handleSubjectiveEvaluationUpdate(rating, name);
         setShowRatingModal(false);
     }
 
@@ -694,7 +696,7 @@ function SubjectiveEvaluationSurvey({
                         {/* @ts-ignore */}
                         {criteriaGroup.criteria?.map((criterion) =>
                             <Tooltip placement="top" title={tooltipForCriterion(criterion)}>
-                                <Tooltip placement="bottom" title={tooltipForCriterionRating(criterion)}>
+                                <Tooltip placement="bottom" title={tooltipForCriterionRating(criterion).join('|')}>
                                     <Paper
                                         variant="outlined"
                                         style={{

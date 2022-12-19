@@ -351,10 +351,7 @@ def run(path: str, model_name: str):
                 
                     _ifcgraph.update_node_properties(target, properties={"materials": json.dumps(materials)})
                     material_record_count += 1
-        
-        if debug:
-            logger.info("parents", nodes)
-            logger.info("materials", materials)
+
     
     logger.info("Prepared {} material records in {} sec".format(material_record_count, round(time.time() - start, 2)))
 
@@ -647,7 +644,7 @@ def open_ifc_file(ifc_path: str):
             logger.info("No Ifc Found, Please write the path to the IFC File")
 
 # Connect to desired Neo4j database                
-def get_connection(default_uri = "localhost:7687", default_username = "neo4j", default_password = "123"):
+def get_connection(default_uri = "neo4j:7687", default_username = "neo4j", default_password = "123"):
     try:
         conn = Graph(auth=(default_username, default_password), address=default_uri) 
         logger.info("Connection Successfull.")

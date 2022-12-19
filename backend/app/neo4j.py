@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import reduce
 from neo4j import GraphDatabase, basic_auth
 import os
 
@@ -16,6 +17,7 @@ database = os.getenv("NEO4J_DATABASE", "neo4j")
 class DE:
     Guid: str
     description: str
+    explanation_tags: list[str]
 
 class Neo4JGraph:
 
@@ -27,11 +29,26 @@ class Neo4JGraph:
 
     @staticmethod
     def _query_all_design_episode_descriptions(tx):
-        result = tx.run("MATCH (n:DesignEpisode) RETURN n.Guid, n.Description")
+        result = tx.run("""
+        MATCH (d:DesignEpisode)-[EpisodeElement]->(m)
+        RETURN d.Guid, d.Description, Collect(distinct m.ExplanationTags)
+        """)
         return [record.values() for record in result]
     
     def query_all_design_episode_descriptions(self) -> list[DE]:
         with self.driver.session() as session:
             all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions)
-            return list(map(lambda element: DE(Guid=element[0], description=element[1]), all_id_and_description))
+            return list(
+                map(
+                    lambda element: DE(Guid=element[0], description=element[1], explanation_tags=_flatten_explanation_tags(element[2])),
+                    all_id_and_description
+                )
+            )
+    
+def _flatten_explanation_tags(explanation_tags_list: list[list[str]]) -> list[str]:
+    def extend_list(acc: list[str], curr_list: list[str]) -> list[str]:
+        acc.extend(curr_list) 
+        return acc
+    return list(set(reduce(extend_list, explanation_tags_list, [])))
+
 

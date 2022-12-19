@@ -25,13 +25,11 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler}: Var
             setActiveVariantExplorationIndex(index)
         }
     }
-
     function isEmptyObject(activeVariant: DecisionTree) {
         return activeVariant // 👈 null and undefined check
         && Object.keys(activeVariant).length === 0
         && Object.getPrototypeOf(activeVariant) === Object.prototype
     }
-
     // @ts-ignore
     return (
         <div className="VariantViewer" style={{
@@ -74,7 +72,7 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler}: Var
                                     // testing={true}
                                     // path={'http://localhost:3000/0.svf'}
                                     urn={'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGVjaXNpb24tc3VwcG9ydC1idWNrZXQvVjItMS5pZmM'}
-                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6ImF1aUFhdmNwVER0MFNLTk4zS3B6WUtLRXNZR3VWRUZPcEluTmpkalBSaUpWSWl1OEZmbzE0OTM0TFc5d2pidG8iLCJleHAiOjE2NjkzMDAxMTN9.Vvbfm5UInoM2oZC7UnWe7TtV0VIB3cSXnGP0c6_kuXtOiFeW_XQR7SjLv7drV3iGXFD9S7ltmVIKpwjX4_5f1SymzXPTNgAfqmr47s4jeAFPNMVDwpxQULTVKzKpprKNtOdifzT_lOjXpMTg6A7ae9TwMFdTY46v0xP2sRVle7XcB1S-dsTwK6NINMn-9fAsMeFTgSMh9cdXVu9x68yqe2mMYcD_X2dgcsPQdKLa8nvsr-oBb5TaAcmN4OBfMWC3DMO5Xz4_3uueI1ZG5hK0FMhAPVdR50huJo4sf6CEz3sVFKUHxWxn2t6ttkwTFQ_ck1ncjZr9QekHNwwWq60UIQ'}
+                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6IlBidzM1UW1ETHdkSGxEa2dnakdYM3JTTjJlNWk0aXIzYlo3YUlReGlxeFFpMDBFMXN4U2oyejg3aE9oYlQ1QXoiLCJleHAiOjE2Njk2NTIyMjR9.XjjzN2ml1ILBfxEQMooeJ08ggszqkPohdJdcGaHSipf2AQD9YFWNkDJI5g2MV4c_wbMf2AHsg-WLNDMEkD1HSrGpo1RUFomDXM3-dqEwFStGSsR4YEKCZYsaVswUrZPeV1hgLyAhuZKT1GX5kMbgOQ7bW7X7FKEeD9BJSz5ie6wxy1k0pmwSYtNA32jBCh4I9tFc10WoA6otnDI-9TVhZFKcKK618BVyPeLBCKdKqtR-G534nRxyIoWuXcT7zGNduVvRqhD6ahjgtPV-8odwHpNWoRgZq1qOGAGmUil8yF8jZ7n52_QDyi--WKcUVqEKgwboxU-gSfNgvnXH8M7M6g'}
                                 /> :
                                 activeVariantExplorationIndex === 1 ?
                                     <GWPEvaluation

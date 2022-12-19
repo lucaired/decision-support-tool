@@ -3,7 +3,7 @@ import * as React from "react";
 
 // @ts-ignore
 function VariantExplorerMenu({activeVariantExplorationHandler, activeVariantExplorationIndex}) {
-    const labels = ["BIM visualization", "GWP Evaluation", "Design Rationale", "Subjective Evaluation", "Objective Evaluation"]
+    const labels = ["BIM visualization", "GWP Evaluation", "Design Rationale", "Subjective Evaluation"]
 
     function VariantExplorerMenuButton(label: string, index: number) {
         return <Button

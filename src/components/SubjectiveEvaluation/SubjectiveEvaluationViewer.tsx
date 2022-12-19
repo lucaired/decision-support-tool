@@ -176,6 +176,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     });
 
     const computeTotalSubjectiveEvaluation = () => {
+        // Compute total evaluation factoring all evaluations from users,
         // @ts-ignore
         const totalEvaluation = subjectiveEvaluations.reduce((acc, evaluation) => {
             let update = {...acc}
@@ -205,7 +206,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         const leftUpdate = left.map((leftScore) => {
             const index = right.findIndex((rightScore) => leftScore.label === rightScore.label)
             if (index !== -1) {
-                return {label: leftScore.label, rating: leftScore.rating + right[index].rating}
+                return {label: leftScore.label, rating: (leftScore.rating + right[index].rating)}
             } else {
                 return leftScore
             }
@@ -302,6 +303,9 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                         }}
                         handleSubjectiveEvaluationRemoval={() => {
                         }}
+                        globalFactorWeight={1 / subjectiveEvaluations.length}
+                        disableEvaluationRemoval={true}
+                        subjectiveEvaluationStyle={{border: 'solid #1976d2 1.5px', marginBottom: '10px'}}
                     />
                 }
                 <SubjectiveEvaluationTable
@@ -309,6 +313,9 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                     toggleShowSubjectiveEvaluationSurvey={toggleShowSubjectiveEvaluationSurvey}
                     setCurrentUserEvaluation={setCurrentUserEvaluation}
                     handleSubjectiveEvaluationRemoval={handleSubjectiveEvaluationRemoval}
+                    globalFactorWeight={1}
+                    disableEvaluationRemoval={false}
+                    subjectiveEvaluationStyle={{}}
                 />
                 <Button
                     onClick={() => handleRatingModalOpen()}
@@ -327,13 +334,13 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     </div>
 }
 
-function computeCriteriaGroupScore(criteriaGroup: object): number {
+function computeCriteriaGroupScore(criteriaGroup: object, globalFactorWeight: number): number {
     // @ts-ignore
     const groupRating = criteriaGroup.criteria.reduce((acc, criterion) => acc + criterion.rating, 0)
-    return Math.round(groupRating * 100) / 100
+    return Math.round(groupRating * globalFactorWeight * 100) / 100
 }
 
-function computeFactorScore(evaluation: object): number {
+function computeFactorScore(evaluation: object, globalFactorWeight: number): number {
     const criteriaGroupWeights = {
         'Design Quality': 1,
         'Functionality': 1,
@@ -343,9 +350,44 @@ function computeFactorScore(evaluation: object): number {
     const score = evaluation.criteriaGroups?.reduce((acc, criteriaGroup) => {
         // @ts-ignore
         const weight = criteriaGroupWeights[criteriaGroup.label]
-        return acc + weight * computeCriteriaGroupScore(criteriaGroup)
+        return acc + weight * computeCriteriaGroupScore(criteriaGroup, globalFactorWeight)
     }, 0)
     return Math.round(score * 100) / 100
+}
+
+function CriteriaGroupScore(props: { onClick: () => void, criteriaGroup: any, globalFactorWeight: any }) {
+    return <Paper
+
+        variant="outlined"
+        style={{
+            cursor: "pointer",
+            width: "90px",
+            padding: "5px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+        }}
+        onClick={props.onClick}
+    >
+        <p style={{textAlign: "center"}}>{props.criteriaGroup.label}</p>
+        <Chip label={computeCriteriaGroupScore(props.criteriaGroup, props.globalFactorWeight)}/>
+    </Paper>;
+}
+
+function FactorScore(props: { factorRating: any, globalFactorWeight: any }) {
+    return <Paper
+        elevation={1}
+        style={{
+            width: "90px",
+            padding: "5px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+        }}
+    >
+        <p style={{textAlign: "center"}}>{props.factorRating.label}</p>
+        <Chip label={computeFactorScore(props.factorRating, props.globalFactorWeight)}/>
+    </Paper>;
 }
 
 function SubjectiveEvaluationTable({
@@ -356,9 +398,16 @@ function SubjectiveEvaluationTable({
                                        // @ts-ignore
                                        setCurrentUserEvaluation,
                                        // @ts-ignore
-                                       handleSubjectiveEvaluationRemoval
+                                       handleSubjectiveEvaluationRemoval,
+                                       // @ts-ignore
+                                       globalFactorWeight,
+                                       // @ts-ignore
+                                       disableEvaluationRemoval,
+                                       // @ts-ignore
+                                       subjectiveEvaluationStyle,
                                    }) {
 
+    // @ts-ignore
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
         { /* @ts-ignore */}
         {subjectiveEvaluations?.map((evaluation) => (
@@ -368,6 +417,7 @@ function SubjectiveEvaluationTable({
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "15px",
+                    ...subjectiveEvaluationStyle
                 }}
             >
                 <Card
@@ -390,48 +440,28 @@ function SubjectiveEvaluationTable({
                         style={{display: "flex", flexDirection: "row", gap: "5px"}}
                         key={`${factorRating.label}`}
                     >
-                        <Paper
-                            elevation={1}
-                            style={{
-                                width: "90px",
-                                padding: "5px",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-around",
-                            }}
-                        >
-                            <p style={{textAlign: "center"}}>{factorRating.label}</p>
-                            <Chip label={computeFactorScore(factorRating)}/>
-                        </Paper>
+                        <FactorScore factorRating={factorRating} globalFactorWeight={globalFactorWeight}/>
                         <div style={{display: "flex", gap: "5px"}}>
                             {/* @ts-ignore */}
-                            {factorRating.criteriaGroups.sort((groupA,groupB) => groupA.label < groupB.label ).map((criteriaGroup) =>
-                                <Paper
-                                    key={`${criteriaGroup.label}`}
-                                    variant="outlined"
-                                    style={{
-                                        cursor: "pointer",
-                                        width: "90px",
-                                        padding: "5px",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "space-around",
-                                    }}
-                                    onClick={() => {
-                                        toggleShowSubjectiveEvaluationSurvey(true)
-                                        setCurrentUserEvaluation({
-                                            user: evaluation.user,
-                                            factorLabel: factorRating.label
-                                        })
-                                    }}
-                                >
-                                    <p style={{textAlign: "center"}}>{criteriaGroup.label}</p>
-                                    <Chip label={computeCriteriaGroupScore(criteriaGroup)}/>
-                                </Paper>
+                            {factorRating.criteriaGroups.sort((groupA, groupB) => {
+                                return groupA.label < groupB.label ? -1 :
+                                    groupA.label > groupB.label ? 1 : 0;
+                            }).map((criteriaGroup: { label: string }) =>
+                                <CriteriaGroupScore key={`${criteriaGroup.label}`} onClick={() => {
+                                    toggleShowSubjectiveEvaluationSurvey(true)
+                                    setCurrentUserEvaluation({
+                                        user: evaluation.user,
+                                        factorLabel: factorRating.label
+                                    })
+                                }} criteriaGroup={criteriaGroup} globalFactorWeight={globalFactorWeight}/>
                             )}
                         </div>
                     </div>)}
-                <Button onClick={() => handleSubjectiveEvaluationRemoval(evaluation.user)} startIcon={<DeleteIcon/>}/>
+                <Button
+                    disabled={disableEvaluationRemoval}
+                    onClick={() => handleSubjectiveEvaluationRemoval(evaluation.user)}
+                    startIcon={!disableEvaluationRemoval && <DeleteIcon/>}
+                />
             </Card>
         ))}
     </div>
@@ -551,8 +581,8 @@ function tooltipForCriterionRating(criterion: {
     switch (criterion.label) {
         case 'Safety':
             return ['POOR - Fire protection requirements not considered; Safety requirements\n' +
-                'not met (too long\n' +
-                'escape routes); partly confusing escape routes\n',
+            'not met (too long\n' +
+            'escape routes); partly confusing escape routes\n',
                 'AVERAGE - Fire safety requirements partly considered; Safety requirements\n' +
                 'partially met; mostly\n' +
                 'escape routes\n',
@@ -560,8 +590,8 @@ function tooltipForCriterionRating(criterion: {
                 'clear escape routes']
         case 'Sound insulation':
             return ['POOR - unfavorable orientation of vulnerable rooms; unfavorable' +
-                'orientation of private open spaces (e.g. railway tracks); structural sound' +
-                'insulation measures not recognizable; use conflicts | ',
+            'orientation of private open spaces (e.g. railway tracks); structural sound' +
+            'insulation measures not recognizable; use conflicts | ',
                 'AVERAGE - partly unfavorable orientation of vulnerable rooms; partly' +
                 'unfavorable orientation of private open spaces; structural noise' +
                 'protection measures partly considered; if necessary, use conflicts (z. B.' +
@@ -571,9 +601,9 @@ function tooltipForCriterionRating(criterion: {
                 'considered; no conflicts of use\n']
         case 'Accessibility':
             return ['POOR - driveway not considered; supply and disposal not accessible; poor\n' +
-                'access to the underground parking; poor positioning of bicycle parking\n' +
-                'spaces; number of bicycle parking spaces not fulfilled (0 pcs.); main\n' +
-                'entrance not recognizable; long internal ways\n',
+            'access to the underground parking; poor positioning of bicycle parking\n' +
+            'spaces; number of bicycle parking spaces not fulfilled (0 pcs.); main\n' +
+            'entrance not recognizable; long internal ways\n',
                 'AVERAGE - driveway considered in a limited way; supply and disposal not\n' +
                 'fully accessible; average access to the underground parking; average\n' +
                 'positioning of bicycle parking spaces; number of bicycle parking spaces\n' +
@@ -585,21 +615,21 @@ function tooltipForCriterionRating(criterion: {
                 'entrance well recognizable; short internal ways\n']
         case 'Public accessibility':
             return ['POOR - public accessibility not considered; structural requirements for the\n' +
-                'opening of internal facilities not considered\n',
+            'opening of internal facilities not considered\n',
                 'AVERAGE - public accessibility partially considered; structural requirements\n' +
                 'for the opening of internal facilities partially considered\n',
                 'EXCELLENT - considered public accessibility; structural requirements for the\n' +
                 'opening of internal facilities considered']
         case 'Barrier-free access':
             return ['POOR - barrier-free access not possible (elevator missing); barrier-free\n' +
-                'entrance not possible\n',
+            'entrance not possible\n',
                 'AVERAGE - barrier-free access to some of the rooms (elevator on some\n' +
                 'floors); barrier-free entrance possibility (e.g. ramps inside entrance area)\n',
                 'EXCELLENT - barrier-free access to all rooms (elevator on each floor);\n' +
                 'Barrier-free entrance (ramps in entrance area)']
         case 'Social integration spaces':
             return ['POOR - offer of free spaces with possibilities to sit in the building is barely\n' +
-                'existing, offer in the outdoor area (foyer, communication zones, outdoor areas) is barely existing',
+            'existing, offer in the outdoor area (foyer, communication zones, outdoor areas) is barely existing',
                 'AVERAGE - small offer of free spaces with possibilities to sit in the building,\n' +
                 'small offer in the outdoor area (foyer, Communication zones, outdoor areas)\n',
                 'EXCELLENT - varied offer of free spaces with possibilities to sit in the\n' +

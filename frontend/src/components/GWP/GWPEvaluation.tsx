@@ -58,7 +58,7 @@ function GWPEvaluation({activeVariant}) {
 function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
     let elementAreasByElementType = new Map<string, number>();
-    let elementsMaterialLayerByType = new Map<string, string[]>();
+    let elementsMaterialLayerByType = new Map<string, Map<string, object>>();
 
     const [elementIndex, setElementIndex] = React.useState<object>({});
     const handleElementIndex = (index: number) => {
@@ -102,7 +102,28 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         const loadBearing = record.get('element.LoadBearing')
         const isExternal = record.get('element.IsExternal')
 
-        const key = `${label}${loadBearing ? ' load-bearing' : ''}${isExternal ? ' external' : ''}`
+        let uniqueLayers = new Map();
+        [record.get('element.materials')]
+            .filter((layers: string) => layers !== undefined && layers !== null)
+            .map((layers: string) => {
+                let layersObject = JSON.parse(layers)
+                // this contains multiple layers
+                return Object.entries(layersObject)
+            })
+            .flat()
+            // @ts-ignore
+            .forEach((layer) => {
+                if (!uniqueLayers.has(layer[0])) {
+                    if (layer[0] === '<Unnamed>') {
+                        layer[0] = 'Undefined'
+                    }
+                    uniqueLayers.set(layer[0], layer[1])
+                }
+            })
+        // @ts-ignore
+        const elementHasLayersDefined = Array.from(uniqueLayers.values()).some((layer) => Object.hasOwn(layer, 'LayerThickness'))        
+
+        const key = `${label}${loadBearing ? ' load-bearing' : ''}${isExternal ? ' external' : ''} ${elementHasLayersDefined ? ' defined': ' undefined'}`
 
         let totalElementArea = elementAreasByElementType.get(key)
         totalElementArea = totalElementArea ? totalElementArea += totalRecordArea : totalRecordArea
@@ -110,9 +131,14 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         elementAreasByElementType.set(key, totalElementArea || 0)
 
         if (elementsMaterialLayerByType.has(key)) {
-            elementsMaterialLayerByType.set(key, [...elementsMaterialLayerByType.get(key) || [], record.get('element.materials')])
+            const layersUpdate = new Map([
+                // @ts-ignore
+                ...Array.from(elementsMaterialLayerByType.get(key).entries()), 
+                ...Array.from(uniqueLayers.entries())
+            ]);
+            elementsMaterialLayerByType.set(key, layersUpdate)
         } else {
-            elementsMaterialLayerByType.set(key, [record.get('element.materials')])
+            elementsMaterialLayerByType.set(key, uniqueLayers)
         }
 
         totalBuildingArea += totalElementArea || 0
@@ -147,33 +173,18 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         // @ts-ignore
         const elementTypeIndex = elementIndex['1']
         const elementType = Array.from(elementAreasByElementType.keys())[elementTypeIndex]
-        const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType) || []
-
-        let uniqueLayers = new Map();
-        const layers = elementsMaterialLayers
-            .filter((layers: string) => layers !== undefined && layers !== null)
-            .map((layers: string) => {
-                let layersObject = JSON.parse(layers)
-                // this contains multiple layers
-                return Object.entries(layersObject)
-            })
-            // @ts-ignore
-            .flat()
-            .map((layer) => {
-                if (!uniqueLayers.has(layer[0])) {
-                    uniqueLayers.set(layer[0], layer[1])
-                }
-            })
-        return uniqueLayers
+        const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType)
+        return elementsMaterialLayers || new Map()
     }
 
     const getGWPForLayer = (layerName: string, layer: Object): number|Array<number> => {
-        if (layerName === '<Unnamed>') {
-            console.log(layer)
-        }
-        let gwp: number|Array<number> = layerName.length * 100
+        /*
+            Layers are undefined:
+            - layerName is element of {<Unnamed>, Default Wall}
+            - LayerThickness is undefined
+        */ 
+        let gwp: number|Array<number> = layerName.length * 10
         if (!layer.hasOwnProperty('LayerThickness')) {
-            console.log(layer)
             gwp = [gwp, gwp * 2]
         } else {
             // @ts-ignore
@@ -191,10 +202,44 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                         []
     }
 
-    const getData = () => {
-        return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5] :
-            decisionLevel === 1 ? Array.from(elementAreasByElementType.values()).map(value => [value * Math.random(), value]) :
-                // TODO: get data from oracle
+    const getGWPForBuildingPart = (elementType: string) => {
+        // calculate GWP as point value using all layers, if no layers are set we fall back to the area
+        const layers = elementsMaterialLayerByType.get(elementType) || new Map()
+        const area = elementAreasByElementType.get(elementType) || 1
+
+        if (elementType === 'Proxy  undefined') {
+            return  [area / 5, area * 2 / 5]
+        }
+
+        let gwpForBuildingPart;
+
+        if (Array.from(layers.keys()).length === 0) {
+            gwpForBuildingPart = [area, area * 2]
+            return gwpForBuildingPart
+        }
+
+        const gwpSumOfLayers = Array.from(layers.entries()).map((layer) => getGWPForLayer(layer[0], layer[1]))
+        for (const gwpResult of gwpSumOfLayers) {
+            if (typeof gwpResult === 'number') {
+                if (!gwpForBuildingPart) {
+                    gwpForBuildingPart = 0
+                }
+                // @ts-ignore
+                gwpForBuildingPart += gwpResult
+            } else {
+                if (!gwpForBuildingPart) {
+                    gwpForBuildingPart = [0,0]
+                }
+                // @ts-ignore
+                gwpForBuildingPart = [gwpForBuildingPart[0] + gwpResult[0] * area, gwpForBuildingPart[1] + gwpResult[1] * area]
+            }
+        }
+        return gwpForBuildingPart || 0
+    }
+
+     const getData = () => {
+        return decisionLevel === 0 ? [totalBuildingArea, totalBuildingArea * 1.5] :
+            decisionLevel === 1 ? Array.from(elementsMaterialLayerByType.keys()).map(elementType => getGWPForBuildingPart(elementType)) :
                 // @ts-ignore
                 decisionLevel === 2 ? Array.from(getLayersForElementType().entries()).map((entry) => getGWPForLayer(entry[0], entry[1])) :
                         []
@@ -238,12 +283,12 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     return (
         <div>
             {decisionLevel !== 0 && <Button onClick={() => handleChartNavigation()}>Back</Button>}
-            <Bar
+            {data.datasets[0].data.length > 0 ? <Bar
                 options={options}
                 data={data}
                 ref={chartRef}
                 onClick={(event) => onClick(event, handleElementIndex)}
-            />
+            /> : <p>Level of Detail contains no layer information</p>}
         </div>
     );
 }

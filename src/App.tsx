@@ -7,7 +7,8 @@ import './App.css';
 import DecisionTreeHandler from './components/Tree/DecisionTreeHandler';
 import {ForgeViewer} from "./components/ForgeViewer/viewer";
 import VariantExplorerMenu from "./components/VariantExplorerMenu";
-import Evaluation from "./components/GWP/Evaluation";
+import GWPEvaluation from "./components/GWP/GWPEvaluation";
+import ObjectiveEvaluationViewer from "./components/ObjectiveEvaluation/ObjectiveEvaluationViewer";
 
 function App() {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
@@ -72,7 +73,7 @@ function App() {
                                     //token={token}
                                 /> :
                                 activeVariantExplorationIndex === 1 ?
-                                    <Evaluation
+                                    <GWPEvaluation
                                         key={"gwp-variant-exploration"}
                                         activeVariant={activeVariant}
                                     /> :
@@ -86,9 +87,12 @@ function App() {
                                             <div
                                                 key={"objective-evaluation-variant-exploration"}
                                             >
-                                                Not implemented
+                                                <ObjectiveEvaluationViewer
+                                                    key={"objective-evaluation-viewer"}
+                                                    activeVariant={activeVariant}
+                                                />
                                             </div> :
-                                            <Evaluation
+                                            <GWPEvaluation
                                                 activeVariant={activeVariant}
                                             />
                             }

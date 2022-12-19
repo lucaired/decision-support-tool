@@ -1,5 +1,5 @@
 import {useReadCypher} from "use-neo4j";
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 
 import {
     Chart as ChartJS,
@@ -26,7 +26,7 @@ ChartJS.register(
 );
 
 // @ts-ignore
-function Evaluation({activeVariant}) {
+function GWPEvaluation({activeVariant}) {
     // use essential building elements for BoQ
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
         'WHERE (not (element:Space))' +
@@ -51,7 +51,6 @@ function Evaluation({activeVariant}) {
     })
 
     const totalAreaRounded = Math.round((totalArea + Number.EPSILON) * 100) / 100
-
 
     return <div>{
         activeVariant.decisionLevel === 'construction' ?
@@ -217,4 +216,4 @@ function BuildingPartEvaluation({records}) {
 }
 
 
-export default Evaluation
+export default GWPEvaluation

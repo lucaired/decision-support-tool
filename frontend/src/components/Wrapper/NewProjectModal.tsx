@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Box, Button, Fade, Modal, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import StringPropInput from '../Tree/NodeStringPropInput';
-import { node } from 'prop-types';
 import NodeStringPropInput from '../Tree/NodeStringPropInput';
-import NodeStringPropSelect from '../Tree/NodeStringPropSelect';
 import axios from 'axios';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'

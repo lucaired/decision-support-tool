@@ -74,7 +74,7 @@ function VariantViewer({activeProject, activeVariant, activeProjectTree, activeV
                                     key={"renderer-variant-exploration"}
                                     // local={true}
                                     // testing={true}
-                                    // path={'http://localhost:3000/0.svf'}
+                                    // path={'http://192.168.2.168:3000/0.svf'}
                                     urn={'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGVjaXNpb24tc3VwcG9ydC1idWNrZXQvVjItMS5pZmM'}
                                     token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6ImVoYkw3bW1YamRZR3JyckJFS2szeDY3elBEZjNkMTFPdUYxU1NZeHFKdW5Yc0daUm9Sb2xTQ0xvQ0RISjAwSTciLCJleHAiOjE2Njk4MzMxNjN9.e4LQ623P4BtnGblf8rSJ-AP-CWnKlYCUlv1vkP8UC3_07nHAaeFBiZDfVzCB6kJJF-vHJNn2zrXjmZy5YysaxoXTapOTxoutMNzlc2o6-u55j8i9od83kJzvolj8S-EVCVBwN4FvYGFVurebuBtfww8rxTcz13IaIekWgqBQo6hnHKfu3A-2ZUsxjtS9lEnilCG65pGrkmeOcXbZGDX09bjqpx8tddskynJquOx5BT6nWWIHoSm39PDkrXKNTYqYf6sdjo-sBOXyAheYTTE796ZLkTwQ6eMinTtlHw7p8pHueerlx1i1Am3sQx_PLaqdhMDNIGpbhopVMF9Zk2lyeg'}
                                 /> :

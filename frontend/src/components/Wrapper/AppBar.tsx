@@ -14,12 +14,13 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
     activeProject?: object;
-    toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
+    toggleLeftDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
+    toggleRightDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
     // @ts-ignore
     saveCurrentProject: () => void;
 }
 
-export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer, saveCurrentProject}: ButtonAppBarProps) {
+export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDrawer, toggleRightDrawer, saveCurrentProject}: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -30,7 +31,7 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={toggleDrawer(true)}
+            onClick={toggleLeftDrawer(true)}
           >
             <MenuIcon />
           </IconButton>
@@ -58,6 +59,7 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer
           >
               <SvgIcon
                   color='primary'
+                  onClick={toggleRightDrawer(true)}
                   component={AnalyticsIcon}
               />
           </Button>}

@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import ButtonAppBar from './components/Wrapper/AppBar'
 import { DecisionTree } from './components/Tree/NodeHandler';
 import VariantViewer from './components/Variant/VariantViewer';
-import AppDrawer from './components/Wrapper/AppDrawer';
+import ProjectsDrawer from './components/Wrapper/ProjectsDrawer';
+import SimilarProjectsDrawer from './components/Wrapper/SimilarProjectsDrawer';
 
 function App() {
 
@@ -20,7 +21,7 @@ function App() {
     }
 
     const saveProjectHandler = (project: object) => {
-        axios.post(`http://localhost:80/projects/`, project)
+        axios.post(`http://192.168.2.168:80/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -36,7 +37,7 @@ function App() {
     const updateProjectHandler = (project) => {
         const updateSet = {...project}
         delete updateSet['_id']
-        axios.put(`http://localhost:80/projects/${project._id}`, updateSet)
+        axios.put(`http://192.168.2.168:80/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -53,7 +54,7 @@ function App() {
     }
 
     const removeProjectHandler = (projectId: string) => {
-        axios.delete(`http://localhost:80/projects/${projectId}`)
+        axios.delete(`http://192.168.2.168:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
         })
@@ -67,7 +68,7 @@ function App() {
     }
 
     const [leftDrawerState, setLeftDrawerState] = React.useState(false);
-    const toggleDrawer =
+    const toggleLeftDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
         if (
@@ -77,11 +78,24 @@ function App() {
         ) {
         return;
         }
-
         setLeftDrawerState(open);
     };
+    const [rightDrawerState, setRightDrawerState] = React.useState(false);
+    const toggleRightDrawer =
+    (open: boolean) =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+        console.log("hi")
+        if (
+        event.type === 'keydown' &&
+        ((event as React.KeyboardEvent).key === 'Tab' ||
+            (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+        return;
+        }
+        setRightDrawerState(open);
+    };
 
-    const queryProjects = () => axios.get(`http://localhost:80/projects/`)
+    const queryProjects = () => axios.get(`http://192.168.2.168:80/projects/`)
         // @ts-ignore
         .then(function (response) {
             // @ts-ignore
@@ -113,9 +127,16 @@ function App() {
                 gap: '5px'
             }}
         >
-            <AppDrawer 
+            <SimilarProjectsDrawer
+                drawerState={rightDrawerState} 
+                toggleRightDrawer={toggleRightDrawer}
+                activeProjectHandler={activeProjectHandler}
+                allSimilarProjectsByDE={allProjects}
+                allSimilarProjectsByBuildingCode={allProjects}
+            />
+            <ProjectsDrawer 
                 drawerState={leftDrawerState} 
-                toggleDrawer={toggleDrawer}
+                toggleLeftDrawer={toggleLeftDrawer}
                 allProjects={allProjects}
                 activeProjectHandler={activeProjectHandler}
                 removeProjectHandler={removeProjectHandler}
@@ -124,7 +145,8 @@ function App() {
             <ButtonAppBar 
                 activeVariant={activeVariant}
                 activeProject={activeProject}
-                toggleDrawer={toggleDrawer}
+                toggleLeftDrawer={toggleLeftDrawer}
+                toggleRightDrawer={toggleRightDrawer}
                 saveCurrentProject={saveCurrentProject}
             />
             {activeProject && <VariantViewer 

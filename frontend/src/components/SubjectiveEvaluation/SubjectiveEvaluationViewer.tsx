@@ -166,31 +166,44 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         // @ts-ignore
         const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === userName)
         if (index !== -1) {
-            setSubjectiveEvaluations((subjectiveEvaluation) => {
-                // @ts-ignore
-                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === userName)
-                // @ts-ignore
-                const factorRatings = subjectiveEvaluation[evaluationIndex].factorRatings || []
-                // @ts-ignore
-                const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label === factorRating.label)
 
-                let update = [...subjectiveEvaluation]
-                let updateRating = [...factorRatings]
-                if (factorEvaluationIndex !== -1) {
-                    updateRating[factorEvaluationIndex] = factorRating
-                } else {
-                    // @ts-ignore
-                    updateRating.push(factorRating)
-                }
+            // @ts-ignore
+            const evaluationIndex = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === userName)
+            const subjectiveEvaluation = subjectiveEvaluations[evaluationIndex]
+            // @ts-ignore
+            const factorRatings = subjectiveEvaluation.factorRatings || []
+            // @ts-ignore
+            const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label === factorRating.label)
+
+            let update = [...subjectiveEvaluations]
+            let updateRating = [...factorRatings]
+            if (factorEvaluationIndex !== -1) {
+                updateRating[factorEvaluationIndex] = factorRating
+            } else {
                 // @ts-ignore
-                update[evaluationIndex] = {
-                    user: userName,
-                    factorRatings: updateRating,
-                    _id: surveyId,
-                    variantId: activeVariantId
-                }
-                return update
-            })
+                updateRating.push(factorRating)
+            }
+            // @ts-ignore
+            update[evaluationIndex] = {
+            // @ts-ignore
+                ...subjectiveEvaluation,
+                factorRatings: updateRating,
+            }
+
+            // @ts-ignore
+            const surveyId = update[evaluationIndex]._id
+
+            axios.put(`http://localhost:80/surveys/${surveyId}`, update[evaluationIndex])
+                .then(function (response) {
+                    setSubjectiveEvaluations((subjectiveEvaluations) => {
+                        return update
+                    })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+
         } else {
             const survey = {variantId: activeVariantId, user: userName, factorRatings: [factorRating]}
             axios.post('http://localhost:80/surveys/', survey)

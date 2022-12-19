@@ -4,3 +4,4 @@ backend/app/routers/__pycache__/*
 backend/app/routers/__pycache__/survey.cpython-310.pyc
 backend/app/__pycache__/main.cpython-310.pyc
 backend/app/routers/__pycache__/survey.cpython-310.pyc
+backend/app/routers/project.py

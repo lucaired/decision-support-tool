@@ -157,6 +157,11 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
 
     const [subjectiveEvaluation, setSubjectiveEvaluation] = React.useState(mockSubjectiveEvaluation);
 
+    const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
+        user: undefined,
+        factorLabel: undefined,
+    });
+
     // @ts-ignore
     const handleSubjectiveEvaluationUpdate = (factorRating, user: string) => {
         const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
@@ -185,11 +190,16 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
             })
         }
     }
-
-    const [currentUserEvaluation, setCurrentUserEvaluation] = React.useState({
-        user: undefined,
-        factorLabel: undefined,
-    });
+    const handleSubjectiveEvaluationRemoval = (user: string) => {
+        const index = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
+        if (index !== -1) {
+            setSubjectiveEvaluation((subjectiveEvaluation) => {
+                let update = [...subjectiveEvaluation]
+                update.splice(index, 1);
+                return update
+            })
+        }
+    }
 
     const getFactorRating = () => {
         const factor = subjectiveEvaluation
@@ -227,6 +237,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                     subjectiveEvaluation={subjectiveEvaluation}
                     toggleShowSubjectiveEvaluationSurvey={toggleShowSubjectiveEvaluationSurvey}
                     setCurrentUserEvaluation={setCurrentUserEvaluation}
+                    handleSubjectiveEvaluationRemoval={handleSubjectiveEvaluationRemoval}
                 />
                 <Button
                     onClick={() => handleRatingModalOpen()}
@@ -263,7 +274,9 @@ function SubjectiveEvaluationTable({
                                       // @ts-ignore
                                       toggleShowSubjectiveEvaluationSurvey,
                                       // @ts-ignore
-                                      setCurrentUserEvaluation
+                                      setCurrentUserEvaluation,
+                                       // @ts-ignore
+                                       handleSubjectiveEvaluationRemoval
                                   }) {
 
     return <div style={{display: "flex", flexDirection: "column", gap: "5px"}}>
@@ -334,7 +347,7 @@ function SubjectiveEvaluationTable({
                                 )}
                             </div>
                     </div>)}
-                    <Button startIcon={<DeleteIcon/>}/>
+                    <Button onClick={() => handleSubjectiveEvaluationRemoval(evaluation.user)} startIcon={<DeleteIcon/>}/>
             </Card>
         ))}
     </div>

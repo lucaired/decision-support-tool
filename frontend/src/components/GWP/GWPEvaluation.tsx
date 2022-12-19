@@ -31,10 +31,10 @@ function GWPEvaluation({activeVariant}) {
     const q = 'MATCH (b:Building {ifcmodel: $ifcmodel})-[:has]->(:Storey)-[:has]->(element)' +
         'WHERE (not (element:Space))' +
         'RETURN labels(element), element.TotalSurfaceArea, element.GrossArea, element.GrossSideArea, element.LoadBearing, element.IsExternal, element.materials'
-    const {loading, records, run,} = useReadCypher(q, {ifcmodel: activeVariant.neo4JReference})
+    const {loading, records, run,} = useReadCypher(q, {ifcmodel: activeVariant.ifcFile})
 
     useEffect(() => {
-        run({ifcmodel: activeVariant.neo4JReference}).then(r => {
+        run({ifcmodel: activeVariant.ifcFile}).then(r => {
         })
     }, [activeVariant])
 

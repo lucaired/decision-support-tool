@@ -38,7 +38,7 @@ export default function VariantCreatorStepper({
         },
         id: (Math.random() + 1).toString(36).substring(7),
         showNodeControl: false,
-        neo4JReference: 'V1-1.ifc',
+        ifcFile: 'V1-1.ifc',
         decisionLevel: 'construction',
         bimReference: ''
     })
@@ -110,7 +110,7 @@ export default function VariantCreatorStepper({
                         {activeStep === 2 && <NodeStringPropInput
                             target={node}
                             updateFunction={setNode}
-                            property={'neo4JReference'}
+                            property={'ifcFile'}
                             propertyName={'Neo4j Reference'}
                         />}
                         <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>

@@ -39,7 +39,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
         },
         id: 'g9ecb',
         showNodeControl: false,
-        neo4JReference: 'V1-1.ifc',
+        ifcFile: 'V1-1.ifc',
         bimReference: 'enter urn',
         decisionLevel: 'construction' as DecisionLevel,
         children: [],
@@ -54,6 +54,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
         setNodeProperty(tree, nodeId, setNodeControl)
         setDecisionTree(tree)
     }
+
     const handleRemoveChild = (nodeId: string) => {
         let tree = {...decisionTree};
         setParentNodeProperty(tree, nodeId, removeNodeChild)
@@ -66,13 +67,17 @@ function DecisionTreeHandler({activeVariantHandler}) {
         setModalActiveAction("addNodeChild")
         handleNodeModalOpen()
     }
+
     const handleAddSibling = (nodeId: string) => {
         setActiveNode({id: nodeId})
         setModalActiveAction("addNodeSibling")
         handleNodeModalOpen()
     }
+
     const [nodeModalOpen, setNodeModalOpen] = React.useState(false);
+    
     const handleNodeModalOpen = () => setNodeModalOpen(true);
+    
     const handleNodeModalClose = () => {
         setNodeModalOpen(false);
         setModalActiveAction('')

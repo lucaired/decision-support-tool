@@ -6,14 +6,19 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { DecisionTree } from '../Tree/NodeHandler';
+import SvgIcon from '@mui/icons-material/Menu';
+import { Button } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
 
 interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
     activeProject?: object;
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
+    // @ts-ignore
+    saveCurrentProject: () => void;
 }
 
-export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer}: ButtonAppBarProps) {
+export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer, saveCurrentProject}: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -35,6 +40,17 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleDrawer
           {activeVariant && <Typography variant="h6" component="div">
             {`Variant: ${activeVariant.name}`}
           </Typography>}
+          {activeProject && 
+          <Button 
+            variant="contained"
+            style={{marginLeft: '15px', backgroundColor: 'white'}}
+          >
+              <SvgIcon
+                  color='primary'
+                  onClick={() => saveCurrentProject()}
+                  component={SaveIcon}
+              />
+          </Button>}
         </Toolbar>
       </AppBar>
     </Box>

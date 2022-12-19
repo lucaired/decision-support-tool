@@ -30,7 +30,26 @@ function App() {
         })
         // @ts-ignore
         .catch((error) => console.log(error))
+    }
+    
+    // @ts-ignore
+    const updateProjectHandler = (project) => {
+        const updateSet = {...project}
+        delete updateSet['_id']
+        axios.put(`http://localhost:80/projects/${project._id}`, updateSet)
+        // @ts-ignore
+        .then(function (response) {
+        // @ts-ignore
+            if (response.data) {
+                setActiveProject(response.data)
+            }
+        })
+        // @ts-ignore
+        .catch((error) => console.log(error))
+    }
 
+    const saveCurrentProject = () => {
+        updateProjectHandler(activeProject)
     }
 
     const removeProjectHandler = (projectId: string) => {
@@ -106,6 +125,7 @@ function App() {
                 activeVariant={activeVariant}
                 activeProject={activeProject}
                 toggleDrawer={toggleDrawer}
+                saveCurrentProject={saveCurrentProject}
             />
             {activeProject && <VariantViewer 
                 activeProject={activeProject} 

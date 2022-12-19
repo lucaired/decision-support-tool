@@ -98,7 +98,7 @@ function VariantViewer({activeProject, activeVariant, activeProjectTree, activeV
                                                     // @ts-ignore
                                                     activeVariantId={activeVariant.id}
                                                     // @ts-ignore
-                                                    weightsSets={activeProject.weightsSet}
+                                                    weightsSets={activeProject.weightsSets}
                                                 />
                                             </div>
                                             : activeVariantExplorationIndex === 4 ?

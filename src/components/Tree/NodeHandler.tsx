@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import {DecisionLevel} from "./DecisionTreeHandler";
 
-export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; decisionLevel: DecisionLevel, children: Array<DecisionTree>; neo4JReference: string, bimReference: string, objectiveEvaluation?: Array<object> };
+export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; decisionLevel: DecisionLevel, children: Array<DecisionTree>; neo4JReference: string, bimReference: string };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {

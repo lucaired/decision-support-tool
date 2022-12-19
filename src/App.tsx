@@ -89,7 +89,8 @@ function App() {
                                             >
                                                 <ObjectiveEvaluationViewer
                                                     key={"objective-evaluation-viewer"}
-                                                    activeVariant={activeVariant}
+                                                    // @ts-ignore
+                                                    activeVariantId={activeVariant.id}
                                                 />
                                             </div> :
                                             <GWPEvaluation

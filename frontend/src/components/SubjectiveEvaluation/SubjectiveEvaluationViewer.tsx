@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import Card from "@mui/material/Card";
@@ -97,73 +98,7 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
 
 // @ts-ignore
 function SubjectiveEvaluationViewer({activeVariantId}) {
-    // TODO: get evaluations for the activeVariant
-    const mockFactorRating = {
-        label: 'Social Factors',
-        criteriaGroups: [
-            {
-                label: 'Design Quality',
-                criteria: [
-                    {
-                        label: 'Urban integration',
-                        rating: 3
-                    },
-                    {
-                        label: 'External space quality',
-                        rating: 3
-                    },
-                    {
-                        label: 'Building quality',
-                        rating: 3
-                    },
-                    {
-                        label: 'User and task-specific image',
-                        rating: 2
-                    }
-                ]
-            },
-            {
-                label: 'Functionality',
-                criteria: [
-                    {
-                        label: 'Accessibility',
-                        rating: 2
-                    },
-                    {
-                        label: 'Public accessibility',
-                        rating: 3
-                    },
-                    {
-                        label: 'Barrier-free access',
-                        rating: 2
-                    },
-                    {
-                        label: 'Social integration spaces',
-                        rating: 3
-                    },
-                ]
-            },
-            {
-                label: 'Comfort and health',
-                criteria: [
-                    {
-                        label: 'Safety',
-                        rating: 2
-                    },
-                    {
-                        label: 'Sound insulation',
-                        rating: 6
-                    }
-                ]
-            }
-        ]
-    };
-
-    const mockSubjectiveEvaluation = [
-        {user: 'Architect Adrian', factorRatings: [mockFactorRating]},
-    ]
-
-    const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState(mockSubjectiveEvaluation);
+    const [subjectiveEvaluations, setSubjectiveEvaluations] = React.useState([]);
     useEffect(() => {
         computeTotalSubjectiveEvaluation()
     }, [subjectiveEvaluations])
@@ -181,18 +116,23 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         const totalEvaluation = subjectiveEvaluations.reduce((acc, evaluation) => {
             let update = {...acc}
             // apply the criteriaGroup array to the accumulator
+            // @ts-ignore
             evaluation.factorRatings[0].criteriaGroups.forEach((criteriaGroup) => {
                 // if criteriaGroup not in accumulator, we can just use it
                 let updateCriteriaGroup = criteriaGroup
 
+                // @ts-ignore
                 const index = update.factorRatings[0]?.criteriaGroups?.findIndex((old) => old.label === criteriaGroup.label)
                 // criteriaGroup is in the accumulator
                 if (index !== -1 && index !== undefined) {
+                    // @ts-ignore
                     let right = update.factorRatings[0].criteriaGroups[index].criteria
                     const updatedCriteria = mergeCriteriaGroupScores(criteriaGroup.criteria, right)
                     updateCriteriaGroup = {label: criteriaGroup.label, criteria: updatedCriteria}
+                    // @ts-ignore
                     update.factorRatings[0].criteriaGroups[index] = updateCriteriaGroup
                 } else {
+                    // @ts-ignore
                     update.factorRatings[0].criteriaGroups = [updateCriteriaGroup, ...update.factorRatings[0].criteriaGroups]
                 }
             })
@@ -222,12 +162,16 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     }
 
     // @ts-ignore
-    const handleSubjectiveEvaluationUpdate = (factorRating, user: string) => {
-        const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
+    const handleSubjectiveEvaluationUpdate = (factorRating, userName: string) => {
+        // @ts-ignore
+        const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === userName)
         if (index !== -1) {
             setSubjectiveEvaluations((subjectiveEvaluation) => {
-                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === user)
+                // @ts-ignore
+                const evaluationIndex = subjectiveEvaluation.findIndex((evaluation) => evaluation.user === userName)
+                // @ts-ignore
                 const factorRatings = subjectiveEvaluation[evaluationIndex].factorRatings || []
+                // @ts-ignore
                 const factorEvaluationIndex = factorRatings.findIndex((rating) => rating.label === factorRating.label)
 
                 let update = [...subjectiveEvaluation]
@@ -238,18 +182,39 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                     // @ts-ignore
                     updateRating.push(factorRating)
                 }
-                update[evaluationIndex] = {user: user, factorRatings: updateRating}
+                // @ts-ignore
+                update[evaluationIndex] = {
+                    user: userName,
+                    factorRatings: updateRating,
+                    _id: surveyId,
+                    variantId: activeVariantId
+                }
                 return update
             })
         } else {
-            setSubjectiveEvaluations((subjectiveEvaluation) => {
-                let update = [...subjectiveEvaluation]
-                update.push({user: user, factorRatings: [factorRating]})
-                return update
-            })
+            const survey = {variantId: activeVariantId, user: userName, factorRatings: [factorRating]}
+            axios.post('http://localhost:80/surveys/', survey)
+                .then(function (response) {
+                    const surveyId = response.data._id
+                    setSubjectiveEvaluations((subjectiveEvaluation) => {
+                        let update = [...subjectiveEvaluation]
+                        // @ts-ignore
+                        update.push({
+                            user: userName,
+                            factorRatings: [factorRating],
+                            _id: surveyId,
+                            variantId: activeVariantId
+                        })
+                        return update
+                    })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
     }
     const handleSubjectiveEvaluationRemoval = (user: string) => {
+        // @ts-ignore
         const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
             setSubjectiveEvaluations((subjectiveEvaluation) => {
@@ -263,7 +228,9 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
 
     const getFactorRating = () => {
         const factor = subjectiveEvaluations
+            // @ts-ignore
             .filter((evaluation) => evaluation.user === currentUserEvaluation.user)
+            // @ts-ignore
             .map((evaluation) => evaluation.factorRatings)
             .flat()
             .filter((factorRating) =>
@@ -278,8 +245,8 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
     const [showRatingModal, setShowRatingModal] = React.useState(false);
     const handleRatingModalOpen = () => setShowRatingModal(true);
     const handleRatingModalClose = () => setShowRatingModal(false);
-    const handleRatingModalUpdate = (rating: object, name: string) => {
-        handleSubjectiveEvaluationUpdate(rating, name);
+    const handleRatingModalUpdate = (rating: object, userName: string) => {
+        handleSubjectiveEvaluationUpdate(rating, userName);
         setShowRatingModal(false);
     }
 
@@ -374,8 +341,8 @@ function FactorScore(props: { factorRating: any, globalFactorWeight: any }) {
     const criteriaGroupScore = computeFactorScore(props.factorRating, props.globalFactorWeight)
     // @ts-ignore
     const maxScore = props.factorRating.criteriaGroups.reduce((acc, criteriaGroup) =>
-        acc + criteriaGroup.criteria.length * weightForCriteriaGroup(criteriaGroup.label) * 3
-    ,0)
+            acc + criteriaGroup.criteria.length * weightForCriteriaGroup(criteriaGroup.label) * 3
+        , 0)
     const scoreLabel = `${criteriaGroupScore}/${maxScore}`
 
     return <Paper
@@ -651,7 +618,7 @@ function tooltipForCriterionRating(criterion: {
     }
 }
 
-function weightForCriteriaGroup (label: string): number {
+function weightForCriteriaGroup(label: string): number {
     switch (label.toLowerCase()) {
         case 'comfort and health':
             return 2

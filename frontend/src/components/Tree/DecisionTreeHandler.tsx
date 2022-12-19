@@ -31,33 +31,24 @@ const modalStyle = {
 export type DecisionLevel = 'construction' | 'building-part'
 
 // @ts-ignore
-function DecisionTreeHandler({activeVariantHandler, activeVariant}) {
-    // node handling
-    const [decisionTree, setDecisionTree] = useState(undefined)
-    useEffect(() => {
-        if (activeVariant) {
-            setDecisionTree(activeVariant)
-        }
-    }, [activeVariant]);
-
+function DecisionTreeHandler({activeVariantHandler, activeVariant, activeProjectTree, activeProjectTreeHandler}) {
 
     // node handlers
     const [activeNode, setActiveNode] = useState({})
     const [activeAction, setModalActiveAction] = useState('')
 
-
     const handleNodeControl = (nodeId: string) => {
         // @ts-ignore
-        let tree = {...decisionTree};
-        setNodeProperty(tree, nodeId, setNodeControl)
-        setDecisionTree(tree)
+        let tree = {...activeProjectTree};
+        setNodeProperty(tree, nodeId, setNodeControl);
+        activeProjectTreeHandler(tree);
     }
 
     const handleRemoveChild = (nodeId: string) => {
         // @ts-ignore
-        let tree = {...decisionTree};
-        setParentNodeProperty(tree, nodeId, removeNodeChild)
-        setDecisionTree(tree)
+        let tree = {...activeProjectTree};
+        setParentNodeProperty(tree, nodeId, removeNodeChild);
+        activeProjectTreeHandler(tree);
     }
 
     // modal handling
@@ -86,8 +77,8 @@ function DecisionTreeHandler({activeVariantHandler, activeVariant}) {
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
 
     return <div id="treeWrapper" style={{height: "500px"}}>
-        {decisionTree && <Tree
-            data={decisionTree}
+        {activeProjectTree && <Tree
+            data={activeProjectTree}
             orientation={"vertical"}
             // dimensions={{
             //    "width": 1200,
@@ -117,8 +108,8 @@ function DecisionTreeHandler({activeVariantHandler, activeVariant}) {
                     <h1>New design variant</h1>
                     {activeAction === 'addNodeChild' &&
                     <VariantCreatorStepper
-                        decisionTree={decisionTree}
-                        setDecisionTree={setDecisionTree}
+                        decisionTree={activeProjectTree}
+                        setDecisionTree={activeProjectTreeHandler}
                         setProperty={setNodeProperty}
                         addProperty={addNodeChild}
                         activeNodeId={activeNode}
@@ -127,8 +118,8 @@ function DecisionTreeHandler({activeVariantHandler, activeVariant}) {
                     />}
                     {activeAction === 'addNodeSibling' &&
                         <VariantCreatorStepper
-                            decisionTree={decisionTree}
-                            setDecisionTree={setDecisionTree}
+                            decisionTree={activeProjectTree}
+                            setDecisionTree={activeProjectTreeHandler}
                             setProperty={setParentNodeProperty}
                             addProperty={addNodeChild}
                             activeNodeId={activeNode}

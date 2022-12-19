@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
-import {DecisionLevel} from "./DecisionTreeHandler";
+import { DecisionLevel } from "./DecisionTreeHandler";
 
-export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: any; decisionLevel: DecisionLevel, children: Array<DecisionTree>; ifcFile: string, bimReference: string };
+export type DecisionTree = { id: string; name: string; attributes: object; showNodeControl: boolean; decisionLevel: DecisionLevel, children: Array<DecisionTree>; ifcFile: string, bimReference: string };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.id === id) {
@@ -43,23 +43,23 @@ export const removeNodeChild = (tree: DecisionTree, nodeId?: string) => {
 
 // @ts-ignore
 export function RenderNode({
-                               // @ts-ignore
-                               nodeDatum,
-                               // @ts-ignore
-                               toggleNode,
-                               // @ts-ignore
-                               foreignObjectProps,
-                               // @ts-ignore
-                               handleNodeControl,
-                               // @ts-ignore
-                               handleAddChild,
-                               // @ts-ignore
-                               handleAddSibling,
-                               // @ts-ignore
-                               handleRemoveChild,
-                               // @ts-ignore
-                               activeVariantHandler
-                           }) {
+    // @ts-ignore
+    nodeDatum,
+    // @ts-ignore
+    toggleNode,
+    // @ts-ignore
+    foreignObjectProps,
+    // @ts-ignore
+    handleNodeControl,
+    // @ts-ignore
+    handleAddChild,
+    // @ts-ignore
+    handleAddSibling,
+    // @ts-ignore
+    handleRemoveChild,
+    // @ts-ignore
+    activeVariantHandler
+}) {
     return (
         <g>
             <rect
@@ -74,7 +74,7 @@ export function RenderNode({
                 }}
             />
             <foreignObject {...foreignObjectProps}>
-                <div style={{display:"flex", flexDirection:"column"}}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
                     <span><strong>{nodeDatum.name} </strong></span>
                     <span>{nodeDatum.decisionLevel} level</span>
                 </div>

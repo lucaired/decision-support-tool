@@ -20,6 +20,7 @@ class Tree(BaseModel):
     bim_reference: str = Field(..., alias="bimReference")
     decision_level: str = Field(..., alias="decisionLevel")
     children: list['Tree']
+    show_node_control: bool = Field(bool, alias="showNodeControl")
 
 class Project(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")

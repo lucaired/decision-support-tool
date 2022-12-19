@@ -15,10 +15,12 @@ import { DecisionTree } from '../../components/Tree/NodeHandler';
 interface VariantViewerProps {
     activeProject?: any;
     activeVariant?: DecisionTree;
+    activeProjectTree?: DecisionTree;
     activeVariantHandler: (activeVariant: DecisionTree) => void
+    activeProjectTreeHandler: (projectTree: DecisionTree) => void
 }
 
-function VariantViewer({activeProject, activeVariant, activeVariantHandler}: VariantViewerProps) {
+function VariantViewer({activeProject, activeVariant, activeProjectTree, activeVariantHandler, activeProjectTreeHandler}: VariantViewerProps) {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
     const activeVariantExplorationHandler = (index: number) => {
         if (0 <= index && index <= 3) {
@@ -48,6 +50,8 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler}: Var
                             <DecisionTreeHandler
                                 activeVariantHandler={activeVariantHandler}
                                 activeVariant={activeVariant}
+                                activeProjectTreeHandler={activeProjectTreeHandler}
+                                activeProjectTree={activeProjectTree}
                             />
                         </CardContent>
                     </React.Fragment>

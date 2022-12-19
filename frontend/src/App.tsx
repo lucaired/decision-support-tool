@@ -14,6 +14,10 @@ function App() {
         setActiveProject(project)
         setActiveVariant(project.tree)
     }
+    const activeProjectTreeHandler = (projectTree: DecisionTree) => {
+        let project = {...activeProject, tree: projectTree};
+        setActiveProject(project);
+    }
 
     const saveProjectHandler = (project: object) => {
         axios.post(`http://localhost:80/projects/`, project)
@@ -103,11 +107,13 @@ function App() {
                 activeProject={activeProject}
                 toggleDrawer={toggleDrawer}
             />
-            <VariantViewer 
+            {activeProject && <VariantViewer 
                 activeProject={activeProject} 
-                activeVariant={activeVariant} 
+                activeVariant={activeVariant}
+                activeProjectTree={activeProject.tree}
                 activeVariantHandler={activeVariantHandler}
-                />
+                activeProjectTreeHandler={activeProjectTreeHandler}
+                />}
         </div>
     )
 }

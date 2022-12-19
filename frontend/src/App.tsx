@@ -120,9 +120,9 @@ function App() {
     // @ts-ignore
     .catch((error) => console.log(error));
 
-    const querySimilarProjects = () => {
+    const queryMatchingProjects = (variantsToDesignEpisodes: Object) => {
         const projectId = activeProject._id
-        return axios.get(`http://${backendUrl}:80/matchings/project/${projectId}/match_by_design_episodes`)
+        return axios.post(`http://${backendUrl}:80/matchings/project/${projectId}/match_by_design_episodes`, variantsToDesignEpisodes)
         // @ts-ignore
         .then(function (response) {
 
@@ -234,7 +234,7 @@ function App() {
             <DesignEpisodeMatchingModal 
                 showDesignEpisodeMatchingModal={showDesignEpisodeMatchingModal} 
                 showDesignEpisodeMatchingModalHandler={showDesignEpisodeMatchingModalHandler} 
-                queryProjects={()=>{}}
+                queryMatchingProjects={queryMatchingProjects}
                 activeProjectTree={activeProject?.tree}            
             />
             <ProjectsDrawer 

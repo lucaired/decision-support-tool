@@ -9,7 +9,7 @@ import { DecisionTree } from '../Tree/NodeHandler';
 interface DesignEpisodeMatchingModal {
     showDesignEpisodeMatchingModal: boolean; 
     showDesignEpisodeMatchingModalHandler: (show: boolean)=>void;
-    queryProjects: ()=>void;
+    queryMatchingProjects: (variantsToDesignEpisodes: Object) => void;
     activeProjectTree: DecisionTree;
 }
 
@@ -49,7 +49,7 @@ const Android12Switch = styled(Switch)(({ theme }) => ({
 export function DesignEpisodeMatchingModal({
     showDesignEpisodeMatchingModal, 
     showDesignEpisodeMatchingModalHandler,
-    queryProjects,
+    queryMatchingProjects,
     activeProjectTree,
 }: DesignEpisodeMatchingModal
     ) {
@@ -169,9 +169,10 @@ export function DesignEpisodeMatchingModal({
                 </FormGroup>
                 <div style={{display: 'flex', justifyContent: 'end'}}>
                     <Button onClick={() => {
-                      showDesignEpisodeMatchingModalHandler(false)
+                      showDesignEpisodeMatchingModalHandler(false);
+                      queryMatchingProjects(variantsToDesignEpisodes);
                     }}>
-                        Save
+                        Match
                     </Button>    
                 </div>
                 </Box>

@@ -10,8 +10,14 @@ import VariantExplorerMenu from "../../components/Variant/VariantExplorerMenu";
 import GWPEvaluation from "../../components/GWP/GWPEvaluation";
 import SubjectiveEvaluationViewer from "../../components/SubjectiveEvaluation/SubjectiveEvaluationViewer";
 import DesignEpisode from "../../components/DesignRationale/DesignEpisode";
+import { DecisionTree } from '../../components/Tree/NodeHandler';
 
-function VariantViewer() {
+interface VariantViewerProps {
+    activeVariant?: DecisionTree;
+    activeVariantHandler: (activeVariant: DecisionTree) => void
+}
+
+function VariantViewer({activeVariant, activeVariantHandler}: VariantViewerProps) {
     const [activeVariantExplorationIndex, setActiveVariantExplorationIndex] = React.useState(1);
     const activeVariantExplorationHandler = (index: number) => {
         if (0 <= index && index <= 3) {
@@ -19,13 +25,7 @@ function VariantViewer() {
         }
     }
 
-    const [activeVariant, setActiveVariant] = React.useState({});
-    // @ts-ignore
-    const activeVariantHandler = (variant) => {
-        setActiveVariant(variant)
-    }
-
-    function isEmptyObject(activeVariant: {}) {
+    function isEmptyObject(activeVariant: DecisionTree) {
         return activeVariant // 👈 null and undefined check
         && Object.keys(activeVariant).length === 0
         && Object.getPrototypeOf(activeVariant) === Object.prototype
@@ -48,12 +48,13 @@ function VariantViewer() {
                         >
                             <DecisionTreeHandler
                                 activeVariantHandler={activeVariantHandler}
+                                activeVariant={activeVariant}
                             />
                         </CardContent>
                     </React.Fragment>
                 </Card>
             </Box>
-            {!isEmptyObject(activeVariant) && <Box>
+            {activeVariant && !isEmptyObject(activeVariant) && <Box>
                 <Card variant="outlined">
                     <React.Fragment>
                         <CardContent

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useState} from 'react';
+import { useEffect } from 'react';
 import Tree from "react-d3-tree";
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -30,32 +31,30 @@ const modalStyle = {
 export type DecisionLevel = 'construction' | 'building-part'
 
 // @ts-ignore
-function DecisionTreeHandler({activeVariantHandler}) {
+function DecisionTreeHandler({activeVariantHandler, activeVariant}) {
     // node handling
-    const [decisionTree, setDecisionTree] = useState({
-        name: 'V1-1',
-        attributes: {
-            level: 'Building Level',
-        },
-        id: 'g9ecb',
-        showNodeControl: false,
-        ifcFile: 'V1-1.ifc',
-        bimReference: 'enter urn',
-        decisionLevel: 'construction' as DecisionLevel,
-        children: [],
-    })
+    const [decisionTree, setDecisionTree] = useState(undefined)
+    useEffect(() => {
+        if (activeVariant) {
+            setDecisionTree(activeVariant)
+        }
+    }, [activeVariant]);
+
+
     // node handlers
     const [activeNode, setActiveNode] = useState({})
     const [activeAction, setModalActiveAction] = useState('')
 
 
     const handleNodeControl = (nodeId: string) => {
+        // @ts-ignore
         let tree = {...decisionTree};
         setNodeProperty(tree, nodeId, setNodeControl)
         setDecisionTree(tree)
     }
 
     const handleRemoveChild = (nodeId: string) => {
+        // @ts-ignore
         let tree = {...decisionTree};
         setParentNodeProperty(tree, nodeId, removeNodeChild)
         setDecisionTree(tree)
@@ -87,7 +86,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
     const foreignObjectProps = {width: nodeSize.x, height: nodeSize.y, x: 20};
 
     return <div id="treeWrapper" style={{height: "500px"}}>
-        <Tree
+        {decisionTree && <Tree
             data={decisionTree}
             orientation={"vertical"}
             // dimensions={{
@@ -105,7 +104,7 @@ function DecisionTreeHandler({activeVariantHandler}) {
                     activeVariantHandler: activeVariantHandler
                 })
             }
-        />
+        />}
         <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"

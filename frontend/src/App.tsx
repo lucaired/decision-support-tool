@@ -21,6 +21,7 @@ function App() {
     }
     const activeProjectTreeHandler = (projectTree: DecisionTree) => {
         let project = {...activeProject, tree: projectTree};
+        // update also all projects here
         setActiveProject(project);
     }
 
@@ -235,7 +236,6 @@ function App() {
             {activeProject && <VariantViewer 
                 activeProject={activeProject} 
                 activeVariant={activeVariant}
-                activeProjectTree={activeProject.tree}
                 activeVariantHandler={activeVariantHandler}
                 activeProjectTreeHandler={activeProjectTreeHandler}
                 />}

@@ -104,7 +104,7 @@ async def update_project(id: str, project: UpdateProject = Body(...)):
         raise HTTPException(status_code=404, detail=f"Project {id} not found")
 
 @router.delete("/{id}", response_description="Delete a project", response_model=Project)
-async def delete_project(id: str):        
+async def delete_project(id: str):               
     delete_result = await crud.delete_project(id)
     if delete_result.deleted_count == 1:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

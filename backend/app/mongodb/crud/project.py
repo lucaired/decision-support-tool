@@ -4,6 +4,9 @@ def query_all_projects():
     all_project = mongodb.projects.find().to_list(100)
     return all_project
 
+async def query_project_by_id(id: str):
+    return await mongodb.projects.find_one({"_id": id})
+
 async def delete_project(project_id: str): 
     response = await mongodb.projects.delete_one({"_id": project_id})
     return response

@@ -1,5 +1,5 @@
 import {useReadCypher} from "use-neo4j";
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {
     Chart as ChartJS,
@@ -38,110 +38,36 @@ function GWPEvaluation({activeVariant}) {
         })
     }, [activeVariant])
 
+    const decisionLevelTitle = ['Construction Level', 'Building Part Level', 'Layer Level', 'Layer Level']
+    const [decisionLevel, setDecisionLevel] = useState(0)
+    const handleSetDecisionLevel = (level: number) => setDecisionLevel(level)
+
     if (loading) return (<div>Loading...</div>)
 
-    let totalArea = 0
-
-    records?.forEach((record) => {
-        const totalSurfaceArea = record.get('element.TotalSurfaceArea')
-        const grossArea = record.get('element.GrossArea')
-        const grossSideArea = record.get('element.GrossSideArea')
-        // take only one
-        totalArea += totalSurfaceArea ? totalSurfaceArea : grossArea ? grossArea : grossSideArea ? grossSideArea : 0
-    })
-
-    const totalAreaRounded = Math.round((totalArea + Number.EPSILON) * 100) / 100
-
-    return <div>{
-        activeVariant.decisionLevel === 'construction' ?
-            <div>
-                <Button style={{background: "green", color: "white"}}>Construction Types</Button>
-                <WholeBuildingEvaluation totalAreaRounded={totalAreaRounded}/>
-            </div> :
-            activeVariant.decisionLevel === 'building-part' ?
-                <div>
-                    <Button style={{background: "green", color: "white"}}>Building Parts</Button>
-                    <BuildingPartEvaluation records={records}/>
-                </div>
-                : <div></div>
-    }
-    </div>
+    return <div>
+            <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
+            <BuildingEvaluation
+                records={records}
+                decisionLevel={decisionLevel}
+                handleSetDecisionLevel={handleSetDecisionLevel}
+            />
+        </div>
 }
 
 // @ts-ignore
-function WholeBuildingEvaluation({totalAreaRounded}) {
-    const gwpWood = [5000, totalAreaRounded * 3.5]
-    const gwpConcrete = [15000, totalAreaRounded * 6]
-    const gwpBricks = [10000, totalAreaRounded * 5]
+function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
-    const gwpWholeBuilding = [
-        Math.min(gwpWood[0], gwpConcrete[0], gwpBricks[0]),
-        Math.max(gwpWood[1], gwpConcrete[1], gwpBricks[1])
-    ]
-
-    const options = {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'GWP Construction Types',
-            },
-        },
-    };
-    const labels = ['Whole Building Range', 'Brick', 'Reinforced concrete', 'Wood'];
-    const data = {
-        labels,
-        datasets: [
-            {
-                label: 'GWP in t CO2-eq',
-                data: [gwpWholeBuilding, gwpBricks, gwpConcrete, gwpWood]
-            },
-        ],
-    };
-
-    return <Bar options={options} data={data}/>;
-}
-
-// @ts-ignore
-const mapToBuildingPartDecision = (elementsByElementType, index) => {
-    const buildingPartType = Array.from(elementsByElementType.keys())[index]
-    const options = {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: `GWP for ${buildingPartType} type`,
-            },
-        },
-    };
-
-    // TODO: do mapping
-    const labels = ["Wood frame 1", "Wood frame 2", "Wood solid 1", "Wood solid 2"]
-
-    const data = {
-        labels,
-        datasets: [
-            {
-                label: 'GWP in t CO2-eq',
-                data: labels.map(() => {
-                    let gwp: number = faker.datatype.number({min: 0, max: 1000})
-                    return [gwp, gwp * 2]
-                }),
-            },
-        ],
-    };
-
-    return <Bar
-        options={options}
-        data={data}
-    />
-}
-
-// @ts-ignore
-function BuildingPartEvaluation({records}) {
     let elementsByElementType = new Map<string, number>();
+
     const [elementIndex, setElementIndex] = React.useState(-1);
-    const handleElementIndex = (index: number) => setElementIndex(index)
+    const handleElementIndex = (index: number) => {
+        if (decisionLevel !== 3) {
+            setElementIndex(index)
+            handleSetDecisionLevel(decisionLevel + 1)
+        }
+    }
+
+    let totalBuildingArea = 0
 
     // @ts-ignore
     records?.forEach(record => {
@@ -160,11 +86,13 @@ function BuildingPartEvaluation({records}) {
         totalElementArea = totalElementArea ? totalElementArea += totalRecordArea : totalRecordArea
 
         elementsByElementType.set(key, totalElementArea || 0)
-    })
 
+        totalBuildingArea += totalElementArea || 0
+    })
+    
     const chartRef = useRef();
 
-    // get element index from the dataseries
+    // get element index from the data-series
     const onClick = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>, handleElementIndex: (index: number) => void) => {
         // @ts-ignore
         const element = getElementAtEvent(chartRef.current, event)
@@ -180,37 +108,59 @@ function BuildingPartEvaluation({records}) {
         plugins: {
             title: {
                 display: true,
-                text: 'GWP Building Parts',
+                text: 'Global Warming Potential',
             },
         },
     };
+
+    const getLabels = () => {
+        return decisionLevel === 0 ? ['Whole Building']:
+            decisionLevel === 1 ? Array.from(elementsByElementType.keys()):
+            decisionLevel === 2 ? ["Layer 1", "Layer 2", "Layer 3", "Layer 4"]:
+            decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"]:
+                []
+    }
+
+    const getData = () => {
+        return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5]:
+            decisionLevel === 1 ? Array.from(elementsByElementType.values()).map(value => [value * Math.random(), value]):
+                decisionLevel === 2 ? ["Wood frame 1", "Wood frame 2", "Wood solid 1", "Wood solid 2"].map(() => {
+                        let gwp: number = faker.datatype.number({min: 0, max: 1000})
+                        return [gwp, gwp * 2]
+                    }):
+                    decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"].map(() => {
+                        let gwp: number = faker.datatype.number({min: 0, max: 1000})
+                        return [gwp, gwp * 2]
+                    }):
+                    []
+    }
+
     const data = {
-        labels: Array.from(elementsByElementType.keys()),
+        labels: getLabels(),
         datasets: [
             {
                 label: 'GWP in t CO2-eq',
-                data: Array.from(elementsByElementType.values()).map(value => [value * Math.random(), value])
+                data: getData()
             },
         ],
     };
-    // Show all building parts or the evaluation for a specific one
+
+    function handleChartNavigation() {
+        if (decisionLevel !== 0) {
+            handleSetDecisionLevel(decisionLevel - 1)
+            setElementIndex(-1)
+        }
+    }
+
     return (
         <div>
-            {/*Show evaluation for the entire building level*/}
-            {elementIndex === -1 ? <Bar
-                    options={options}
-                    data={data}
-                    ref={chartRef}
-                    onClick={(event) => onClick(event, handleElementIndex)}
-                />
-                : <div>
-                    {/*Show evaluation for the building part level*/}
-                    <Button size="small" onClick={()=>handleElementIndex(-1)}>
-                        Show all
-                    </Button>
-                    {mapToBuildingPartDecision(elementsByElementType, elementIndex)}
-                </div>
-            }
+            {decisionLevel !== 0 && <Button onClick={() => handleChartNavigation()}>Back</Button>}
+             <Bar
+                options={options}
+                data={data}
+                ref={chartRef}
+                onClick={(event) => onClick(event, handleElementIndex)}
+             />
         </div>
     );
 }

@@ -60,11 +60,32 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     let elementAreasByElementType = new Map<string, number>();
     let elementsMaterialLayerByType = new Map<string, string[]>();
 
-    const [elementIndex, setElementIndex] = React.useState(-1);
+    const [elementIndex, setElementIndex] = React.useState<object>({});
     const handleElementIndex = (index: number) => {
         if (decisionLevel !== 3) {
-            setElementIndex(index)
-            handleSetDecisionLevel(decisionLevel + 1)
+            const newDecisionLevel = decisionLevel + 1
+            if (newDecisionLevel === 1) {
+                setElementIndex({...elementIndex, 0: index})
+            } else if (newDecisionLevel === 2) {
+                setElementIndex({...elementIndex, 1: index})
+            } else if (newDecisionLevel === 3) {
+                setElementIndex({...elementIndex, 2: index})
+            }
+            handleSetDecisionLevel(newDecisionLevel)
+        }
+    }
+
+    function handleChartNavigation() {
+        if (decisionLevel !== 0) {
+            if (decisionLevel === 1) {
+                setElementIndex({...elementIndex, 1: -1})
+            } else if (decisionLevel === 2) {
+                setElementIndex({...elementIndex, 2: -1})
+            } else if (decisionLevel === 3) {
+                setElementIndex({...elementIndex, 3: -1})
+            }
+            const newDecisionLevel = decisionLevel - 1
+            handleSetDecisionLevel(newDecisionLevel)
         }
     }
 
@@ -97,8 +118,6 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         totalBuildingArea += totalElementArea || 0
     })
 
-    console.log(elementsMaterialLayerByType)
-
     const chartRef = useRef();
 
     // get element index from the data-series
@@ -124,36 +143,62 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         },
     };
 
-    const getLayersForElementType = () => {
-        const elementType = Array.from(elementAreasByElementType.keys())[elementIndex]
-        const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType) || []
-        // TODO: extract the materials for the layers too
-        // TODO: set right es6 target
+    const getLayersForElementType = (index: number) => {
         // @ts-ignore
-        const layers = [...new Set(elementsMaterialLayers
+        const elementType = Array.from(elementAreasByElementType.keys())[index]
+        const elementsMaterialLayers = elementsMaterialLayerByType.get(elementType) || []
+        let uniqueLayers = new Map();
+        const layers = elementsMaterialLayers
             .filter((layers: string) => layers !== undefined && layers !== null)
             .map((layers: string) => {
                 let layersObject = JSON.parse(layers)
-                return Object.keys(layersObject)
+                // this contains multiple layers
+                return Object.entries(layersObject)
             })
-            .flat())
-            ]
+            // @ts-ignore
+            .flat()
+            .map((layer) => {
+                if (!uniqueLayers.has(layer[0])) {
+                    uniqueLayers.set(layer[0], layer[1])
+                }
+            })
 
-        return layers
+        return Array.from(uniqueLayers)
+    }
+
+    const getMaterialsForElementTypeAndLayer = (): object => {
+
+        // @ts-ignore
+        const elementTypeIndex = elementIndex['1']
+        // @ts-ignore
+        const layerIndex = elementIndex['2']
+        const layers = getLayersForElementType(elementTypeIndex)
+        console.log(layers)
+        // this seems the problem
+        const layer = layers[layerIndex]
+        console.log(layer)
+        if (layer?.length === 2) {
+            // @ts-ignore
+            return layer[0]
+        } else {
+            return {}
+        }
     }
 
     const getLabels = () => {
         return decisionLevel === 0 ? ['Whole Building'] :
             decisionLevel === 1 ? Array.from(elementAreasByElementType.keys()) :
-                decisionLevel === 2 ? getLayersForElementType() :
-                    decisionLevel === 3 ? ["Material 1", "Material 2", "Material 3", "Material 4"] :
+                // @ts-ignore
+                decisionLevel === 2 ? getLayersForElementType(elementIndex[decisionLevel]).map((layer) => layer[0]):
+                    decisionLevel === 3 ? Object.keys(getMaterialsForElementTypeAndLayer()) :
                         []
     }
 
     const getData = () => {
         return decisionLevel === 0 ? [totalBuildingArea * 1.5, totalBuildingArea * 3.5] :
             decisionLevel === 1 ? Array.from(elementAreasByElementType.values()).map(value => [value * Math.random(), value]) :
-                decisionLevel === 2 ? getLayersForElementType().map(() => {
+                // @ts-ignore
+                decisionLevel === 2 ? getLayersForElementType(elementIndex[decisionLevel]).map(() => {
                         let gwp: number = faker.datatype.number({min: 0, max: 1000})
                         return [gwp, gwp * 2]
                     }) :
@@ -173,13 +218,6 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
             },
         ],
     };
-
-    function handleChartNavigation() {
-        if (decisionLevel !== 0) {
-            handleSetDecisionLevel(decisionLevel - 1)
-            setElementIndex(-1)
-        }
-    }
 
     return (
         <div>

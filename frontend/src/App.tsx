@@ -15,15 +15,24 @@ function App() {
         setActiveVariant(project.tree)
     }
 
+    const saveProjectHandler = (project: object) => {
+        axios.post(`http://localhost:80/projects/`, project)
+        // @ts-ignore
+        .then(function (response) {
+        // @ts-ignore
+            if (response.data) {
+                setActiveProject(response.data)
+            }
+        })
+        // @ts-ignore
+        .catch((error) => console.log(error))
+
+    }
+
     const removeProjectHandler = (projectId: string) => {
         axios.delete(`http://localhost:80/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
-        // @ts-ignore
-            setAllProjects(response.data)
-            if (response.data.length > 0) {
-                setActiveProject(response.data[0])
-            }
         })
         // @ts-ignore
         .catch((error) => console.log(error))
@@ -87,6 +96,7 @@ function App() {
                 allProjects={allProjects}
                 activeProjectHandler={activeProjectHandler}
                 removeProjectHandler={removeProjectHandler}
+                saveProjectHandler={saveProjectHandler}
             />
             <ButtonAppBar 
                 activeVariant={activeVariant}

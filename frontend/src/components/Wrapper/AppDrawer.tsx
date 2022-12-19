@@ -15,10 +15,16 @@ import Looks4Icon from '@mui/icons-material/Looks4';
 import Looks5Icon from '@mui/icons-material/Looks5';
 import Looks6Icon from '@mui/icons-material/Looks6';
 import NumbersIcon from '@mui/icons-material/Numbers';
-
+import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { NewProjectModal } from './NewProjectModal';
 
-export default function AppDrawer({drawerState, toggleDrawer,activeProjectHandler, removeProjectHandler, allProjects}: any) {
+export default function AppDrawer({drawerState, toggleDrawer,activeProjectHandler, removeProjectHandler, allProjects, saveProjectHandler}: any) {
+
+  const [showProjectCreateModal, setShowProjectCreateModal] = React.useState(false);
+  const showProjectCreateModalHandler = (state: boolean) => {
+    setShowProjectCreateModal(state)
+  }
 
   const getIconForIndex = (index: number) => {
     return index === 0 ? <LooksOneIcon/> :
@@ -38,8 +44,7 @@ export default function AppDrawer({drawerState, toggleDrawer,activeProjectHandle
     >
       <List><ListItem><ListItemText><strong>Projects</strong></ListItemText></ListItem></List>
       <Divider />
-      {allProjects.length > 0 ? 
-        <List>
+      <List>
           {/* @ts-ignore */}
           {allProjects && allProjects.map((project, index: number) => (
             <ListItem key={project._id} disablePadding>
@@ -57,9 +62,19 @@ export default function AppDrawer({drawerState, toggleDrawer,activeProjectHandle
               />
             </ListItem>
           ))}
-        </List> 
-        : <List><ListItem><ListItemText>None</ListItemText></ListItem></List>
-      }
+      </List> 
+      <List>
+        <ListItem key={'add-project-button'} disablePadding>
+          <ListItemButton
+            onClick={()=> setShowProjectCreateModal(true)}
+          >
+            <ListItemIcon>
+              <AddIcon/>
+            </ListItemIcon>
+            <ListItemText primary={'Add projects'} />
+          </ListItemButton>
+        </ListItem>
+      </List>
     </Box>
   );
 
@@ -71,6 +86,11 @@ export default function AppDrawer({drawerState, toggleDrawer,activeProjectHandle
       >
         {list()}
       </Drawer>
+      <NewProjectModal 
+        showModal={showProjectCreateModal}
+        showProjectCreateModalHandler={showProjectCreateModalHandler}
+        saveProjectHandler={saveProjectHandler}
+      />
     </React.Fragment>      
   );
 }

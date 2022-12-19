@@ -185,7 +185,7 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
             }
             // @ts-ignore
             update[evaluationIndex] = {
-            // @ts-ignore
+                // @ts-ignore
                 ...subjectiveEvaluation,
                 factorRatings: updateRating,
             }
@@ -202,8 +202,6 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
                 .catch(function (error) {
                     console.log(error);
                 });
-
-
         } else {
             const survey = {variantId: activeVariantId, user: userName, factorRatings: [factorRating]}
             axios.post('http://localhost:80/surveys/', survey)
@@ -230,11 +228,17 @@ function SubjectiveEvaluationViewer({activeVariantId}) {
         // @ts-ignore
         const index = subjectiveEvaluations.findIndex((evaluation) => evaluation.user === user)
         if (index !== -1) {
-            setSubjectiveEvaluations((subjectiveEvaluation) => {
-                let update = [...subjectiveEvaluation]
-                update.splice(index, 1);
-                return update
-            })
+            // @ts-ignore
+            const surveyId = subjectiveEvaluations[index]._id
+
+            axios.delete(`http://localhost:80/surveys/${surveyId}`)
+                .then(function (response) {
+                    setSubjectiveEvaluations((subjectiveEvaluation) => {
+                        let update = [...subjectiveEvaluation]
+                        update.splice(index, 1);
+                        return update
+                    })
+                }).catch((error) => console.log(error))
         }
         computeTotalSubjectiveEvaluation()
     }

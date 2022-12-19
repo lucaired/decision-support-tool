@@ -5,6 +5,16 @@ import json
 import sys
 import time
 import logging
+from sys import stdout
+
+logger = logging.getLogger('mylogger')
+
+logger.setLevel(logging.DEBUG) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 class Graph4Ifc:  
     def __init__(self):
@@ -130,15 +140,15 @@ class Graph4Ifc:
         
         ## Exit the program if there is no node in the file
         if self.subgraph is None:
-            logging.info("No nodes in file", file=sys.stderr)
+            logger.info("No nodes in file", file=sys.stderr)
             sys.exit(1)
         
         ## Start create graph in neo4j
-        logging.info("Start loading subgraph into Neo4j DB...")
+        logger.info("Start loading subgraph into Neo4j DB...")
         
         conn.create(self.subgraph)
         
-        logging.info("Completed at {}, total time taken {} sec".format(
+        logger.info("Completed at {}, total time taken {} sec".format(
             time.strftime("%Y/%m/%d %H:%M:%S", time.strptime(time.ctime())),
             round(time.time() - start, 2)))
         
@@ -160,14 +170,14 @@ def run(path: str, model_name: str):
                               "Category": dictionary["Category"]}
                 return name, properties
         except:
-            logging.info("TODO: Material (#{}) cannot be added.".format(dictionary["id"]))
+            logger.info("TODO: Material (#{}) cannot be added.".format(dictionary["id"]))
 
     ## Start        
     f = open_ifc_file(path)
     if f is None:
         return
     else:
-        logging.info("--Start--")
+        logger.info("--Start--")
 
     
     ## Create graph object for current ifc file    
@@ -178,8 +188,6 @@ def run(path: str, model_name: str):
 
     ## TO CREATE ALL DESIRED NODES 
     start = time.time()
-
-    return
 
     IFC_ESSENTIAL_STRUCTURE_ENTITIES = ["IfcSite", "IfcBuilding", "IfcBuildingStorey", "IfcSpace"]
     ## IFC4 all building elements: 
@@ -197,10 +205,10 @@ def run(path: str, model_name: str):
         try:
             _ifcgraph.add_by_type(f.by_type(element))
         except:
-            logging.info("ALERT: Nodes with label {} cannot added.".format(element))
+            logger.info("ALERT: Nodes with label {} cannot added.".format(element))
 
 
-    logging.info("Prepared {} nodes in {} sec".format(len(_ifcgraph.subgraph.nodes), round(time.time() - start, 2)))
+    logger.info("Prepared {} nodes in {} sec".format(len(_ifcgraph.subgraph.nodes), round(time.time() - start, 2)))
 
     ##  TO CREATE MATERIAL RELATED PROPERTIES
     start = time.time()
@@ -276,7 +284,7 @@ def run(path: str, model_name: str):
 
                         name, properties = get_ifc_material_content(details)
                         if name in materials.keys():
-                            logging.info("TODO: Non-unique name {} exists for IfcMaterial".format(name))
+                            logger.info("TODO: Non-unique name {} exists for IfcMaterial".format(name))
                         else:
                             materials[name] = {**properties, **routing}
 
@@ -289,7 +297,7 @@ def run(path: str, model_name: str):
 
                             name, properties = get_ifc_material_content(item)
                             if name in materials.keys():
-                                logging.info("TODO: Non-unique name {} exists for IfcMaterialList (#{})".format(name, details["id"]))
+                                logger.info("TODO: Non-unique name {} exists for IfcMaterialList (#{})".format(name, details["id"]))
                             else:
                                 materials[name] = {**properties, **routing}
 
@@ -321,15 +329,15 @@ def run(path: str, model_name: str):
 
                             name, properties = get_ifc_material_content(layer["Material"])
                             if name in materials.keys():
-                                logging.info("TODO: Non-unique name {} exists for IfcMaterialList (#{})".format(name, details["id"]))
+                                logger.info("TODO: Non-unique name {} exists for IfcMaterialList (#{})".format(name, details["id"]))
                             else:
                                 materials[name] = {**properties, **layer_properties, **layerset_properties, **routing}
 
                     else:
-                        logging.info("TODO: {} is not handled.".format(details["type"]))
+                        logger.info("TODO: {} is not handled.".format(details["type"]))
 
             except Exception as e:
-                logging.info("TODO: {} for {}".format(type(e), e))
+                logger.info("TODO: {} for {}".format(type(e), e))
                 continue
 
         
@@ -345,10 +353,10 @@ def run(path: str, model_name: str):
                     material_record_count += 1
         
         if debug:
-            logging.info("parents", nodes)
-            logging.info("materials", materials)
+            logger.info("parents", nodes)
+            logger.info("materials", materials)
     
-    logging.info("Prepared {} material records in {} sec".format(material_record_count, round(time.time() - start, 2)))
+    logger.info("Prepared {} material records in {} sec".format(material_record_count, round(time.time() - start, 2)))
 
     
 
@@ -422,7 +430,7 @@ def run(path: str, model_name: str):
                                 else:
                                     _ifcgraph.add_relationship(source, target, relationship="has", rel_properties=rel_properties)
 
-    logging.info("Prepared {} relationships in {} sec".format(len(_ifcgraph.subgraph.relationships), round(time.time() - start, 2)))    
+    logger.info("Prepared {} relationships in {} sec".format(len(_ifcgraph.subgraph.relationships), round(time.time() - start, 2)))    
 
 
     ## TO RETRIEVE CORRESPONDING PROPERTIES OF ALL ELEMENTS (i.e. NODES)
@@ -474,7 +482,7 @@ def run(path: str, model_name: str):
                                     node[key] = value
                                     prop_count += 1
                                 else:
-                                    logging.info("#TODO: Node {} falls into the case of {}".format(node["nid"], p["type"]))
+                                    logger.info("#TODO: Node {} falls into the case of {}".format(node["nid"], p["type"]))
                                     ## TODO: check and enhance the follow cases if there are real case examples
                                     ##########################################################################################################################
                                     ## Useful info for:
@@ -484,7 +492,7 @@ def run(path: str, model_name: str):
                                     ##   IfcPropertyTableValue: DefiningValues & DefinedValues & Expression & DefiningUnit & DefinedUnit & CurveInterpolation
                                     ##########################################################################################################################
                             except:
-                                logging.info("Property type {} cannot be added for node (nid: {})".format(p["type"], node["nid"]))
+                                logger.info("Property type {} cannot be added for node (nid: {})".format(p["type"], node["nid"]))
 
 
                 ## Case 2:
@@ -519,7 +527,7 @@ def run(path: str, model_name: str):
                                     ## Except the value, e.g. "LengthValue", additional useful info for them include: Unit & Formula
                                     ##########################################################################################################################
                             except:
-                                logging.info("Property type {} cannot be added for node (nid: {})".format(q["type"], node["nid"]))
+                                logger.info("Property type {} cannot be added for node (nid: {})".format(q["type"], node["nid"]))
 
 
                 ## Case 3:
@@ -527,7 +535,7 @@ def run(path: str, model_name: str):
                 else:
                     continue
 
-    logging.info("Prepared total {} node properties in {} sec".format(prop_count, round(time.time() - start, 2)))    
+    logger.info("Prepared total {} node properties in {} sec".format(prop_count, round(time.time() - start, 2)))    
 
     
     ## TO SIMPLIFY (:IfcWallStandardCase)-[:has]->(:IfcOpeningElement)-[:has]->() to (:IfcWallStandardCase)-[:has]->()
@@ -555,7 +563,7 @@ def run(path: str, model_name: str):
                 _ifcgraph.remove_relationship(discard_node, end_node, relationship=d[4], rel_properties=d[5])
                 _ifcgraph.remove_node(discard_node)
     
-    logging.info("Simplified paths with IfcOpeningElement in {} sec".format(round(time.time() - start, 2)))    
+    logger.info("Simplified paths with IfcOpeningElement in {} sec".format(round(time.time() - start, 2)))    
 
     
     ## TO SIMPLIFY (:IfcSpace)-[:has]->(:IfcVirtualElement)<-[:has]-(:IfcSpace) to (:IfcSpace)<-[:connect]->(:IfcSpace)
@@ -582,7 +590,7 @@ def run(path: str, model_name: str):
                 _ifcgraph.remove_relationship(s2_node, discard_node, relationship=s2[4], rel_properties=s2[5])
                 _ifcgraph.remove_node(discard_node)
     
-    logging.info("Simplified paths with IfcVirtualElement in {} sec".format(round(time.time() - start, 2)))    
+    logger.info("Simplified paths with IfcVirtualElement in {} sec".format(round(time.time() - start, 2)))    
 
     
     ## TO REPLACE NAMES OF LABELS TO SIMPLER ONES
@@ -600,19 +608,18 @@ def run(path: str, model_name: str):
         x.add_label(IFC_RENAMING_DICT[l])
         
     
-    if debug:
-        logging.info("Subgraph:")
-        display(_ifcgraph.subgraph)
     #### Finish creating the graph content ####
     
     #conn = get_connection()
     #_ifcgraph.load_to_neo4j(conn)
-    logging.info("--End--")
+    logger.info("--End--")
+
+    return
 
 def check_using_default(item, default_value, msg = "Default value is applied."):
     if item == "":
         item = default_value
-        logging.info(msg)
+        logger.info(msg)
 
     return item
     
@@ -624,12 +631,12 @@ def open_ifc_file(ifc_path: str):
                 for line in infile:
                     if line.startswith("FILE_SCHEMA"):
                         schema = line[14:-5]
-                        logging.info("Ifc schema, {}, is going to be processed.".format(schema))
+                        logger.info("Ifc schema, {}, is going to be processed.".format(schema))
                         
                         if schema != "IFC4":
                             to_continue = input("This program does not fully support {} schema, do you want to continue? (y/n)".format(schema))
                             if to_continue.lower() == "n":
-                                logging.info("--End--")
+                                logger.info("--End--")
                                 return
                         break
                      
@@ -637,7 +644,7 @@ def open_ifc_file(ifc_path: str):
 
             return f
         except:
-            logging.info("No Ifc Found, Please write the path to the IFC File")
+            logger.info("No Ifc Found, Please write the path to the IFC File")
 
 # Connect to desired Neo4j database                
 def get_connection(default_uri = "localhost:7687", default_username = "neo4j", default_password = "123"):
@@ -652,12 +659,12 @@ def get_connection(default_uri = "localhost:7687", default_username = "neo4j", d
         password = check_using_default(password, default_password, "Password invalid. Default value is applied.")
 
         try:
-            logging.info(uri, username, password)
+            logger.info(uri, username, password)
             conn = Graph(auth=(username, password), address=uri) 
-            logging.info("Connection Successfull.")
+            logger.info("Connection Successfull.")
             return conn
         except:
-            logging.info("Auth error, please try again.")
+            logger.info("Auth error, please try again.")
             ifc_path = ""
             username = ""
             uri = ""

@@ -198,8 +198,8 @@ export function DesignEpisodeMatchingModal({
                 <FormGroup>    
                   {activeProjectTree && Array.from(getVariantsAndDesignEpisodes(activeProjectTree))
                   .filter((entry) => entry[1].length > 0)
-                  .map((entry) => <div>
-                    <Stack direction="row" spacing={1} alignItems="center" key={entry[0]}>
+                  .map((entry) => <div key={entry[0]}>
+                    <Stack direction="row" spacing={1} alignItems="center">
                       <Card>
                         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                         <Typography style={{fontWeight: '600', paddingLeft: '5px'}}>{entry[0]}</Typography>
@@ -238,7 +238,7 @@ export function DesignEpisodeMatchingModal({
                         <div style={{display: 'flex', flexDirection: 'column'}}>
                         <FormGroup>
                           {entry[1].map((designEpisodeId) =>
-                          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}} key={entry[0]}>
                             <FormControlLabel 
                                 key={`${designEpisodeId}-designEpisode-checkbox`}
                                 label={designEpisodeId}

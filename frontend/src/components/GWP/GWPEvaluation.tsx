@@ -143,7 +143,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
         if (elementLayerSetByBuildingPartCount !== undefined && elementLayerSetByBuildingPartCount.has(key)) {
             // @ts-ignore
-            elementAreasByBuildingPartCount.set(key, elementAreasByBuildingPartCount.get(key)+1)
+            elementLayerSetByBuildingPartCount.set(key, elementLayerSetByBuildingPartCount.get(key)+1)
         } else {
             elementLayerSetByBuildingPartCount.set(key, 1)
         }
@@ -394,13 +394,14 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     }
 
     const getGWPForWholeBuilding = () => {
-        const totalGWP = [0,0]
-        const gwpArray = getGeneralBuildingPartLabels().map((generalBuildingPartName) => getGWPForGeneralBuildingPart(generalBuildingPartName))
-        return gwpArray.reduce((acc, curr) => {
-            acc[0] += curr[0]
-            acc[1] += curr[1]
-            return acc
-        }, totalGWP)
+        const result = getGeneralBuildingPartLabels()
+            .map((generalBuildingPartName) => getGWPForGeneralBuildingPart(generalBuildingPartName))
+            .reduce((acc, curr) => {
+                acc[0] += curr[0]
+                acc[1] += curr[1]
+                return acc
+            }, [0,0]);
+        return result;
     }
 
     const getLabels = () => {
@@ -414,9 +415,9 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     }
 
     const getData = () => {
-        // element types without area greater than 0
-        // or no layer set are not shown
-        return decisionLevel === 0 ? getGWPForWholeBuilding() :
+        // Element types without area greater
+        // than 0 or no layer set are not shown
+        return decisionLevel === 0 ? [getGWPForWholeBuilding()]:
             decisionLevel === 1 ? getGeneralBuildingPartLabels()
                 .map((label) => getGWPForGeneralBuildingPart(label)) :
             // @ts-ignore
@@ -450,14 +451,12 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         return fillColor
     }
 
-    const generatedData = getData()
-
     const data = {
         labels: getLabels(),
         datasets: [
             {
-                data: generatedData,
-                backgroundColor: getBarFillColor(generatedData),
+                data: getData(),
+                backgroundColor: getBarFillColor(getData()),
             },
         ],
     };

@@ -7,8 +7,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {DecisionTree} from "./NodeHandler";
 import NodeStringPropInput from './NodeStringPropInput';
-import NodeStringPropSelect from "./NodeStringPropSelect";
-import FileUploader from '../Shared/FileUpload';
 import axios from 'axios';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
@@ -127,13 +125,6 @@ export default function VariantCreatorStepper({
                                 updateFunction={setNode}
                                 property={'name'}
                                 propertyName={'Name'}
-                            />
-                            <NodeStringPropSelect
-                                node={node}
-                                setNode={setNode}
-                                property={'decisionLevel'}
-                                propertyName={'Decision Level'}
-                                options={['construction', 'building-part', 'layer-type', 'material-type']}
                             />
                         </div>)
                         }

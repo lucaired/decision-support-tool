@@ -84,9 +84,8 @@ export function RenderNode({
                 }}
             />
             <foreignObject {...foreignObjectProps}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "column", color: "darkgrey", fontSize: "18pt" }}>
                     <span><strong>{nodeDatum.name} </strong></span>
-                    <span>{nodeDatum.decisionLevel} level</span>
                 </div>
                 {nodeDatum.showNodeControl &&
                     <Button variant="outlined" size="small" onClick={() => {

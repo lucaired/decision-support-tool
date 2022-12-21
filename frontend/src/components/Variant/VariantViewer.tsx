@@ -71,11 +71,8 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                             {activeVariantExplorationIndex === 0 ?
                                 <ForgeViewer
                                     key={"renderer-variant-exploration"}
-                                    // local={true}
-                                    // testing={true}
-                                    // path={'http://192.168.2.168:3000/0.svf'}
-                                    urn={'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGVjaXNpb24tc3VwcG9ydC1idWNrZXQvVjItMS5pZmM'}
-                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6IlFqSUxXSVd6akdmNHlRRTA4TkdmZmxpN1F3UWcxbDBadHU2MXV1Y21GdHJiSkFSdzJId3lXVFpFOHRmemNvYVYiLCJleHAiOjE2NzE0NjkxNjh9.R--t13tAIVsfuYeJsYqqJAfUBZjZJjs0i2q5G3mBEIyXQxe7ShOmfXUhHamFQNdXvnWZAE_mEv3lVgvPUe3RHUaAtLSr1EFJZJmssk5LSEMG0YgYjLnICjKBYT_kw5kSDDVQUAbR3r0Y16S9zzsYXc--we3NVuAHRRz1EsTKtKfYkk30kf4JnQmuQBLfKJVfsy2E3Ism70YyjV3gTym89UeRnDhI5cB3wIF4xRy_-YSKXyjUXkl3gwJ2KogiWtMU9g4wPrnBpEsysh6RTaASv0tHE3Nx81_1Sqws0mkxw6E_TwlLEmDHlXfFeigG49ILFI5Q-GO0jE_FOlmVV3YZmw'}
+                                    urn={activeVariant.bimReference}
+                                    token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6Im1kN2g2SkltYnpiR3VUU1lKZmd2ZkIwdDlSWHMyVzVJdVQ5bGRqUExSUEVpVXhFcFVKa0VPZUJXNmZ0UmNtZGUiLCJleHAiOjE2NzE2MzI5MDF9.enFaiEVeetAqjOJAvqRmlR3I2q_aigoUDuINh5qjfAwfuWyoxRs6HVCFfJCmAD5IZsuTEoTr8ZC5L02iX3Ex2E86ESqZh-yMgy2L86ckPRPkV1vBlyonZbr3ZS6dGOlDIyhBZr0wk7T_9QJdwfgyKOouCvAzsJTlBMJm3CV6ms05ViM4JQ9IUh7JcCwo5wCOBTM7rLX4xRqvy1T5EHnlmRV9X-UaEOp0UGOP534FLnUif1LqMsTinOjilqm2VqrlE1HPv13rLTrAn2dnCY9SwgH8aRseyv0r1W-aKCi_bhH6f1r-EQ1cgnUrc36LvKTtqX9Y6Z605XVWw7trUy-QFQ'}
                                 /> :
                                 activeVariantExplorationIndex === 1 ?
                                     <GWPEvaluation

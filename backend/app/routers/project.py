@@ -1,10 +1,21 @@
-from app.mongodb.crud.project import Project, UpdateProject
-from fastapi import APIRouter, Body, status, HTTPException
+from fastapi import APIRouter, Body, status, HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
+import logging
+from sys import stdout
 
-from app.routers.shared import flatten
+from app.mongodb.crud.project import Project, UpdateProject
+from app.neo4j import Neo4JGraph, DE
 import app.mongodb.crud.project as crud
+import app.mongodb.crud.variant_images as variant_images_crud
+
+logger = logging.getLogger('mylogger')
+logger.setLevel(logging.DEBUG) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 router = APIRouter(
     prefix="/projects",
@@ -12,8 +23,7 @@ router = APIRouter(
 
 @router.get("/", response_model=list[Project])
 async def get_all_projects():
-    all_project = await crud.query_all_projects()
-    return all_project
+    return await crud.query_all_projects()
 
 @router.post("/", response_description="Add new project", response_model=Project)
 async def create_project(project: Project = Body(...)):
@@ -36,3 +46,25 @@ async def delete_project(id: str):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"Project {id} not found")
+
+@router.post("/variant/{id}/images", status_code=status.HTTP_202_ACCEPTED)
+async def create_images_for_variant(files: list[UploadFile]):
+    for file in files:
+        variant_images_crud.create_image_for_variant(file, id)
+
+@router.get("/variant/{id}/images")
+async def get_all_variant_images():
+    result = await variant_images_crud.get_images_for_variant(id)
+    return Response(content=result[0], media_type="application/octet-stream")
+
+
+@router.get("/design_episodes")
+async def get_all_project_design_episodes():
+    # TODO: apply project scope in neo4j query
+    try:
+        neo = Neo4JGraph()
+        all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
+        logger.info(f"{len(all_design_episode_descriptions)} DEs to match")
+    except Exception as e:
+        logger.error(e)
+        return []

@@ -11,7 +11,7 @@ import axios from 'axios';
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
 
-const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file', 'Design Episodes'];
+const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file', 'Design Episodes', 'Variant image resources'];
 
 export default function VariantCreatorStepper({
 // @ts-ignore
@@ -58,13 +58,14 @@ export default function VariantCreatorStepper({
         let tree = {...decisionTree};
         setProperty(tree, activeNode.id, addProperty, node)
         setDecisionTree(tree)
-        sendFile()
+        sendIfcFile()
+        sendImageFiles()
         setActiveNodeId({id: undefined})
         setActiveStep(0);
         handleNodeModalClose()
     };
 
-    // file upload
+    // ifc file upload
     const [file, setFile] = React.useState<File>();
   
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +76,7 @@ export default function VariantCreatorStepper({
       setFile(file);  
     };
 
-    const sendFile = () => {
+    const sendIfcFile = () => {
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -86,6 +87,38 @@ export default function VariantCreatorStepper({
         formData.append('file', file)
           
         axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
+        .then(function (response) {
+        console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+    }
+
+    // ifc file upload
+    const [images, setImages] = React.useState<FileList>();
+
+    const handleImageFilesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) {
+        return;
+        }
+        const files = e.target.files;
+        setImages(files);  
+    };
+
+    const sendImageFiles = () => {
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+        let formData = new FormData();
+        //@ts-ignore
+        for (const file of images) {
+            formData.append('files', file)
+        }
+            
+        axios.post(`http://${backendUrl}:80/projects/variant/${node.id}/images`, formData, config)
         .then(function (response) {
         console.log(JSON.stringify(response.data));
         })
@@ -155,6 +188,15 @@ export default function VariantCreatorStepper({
                             property={'designEpisodeIds'}
                             propertyName={'Design Episode IDs'}
                         />}
+                        {activeStep === 5 && <Button variant="contained" component="label">
+                            Upload Variant image resources (png/jpeg)
+                            <input
+                                type="file"
+                                hidden
+                                accept="image/png, image/jpeg"
+                                onChange={handleImageFilesUpload}
+                            />
+                            </Button>}
                         <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
                             <Button
                                 color="inherit"

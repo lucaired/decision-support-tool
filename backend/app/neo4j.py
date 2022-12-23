@@ -17,6 +17,7 @@ database = os.getenv("NEO4J_DATABASE", "neo4j")
 class DE:
     Guid: str
     description: str
+    name: str
     explanation_tags: list[str]
 
 class Neo4JGraph:
@@ -31,7 +32,7 @@ class Neo4JGraph:
     def _query_all_design_episode_descriptions(tx):
         result = tx.run("""
         MATCH (d:DesignEpisode)-[EpisodeElement]->(m)
-        RETURN d.Guid, d.Description, Collect(distinct m.ExplanationTags)
+        RETURN d.Guid, d.Description, Collect(distinct m.ExplanationTags), d.Name
         """)
         return [record.values() for record in result]
     
@@ -40,7 +41,12 @@ class Neo4JGraph:
             all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions)
             return list(
                 map(
-                    lambda element: DE(Guid=element[0], description=element[1], explanation_tags=_flatten_explanation_tags(element[2])),
+                    lambda element: DE(
+                        Guid=element[0],
+                        description=element[1],
+                        explanation_tags=_flatten_explanation_tags(element[2]),
+                        name=element[3]
+                        ),
                     all_id_and_description
                 )
             )

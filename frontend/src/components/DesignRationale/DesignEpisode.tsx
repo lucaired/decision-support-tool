@@ -12,11 +12,14 @@ NEO4J_URI = `neo4j://${NEO4J_URI}:7687`
 const NEO4J_USER = "neo4j";
 const NEO4J_PASSWORD = "123";
 
-const DesignEpisode = () => {
+interface DesignEpisodeProps {
+    designEpisodeIds: string;
+}
+
+const DesignEpisode = ({designEpisodeIds}: DesignEpisodeProps) => {
     const [open, setOpen] = React.useState(false);
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);
-
     const style = {
         position: 'absolute' as 'absolute',
         width: '100%',
@@ -40,6 +43,7 @@ const DesignEpisode = () => {
                     neo4jUser={NEO4J_USER}
                     neo4jPassword={NEO4J_PASSWORD}
                     backgroundColor={"#ffffff"}
+                    designEpisodeIds={designEpisodeIds}
                 />
             </div>
             <Modal
@@ -64,6 +68,7 @@ const DesignEpisode = () => {
                         neo4jUser={NEO4J_USER}
                         neo4jPassword={NEO4J_PASSWORD}
                         backgroundColor={"#ffffff"}
+                        designEpisodeIds={designEpisodeIds}
                     />
                 </Box>
             </Modal>

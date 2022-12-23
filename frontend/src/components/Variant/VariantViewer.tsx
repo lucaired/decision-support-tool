@@ -11,6 +11,7 @@ import GWPEvaluation from "../../components/GWP/GWPEvaluation";
 import SubjectiveEvaluationViewer from "../../components/SubjectiveEvaluation/SubjectiveEvaluationViewer";
 import DesignEpisode from "../../components/DesignRationale/DesignEpisode";
 import { DecisionTree } from '../../components/Tree/NodeHandler';
+import { ImageViewer } from './ImageViewer';
 
 interface VariantViewerProps {
     activeProject?: any;
@@ -68,12 +69,14 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                                 activeVariantExplorationHandler={activeVariantExplorationHandler}
                                 activeVariantExplorationIndex={activeVariantExplorationIndex}
                             />
-                            {activeVariantExplorationIndex === 0 ?
+                            {activeVariantExplorationIndex === 0 && activeVariant.bimReference !== '' ?
                                 <ForgeViewer
                                     key={"renderer-variant-exploration"}
                                     urn={activeVariant.bimReference}
                                     token={'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Im93N2xLY0VrbFlXNjVkUW9VMFZxWFVkd0JudFd6VkhRIiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6Im1kN2g2SkltYnpiR3VUU1lKZmd2ZkIwdDlSWHMyVzVJdVQ5bGRqUExSUEVpVXhFcFVKa0VPZUJXNmZ0UmNtZGUiLCJleHAiOjE2NzE2MzI5MDF9.enFaiEVeetAqjOJAvqRmlR3I2q_aigoUDuINh5qjfAwfuWyoxRs6HVCFfJCmAD5IZsuTEoTr8ZC5L02iX3Ex2E86ESqZh-yMgy2L86ckPRPkV1vBlyonZbr3ZS6dGOlDIyhBZr0wk7T_9QJdwfgyKOouCvAzsJTlBMJm3CV6ms05ViM4JQ9IUh7JcCwo5wCOBTM7rLX4xRqvy1T5EHnlmRV9X-UaEOp0UGOP534FLnUif1LqMsTinOjilqm2VqrlE1HPv13rLTrAn2dnCY9SwgH8aRseyv0r1W-aKCi_bhH6f1r-EQ1cgnUrc36LvKTtqX9Y6Z605XVWw7trUy-QFQ'}
-                                /> :
+                                /> : 
+                                activeVariantExplorationIndex === 0 && activeVariant.bimReference === '' ?
+                                <ImageViewer activeVariantId={activeVariant.id}/> :
                                 activeVariantExplorationIndex === 1 ?
                                     <GWPEvaluation
                                         key={"gwp-variant-exploration"}
@@ -83,7 +86,7 @@ function VariantViewer({activeProject, activeVariant, activeVariantHandler, acti
                                         <div
                                             key={"design-rationale-variant-exploration"}
                                         >
-                                            <DesignEpisode/>
+                                            <DesignEpisode designEpisodeIds={activeVariant.designEpisodeIds}/>
                                         </div>
                                         : activeVariantExplorationIndex === 3 ?
                                             <div

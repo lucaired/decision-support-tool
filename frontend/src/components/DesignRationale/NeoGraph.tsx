@@ -16,11 +16,14 @@ const NeoGraph = (props) => {
         neo4jUri,
         neo4jUser,
         neo4jPassword,
+        designEpisodeIds,
     } = props;
 
     const visRef = useRef();
 
     useEffect(() => {
+        // @ts-ignore
+        const ids = designEpisodeIds.split(',').map(id => `'${id}'`)
         const config = {
             // @ts-ignore
             container_id: visRef.current.id,
@@ -54,11 +57,11 @@ const NeoGraph = (props) => {
                 },
             },
             initial_cypher:
-                "MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE ID(s) IN [0] RETURN s, rel, d\n",
+                `MATCH (s:DesignEpisode)-[rel:EpisodeElement]->(d) WHERE s.Guid IN [${ids}] RETURN s, rel, d\n`,
         };
         const vis = new NeoVis(config);
         vis.render();
-    }, [neo4jUri, neo4jUser, neo4jPassword]);
+    }, [neo4jUri, neo4jUser, neo4jPassword, designEpisodeIds]);
 
     return (
         <div
@@ -88,6 +91,7 @@ NeoGraph.propTypes = {
     neo4jUser: PropTypes.string.isRequired,
     neo4jPassword: PropTypes.string.isRequired,
     backgroundColor: PropTypes.string,
+    designEpisodeIds: PropTypes.string,
 };
 
 export default NeoGraph;

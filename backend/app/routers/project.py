@@ -57,18 +57,7 @@ async def create_images_for_variant(variant_id: str, files: list[UploadFile]):
 @router.get("/variant/{variant_id}/images")
 async def get_all_variant_images(variant_id: str):
     images = await variant_images_crud.get_images_for_variant(variant_id)
-    io = BytesIO()
-    zip_sub_dir = "final_archive"
-    zip_filename = f"{zip_sub_dir}.zip"
-    with zipfile.ZipFile(io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
-        for index, image in enumerate(images):
-            zip.writestr(f'{index}.jpeg', image)
-        zip.close()
-    return StreamingResponse(
-        iter([io.getvalue()]),
-        media_type="application/x-zip-compressed",
-        headers={"Content-Disposition": f"attachment;filename={zip_filename}"},
-    )
+    return Response(content=images[0] if images else "", media_type="image/jpeg")
 
 
 @router.get("/design_episodes")

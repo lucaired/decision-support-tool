@@ -189,10 +189,9 @@ export default function VariantCreatorStepper({
                             propertyName={'Design Episode IDs'}
                         />}
                         {activeStep === 5 && <Button variant="contained" component="label">
-                            Upload Variant image resources (png/jpeg)
+                            Upload Variant image resource
                             <input
                                 type="file"
-                                multiple
                                 hidden
                                 accept="image/png, image/jpeg"
                                 onChange={handleImageFilesUpload}

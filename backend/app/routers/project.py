@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Body, status, HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 import logging
 from sys import stdout
+import zipfile
+from io import BytesIO
 
 from app.mongodb.crud.project import Project, UpdateProject
 from app.neo4j import Neo4JGraph, DE
@@ -47,15 +49,26 @@ async def delete_project(id: str):
 
     raise HTTPException(status_code=404, detail=f"Project {id} not found")
 
-@router.post("/variant/{id}/images", status_code=status.HTTP_202_ACCEPTED)
-async def create_images_for_variant(files: list[UploadFile]):
+@router.post("/variant/{variant_id}/images", status_code=status.HTTP_202_ACCEPTED)
+async def create_images_for_variant(variant_id: str, files: list[UploadFile]):
     for file in files:
-        variant_images_crud.create_image_for_variant(file, id)
+        variant_images_crud.create_image_for_variant(file, variant_id)
 
-@router.get("/variant/{id}/images")
-async def get_all_variant_images():
-    result = await variant_images_crud.get_images_for_variant(id)
-    return Response(content=result[0], media_type="application/octet-stream")
+@router.get("/variant/{variant_id}/images")
+async def get_all_variant_images(variant_id: str):
+    images = await variant_images_crud.get_images_for_variant(variant_id)
+    io = BytesIO()
+    zip_sub_dir = "final_archive"
+    zip_filename = f"{zip_sub_dir}.zip"
+    with zipfile.ZipFile(io, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
+        for index, image in enumerate(images):
+            zip.writestr(f'{index}.jpeg', image)
+        zip.close()
+    return StreamingResponse(
+        iter([io.getvalue()]),
+        media_type="application/x-zip-compressed",
+        headers={"Content-Disposition": f"attachment;filename={zip_filename}"},
+    )
 
 
 @router.get("/design_episodes")

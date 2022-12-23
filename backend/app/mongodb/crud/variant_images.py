@@ -12,4 +12,4 @@ def create_image_for_variant(file, variant_id: str):
     fs.put(file.file, filename=file_name)   
 
 async def get_images_for_variant(variant_id: str):
-    return [grid_data.read() for grid_data in fs.find()]
+    return [grid_data.read() for grid_data in fs.find({"filename": {'$regex': f'^{variant_id}'}})]

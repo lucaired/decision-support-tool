@@ -15,7 +15,7 @@ logger.addHandler(consoleHandler)
 
 package = "en_core_web_trf"
 nlp = spacy.load(package)
-#nlp.add_pipe('universal_sentence_encoder')
+nlp.add_pipe('universal_sentence_encoder')
 
 @dataclass
 class MatchingResult:

@@ -196,11 +196,13 @@ function App() {
         setRightDrawerState(open);
     };
     const [showDesignEpisodeMatchingModal, setShowDesignEpisodeMatchingModal] = React.useState(false);
+
     const showDesignEpisodeMatchingModalHandler = (state: boolean) => {
         setShowDesignEpisodeMatchingModal(state)
       }
 
     useEffect(() => {queryProjects()}, [leftDrawerState]);
+
     useEffect(() => {
         if (allSimilarProjects.length > 0) {
             setRightDrawerState(true)

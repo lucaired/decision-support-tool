@@ -66,7 +66,7 @@ async def get_all_project_design_episodes():
     try:
         neo = Neo4JGraph()
         all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
-        logger.info(f"{len(all_design_episode_descriptions)} DEs to match")
+        return all_design_episode_descriptions
     except Exception as e:
         logger.error(e)
         return []

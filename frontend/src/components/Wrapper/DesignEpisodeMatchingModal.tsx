@@ -5,8 +5,18 @@ import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
 import { DecisionTree } from '../Tree/NodeHandler';
+import axios from 'axios';
 
-interface DesignEpisodeMatchingModal {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+
+interface DesignEpisode { 
+  Guid: string;
+  description: string;
+  name: string;
+  explanation_tags: Array<string>;
+}
+
+interface DesignEpisodeMatchingModalProps {
     showDesignEpisodeMatchingModal: boolean; 
     showDesignEpisodeMatchingModalHandler: (show: boolean)=>void;
     queryMatchingProjects: (variantsToDesignEpisodes: Object) => void;
@@ -51,7 +61,7 @@ export function DesignEpisodeMatchingModal({
     showDesignEpisodeMatchingModalHandler,
     queryMatchingProjects,
     activeProjectTree,
-}: DesignEpisodeMatchingModal
+}: DesignEpisodeMatchingModalProps
     ) {
         // local state with variantName -> [DEId1, DEId2, ...]
         //@ts-ignore
@@ -183,6 +193,24 @@ export function DesignEpisodeMatchingModal({
           }
         };
 
+        // retrieve Design Episodes show their pretty names
+        const [allDesignEpisodes, setAllDesignEpisodes] = React.useState<DesignEpisode[]>([]);
+
+        const queryDesignEpisodes = () => axios.get(`http://${backendUrl}:80/projects/design_episodes`)
+        // @ts-ignore
+        .then(function (response) {
+          setAllDesignEpisodes(response.data)
+        })
+
+        React.useEffect(() => {queryDesignEpisodes()}, [showDesignEpisodeMatchingModal]);
+
+        const getNameForDesignEpisodeId = (guid: string): string => {
+          return allDesignEpisodes
+            .filter((designEpisode) => designEpisode.Guid === guid)
+            .map((designEpisode) => designEpisode.name)
+            [0] || "No name"
+        }
+
         return <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"
@@ -241,7 +269,7 @@ export function DesignEpisodeMatchingModal({
                           <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}} key={entry[0]}>
                             <FormControlLabel 
                                 key={`${designEpisodeId}-designEpisode-checkbox`}
-                                label={designEpisodeId}
+                                label={getNameForDesignEpisodeId(designEpisodeId)}
                                 control={
                                   <Checkbox 
                                     checked={isDesignEpisodeSetInVariant(entry[0], designEpisodeId)} 

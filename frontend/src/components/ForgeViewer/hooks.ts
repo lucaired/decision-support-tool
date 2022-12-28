@@ -123,6 +123,7 @@ export function useHooks({
         const viewable = onDocumentLoadSuccess(viewerDocument);
         viewer.loadDocumentNode(viewerDocument, viewable, viewableOptions);
     };
+
     // load model using Derivatives API
     const loadModel = (): void => {
         Autodesk.Viewing.Document.load(

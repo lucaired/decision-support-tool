@@ -3,8 +3,6 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 import logging
 from sys import stdout
-import zipfile
-from io import BytesIO
 
 from app.mongodb.crud.project import Project, UpdateProject
 from app.neo4j import Neo4JGraph, DE
@@ -55,10 +53,13 @@ async def create_images_for_variant(variant_id: str, files: list[UploadFile]):
         variant_images_crud.create_image_for_variant(file, variant_id)
 
 @router.get("/variant/{variant_id}/images")
-async def get_all_variant_images(variant_id: str):
-    images = await variant_images_crud.get_images_for_variant(variant_id)
-    return Response(content=images[0] if images else "", media_type="image/jpeg")
+async def get_all_variant_images(variant_id: str, response_model=list[str]):
+    return await variant_images_crud.get_images_for_variant(variant_id)
 
+@router.get("/variant/image/{image_name}")
+async def get_image_by_name(image_name: str):
+    image = await variant_images_crud.get_image_by_name(image_name)
+    return Response(content=image or "", media_type="image/jpeg")
 
 @router.get("/design_episodes")
 async def get_all_project_design_episodes():

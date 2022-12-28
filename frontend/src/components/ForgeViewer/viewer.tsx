@@ -35,7 +35,7 @@ interface DefaultProps {
 type Props = (ApiProps | LocalProps) & DefaultProps;
 
 export const ForgeViewer = (props: Props): React.ReactElement => {
-    const { refs, style } = useHooks(props);
+    let { refs, style } = useHooks(props);
     return <div id='forgeViewer' ref={refs.viewer} style={style} />;
 };
 

@@ -11,31 +11,41 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
 
 export function ImageViewer({ activeVariantId }: ImageViewerProps) {
 
-    const [image, setImageSrc]= React.useState({
-        src: "",
-        show: false
-    })
+    const [images, setImages]= React.useState([])
 
     useEffect(() => {
+        setImages([])
         axios.request({
             url: `http://${backendUrl}:80/projects/variant/${activeVariantId}/images`,
             method: 'GET',
-            responseType: 'arraybuffer'
         })
-        .then(response => {
-            let base64ImageString = Buffer.from(response.data, 'binary').toString('base64')
-            if (base64ImageString !== "") {
-                setImageSrc({src: `data:image/jpeg;base64,${base64ImageString}`, show: true})
-            } else {
-                setImageSrc({src: "", show: false})
-            }
+        .then((response)=> {
+            // @ts-ignore
+            response.data.forEach((imageName) => {
+                axios.request({
+                    url: `http://${backendUrl}:80/projects/variant/image/${imageName}`,
+                    method: 'GET',
+                    responseType: 'arraybuffer'
+                })
+                .then(response => {
+                    let base64ImageString = Buffer.from(response.data, 'binary').toString('base64')
+                    if (base64ImageString !== "") {
+                        // @ts-ignore
+                        setImages((images) => {
+                            // TODO: make this more performant
+                            return Array.from(new Set([...images, `data:image/jpeg;base64,${base64ImageString}`]))
+                        })
+                    }
+                })
+                .catch((error) => console.log(error))
+            })
         })
-        .catch((error) => console.log(error))
+
     }, [activeVariantId])
 
-    return (
-        (image.show && image.src !== "") 
-        ? <img height="300" width="300" id="myImage" src={image.src} alt='Image'></img> 
-        : <div>No visualization possible</div>
+    return (<div>{images.length > 0 ? images
+        .map((image, index) => <img key={index} height="300" width="300" id="myImage" src={image} alt='Image'></img>  
+        ) : <div>No visualization available</div>}
+        </div>
     );
 }

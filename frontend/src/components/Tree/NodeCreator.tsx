@@ -193,6 +193,7 @@ export default function VariantCreatorStepper({
                             <input
                                 type="file"
                                 hidden
+                                multiple
                                 accept="image/png, image/jpeg"
                                 onChange={handleImageFilesUpload}
                             />

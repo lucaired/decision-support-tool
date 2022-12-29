@@ -85,14 +85,18 @@ export default function VariantCreatorStepper({
         let formData = new FormData();
         //@ts-ignore
         formData.append('file', file)
+
+        if (file !== undefined) {
+            axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
+            .then(function (response) {
+                setFile(undefined);
+                console.log(JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
           
-        axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
-        .then(function (response) {
-        console.log(JSON.stringify(response.data));
-        })
-        .catch(function (error) {
-        console.log(error);
-        });
     }
 
     // ifc file upload
@@ -107,6 +111,10 @@ export default function VariantCreatorStepper({
     };
 
     const sendImageFiles = () => {
+        if (images === undefined) {
+            return
+        }
+
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -120,10 +128,11 @@ export default function VariantCreatorStepper({
             
         axios.post(`http://${backendUrl}:80/projects/variant/${node.id}/images`, formData, config)
         .then(function (response) {
-        console.log(JSON.stringify(response.data));
+            setImages(undefined);  
+            console.log(JSON.stringify(response.data));
         })
         .catch(function (error) {
-        console.log(error);
+            console.log(error);
         });
     }
 

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import logging
 from sys import stdout
 import spacy
+import os
 
 from app.neo4j import Neo4JGraph, DE
 
@@ -15,7 +16,8 @@ logger.addHandler(consoleHandler)
 
 package = "en_core_web_trf"
 nlp = spacy.load(package)
-#nlp.add_pipe('universal_sentence_encoder')
+nlp.add_pipe('universal_sentence_encoder')
+# 063d866c06683311b44b4992fd46003be952409c
 
 @dataclass
 class MatchingResult:

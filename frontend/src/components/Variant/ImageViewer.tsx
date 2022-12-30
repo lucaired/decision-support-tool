@@ -17,6 +17,7 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
     const [images, setImages]= React.useState([])
     const [imageNames, setImageNames]= React.useState([])
 
+    // load new images when the activeVariantId changes
     useEffect(() => {
         setImages([])
         axios.request({
@@ -70,6 +71,11 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
         bgcolor: 'background.paper'
     };
 
+    const transformImageName = (imageName: string): string => {
+        // remove the activeVariantId and the connecting '-'
+        return activeVariantId && imageName ? imageName.substring(activeVariantId.length + 1, imageName.length) : ''
+    }
+
     return (
         <div>{images.length > 0 ? 
             <div>
@@ -81,7 +87,7 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
                         >
                             <img id="myImage" src={image} alt='Image'></img>  
                             <ImageListItemBar
-                                title={imageNames[index]}
+                                title={transformImageName(imageNames[index])}
                                 position={'below'}
                             />
                         </ImageListItem>
@@ -105,7 +111,7 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
                             >
                                 <img id="myImage" src={images[currentOpenImageIndex]} alt='Image'></img>  
                                 <ImageListItemBar
-                                    title={imageNames[currentOpenImageIndex]}
+                                    title={transformImageName(imageNames[currentOpenImageIndex])}
                                     position={'top'}
                                 />
                             </ImageListItem>

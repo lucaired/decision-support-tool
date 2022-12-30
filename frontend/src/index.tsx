@@ -6,10 +6,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const variantNeo4J = process.env.REACT_APP_VARIANT_NEO4J_URL || 'localhost'
+
 const driver = createDriver('neo4j', variantNeo4J, 7687, 'neo4j', '123')
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
       <Neo4jProvider driver={driver}>

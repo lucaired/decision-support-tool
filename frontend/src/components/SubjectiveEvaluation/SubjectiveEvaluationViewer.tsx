@@ -380,9 +380,12 @@ function FactorScore(props: { factorRating: any, globalFactorWeight: any, weight
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-around",
+            textTransform: "uppercase",
         }}
     >
-        <p style={{textAlign: "center"}}>{props.factorRating.label}</p>
+        <Typography style={{textAlign: "center"}} variant="subtitle1" gutterBottom>
+            {props.factorRating.label}
+        </Typography>
         <Chip label={scoreLabel}/>
     </Paper>;
 }

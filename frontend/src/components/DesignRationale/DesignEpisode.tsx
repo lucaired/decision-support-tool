@@ -27,8 +27,8 @@ const DesignEpisode = ({designEpisodeIds}: DesignEpisodeProps) => {
         bgcolor: 'background.paper'
     };
 
-    return (
-        <div>
+    return (<div>
+        {designEpisodeIds.length > 0 ? <div>
             <div style={{display: 'flex', flexDirection: 'column'}}>
                 <Button
                     style={{justifyContent: 'end'}}
@@ -72,6 +72,7 @@ const DesignEpisode = ({designEpisodeIds}: DesignEpisodeProps) => {
                     />
                 </Box>
             </Modal>
+        </div> : <div>No Decision Documentation found - no Design Episodes were referenced.</div>}
         </div>
     );
 };

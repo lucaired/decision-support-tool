@@ -10,7 +10,7 @@ import {
     addNodeChild,
     removeNodeChild,
     RenderNode,
-    setNodeControl,
+    toggleNodeControl,
     setNodeProperty,
     setParentNodeProperty
 } from "./NodeHandler";
@@ -40,7 +40,7 @@ function DecisionTreeHandler({activeVariantHandler, activeVariant, activeProject
     const handleNodeControl = (nodeId: string) => {
         // @ts-ignore
         let tree = {...activeProjectTree};
-        setNodeProperty(tree, nodeId, setNodeControl);
+        setNodeProperty(tree, nodeId, toggleNodeControl);
         activeProjectTreeHandler(tree);
     }
 

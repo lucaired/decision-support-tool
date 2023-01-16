@@ -22,6 +22,8 @@ export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: Dec
         }
     }
 }
+
+
 export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
     if (tree.children) {
         if (tree.children.some((child: DecisionTree) => child.id === id)) {
@@ -33,9 +35,16 @@ export const setParentNodeProperty = (tree: DecisionTree, id: string, func: (tre
         }
     }
 }
-export const setNodeControl = (tree: DecisionTree) => {
+
+export const toggleNodeControl = (tree: DecisionTree) => {
     tree.showNodeControl = !tree.showNodeControl;
 }
+
+export const unsetNodeControl = (tree: DecisionTree) => {
+    tree.showNodeControl = false
+}
+
+
 export const addNodeChild = (tree: DecisionTree, id?: string, child?: DecisionTree) => {
     if (child) {
         tree.children = tree.children ? [...tree.children, child] : [child]

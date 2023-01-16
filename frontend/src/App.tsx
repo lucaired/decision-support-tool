@@ -170,6 +170,7 @@ function App() {
     }
 
     const [leftDrawerState, setLeftDrawerState] = React.useState(false);
+
     const toggleLeftDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -183,6 +184,7 @@ function App() {
         setLeftDrawerState(open);
     };
     const [rightDrawerState, setRightDrawerState] = React.useState(false);
+    
     const toggleRightDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -195,6 +197,7 @@ function App() {
         }
         setRightDrawerState(open);
     };
+    
     const [showDesignEpisodeMatchingModal, setShowDesignEpisodeMatchingModal] = React.useState(false);
 
     const showDesignEpisodeMatchingModalHandler = (state: boolean) => {
@@ -222,7 +225,6 @@ function App() {
                 toggleRightDrawer={toggleRightDrawer}
                 activeProjectHandler={activeProjectHandler}
                 allSimilarProjectsByDE={allSimilarProjects}
-                allSimilarProjectsByBuildingCode={allProjects}
             />
             <DesignEpisodeMatchingModal 
                 showDesignEpisodeMatchingModal={showDesignEpisodeMatchingModal} 

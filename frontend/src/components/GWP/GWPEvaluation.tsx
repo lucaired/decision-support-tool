@@ -44,14 +44,18 @@ function GWPEvaluation({activeVariant}) {
 
     if (loading) return (<div>Loading...</div>)
 
-    return <div>
-        <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
-        <BuildingEvaluation
-            records={records}
-            decisionLevel={decisionLevel}
-            handleSetDecisionLevel={handleSetDecisionLevel}
-        />
-    </div>
+    return (
+        // @ts-ignore
+        <div>{records?.length > 0 ? 
+        <div>
+            <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
+            <BuildingEvaluation
+                records={records}
+                decisionLevel={decisionLevel}
+                handleSetDecisionLevel={handleSetDecisionLevel}
+            />  
+         </div> : <div>No Global Warming Potential evaluation possible - no IFC file was imported.</div>}
+    </div>)
 }
 
 // @ts-ignore
@@ -483,7 +487,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     const showNormalGWPLabel = () => (new Set(data.datasets[0].backgroundColor)).has("#E3E3E3")
 
     return (
-        <div>
+         <div>
             {decisionLevel !== 0 && <Button onClick={() => handleChartNavigation()}>Back</Button>}
             {data.datasets[0].data.length > 0 ? 
             <div>
@@ -498,8 +502,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                     onClick={(event) => onClick(event, handleElementIndex)}
                 />
             </div> : <p>Level of Development contains no layer information</p>}
-        </div>
-    );
+        </div>);
 }
 
 export default GWPEvaluation

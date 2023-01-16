@@ -24,9 +24,9 @@ services:
     image: neo4j:latest
     container_name: neo4j    
     environment:
-      - NEO4J_AUTH=neo4j/123
-      - NEO4J_PLUGINS=["graph-data-science", "apoc"]
       - NEO4J_dbms_security_procedures_allowlist=gds.*, apoc.*
+      - NEO4J_dbms_security_auth__minimum__password__length=3
+      - NEO4J_AUTH=neo4j/123
     volumes:
       - ./neo4j/data:/data
       - ./neo4j/logs:/logs

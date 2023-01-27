@@ -9,7 +9,7 @@ import { DecisionTree } from '../Tree/NodeHandler';
 import SvgIcon from '@mui/icons-material/Menu';
 import { Button } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 interface ButtonAppBarProps {
     activeVariant?: DecisionTree;
@@ -60,7 +60,7 @@ export default function ButtonAppBar({activeVariant, activeProject, toggleLeftDr
               <SvgIcon
                   color='primary'
                   onClick={() => showDesignEpisodeMatchingModalHandler(true)}
-                  component={AnalyticsIcon}
+                  component={ManageSearchIcon}
               />
           </Button>}
         </Toolbar>

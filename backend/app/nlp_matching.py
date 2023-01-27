@@ -25,7 +25,7 @@ class MatchingResult:
     result_de_id: str
     similarity: float
 
-async def match_design_episodes_by_description(source_de_guuid: str) -> list[MatchingResult]:
+async def match_design_episodes_by_description_and_tags(source_de_guuid: str) -> list[MatchingResult]:
     try:
         neo = Neo4JGraph()
         all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
@@ -56,7 +56,7 @@ async def match_design_episodes_by_description(source_de_guuid: str) -> list[Mat
     for de in list(filter(lambda de: de.Guid != source_de_guuid, all_design_episode_descriptions)):
         doc2 = _parse_description(nlp, de)
         description_similiarity = max(doc2.similarity(doc1), 0)
-        tag_similarity = _jaccard_similarity(source_de.explanation_tags, de.explanation_tags)
+        tag_similarity = _overlap_coefficient(source_de.explanation_tags, de.explanation_tags)
         sim = description_similiarity + tag_similarity
         matching_results.append(MatchingResult(source_de_guuid, de.Guid, sim))
         logger.info(f'Matching search DE:{de.Guid}')
@@ -83,12 +83,11 @@ def _parse_description(nlp, source_de):
         logger.error(f'Could not parse description {exception}')
         return None
 
-def _jaccard_similarity(list1: list[str], list2: list[str]) -> float:
+def _overlap_coefficient(list1: list[str], list2: list[str]) -> float:
     list1 = [x.lower() for x in list1]
     list2 = [x.lower() for x in list2]
-    intersection = len(set(list1).intersection(list2))
-    union = len(set(list1).union(list2))
-    return float(intersection) / union if union > 0 else 0
+    size_intersection = len(set(list1).intersection(list2))
+    return float(size_intersection) / min(len(list1), len(list2))
 
 def boost_by_weight(all_matchings: list[MatchingResult], weights: dict) -> list[MatchingResult]:
     def boost_similarity(matching: MatchingResult):

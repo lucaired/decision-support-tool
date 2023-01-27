@@ -20,7 +20,6 @@ export default function SimilarProjectsDrawer({
   toggleRightDrawer,
   activeProjectHandler,
   allSimilarProjectsByDE,
-  allSimilarProjectsByBuildingCode
 }: any) {
 
   const getIconForIndex = (index: number) => {
@@ -44,23 +43,6 @@ export default function SimilarProjectsDrawer({
       <List>
           {/* @ts-ignore */}
           {allSimilarProjectsByDE && allSimilarProjectsByDE.map((project, index: number) => (
-            <ListItem key={project._id} disablePadding>
-              <ListItemButton
-                onClick={()=> activeProjectHandler(project)}
-              >
-                <ListItemIcon>
-                  {getIconForIndex(index)}
-                </ListItemIcon>
-                <ListItemText primary={project.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-      </List> 
-      <List><ListItem><ListItemText><strong>Building Code Matching</strong></ListItemText></ListItem></List>
-      <Divider />
-      <List>
-          {/* @ts-ignore */}
-          {allSimilarProjectsByBuildingCode && allSimilarProjectsByBuildingCode.map((project, index: number) => (
             <ListItem key={project._id} disablePadding>
               <ListItemButton
                 onClick={()=> activeProjectHandler(project)}

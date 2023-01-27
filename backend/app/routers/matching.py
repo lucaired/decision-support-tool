@@ -5,7 +5,7 @@ import copy
 
 import app.mongodb.crud.project as crud
 from app.routers.project import Project
-from app.nlp_matching import boost_by_weight, match_design_episodes_by_description, get_best_matching_design_episodes, boost_similiarity_ranking_based_on_frequency
+from app.nlp_matching import boost_by_weight, match_design_episodes_by_description_and_tags, get_best_matching_design_episodes, boost_similiarity_ranking_based_on_frequency
 
 logger = logging.getLogger('mylogger')
 logger.setLevel(logging.DEBUG) # set logger level
@@ -45,17 +45,17 @@ async def create_project_matching_result(id: str, variant_design_episode_weights
 
         # Containes up to three tuples with the three most similiar 
         # design episodes per search design episode
-        all_matching_design_episodes = []
+        all_matching_results = []
         for id in design_episode_variant_weights:
             if (len(id) > 0):
-                matching_results = await match_design_episodes_by_description(id)
-                all_matching_design_episodes.extend(matching_results)
+                matching_results = await match_design_episodes_by_description_and_tags(id)
+                all_matching_results.extend(matching_results)
 
-        all_matching_design_episodes = boost_similiarity_ranking_based_on_frequency(all_matching_design_episodes)
-        all_matching_design_episodes = boost_by_weight(all_matching_design_episodes, design_episode_variant_weights)
-        all_matching_design_episodes = boost_by_weight(all_matching_design_episodes, design_episode_weights)
+        all_matching_results = boost_similiarity_ranking_based_on_frequency(all_matching_results)
+        all_matching_results = boost_by_weight(all_matching_results, design_episode_variant_weights)
+        all_matching_results = boost_by_weight(all_matching_results, design_episode_weights)
 
-        best_matching_design_episodes = get_best_matching_design_episodes(all_matching_design_episodes)
+        best_matching_design_episodes = get_best_matching_design_episodes(all_matching_results)
         best_matching_design_episode_ids = list(map(lambda de: de.result_de_id, best_matching_design_episodes))
         logger.info(best_matching_design_episode_ids)
         return await crud.get_projects_by_design_episode_guid(best_matching_design_episode_ids)

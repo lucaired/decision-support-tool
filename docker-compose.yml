@@ -21,10 +21,11 @@ services:
     ports:
         - "27017:27017"
   neo4j:
-    image: neo4j:latest
+    image: neo4j:5.3.0
     container_name: neo4j    
     environment:
-      - NEO4J_dbms_security_procedures_allowlist=gds.*, apoc.*
+      - NEO4J_PLUGINS=["graph-data-science"]
+      - NEO4J_dbms_security_procedures_allowlist=gds.*
       - NEO4J_dbms_security_auth__minimum__password__length=3
       - NEO4J_AUTH=neo4j/123
     volumes:
@@ -40,6 +41,7 @@ services:
     build: ./frontend
     container_name: decision-support-client    
     environment:
+    # expecting to be in the TUM VPN
       - BACKEND_URL=0.0.0.0
       - VARIANT_NEO4J_URL=0.0.0.0
       - DE_NEO4J_URL=10.195.6.112

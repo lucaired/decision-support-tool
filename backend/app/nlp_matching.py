@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import logging
 from sys import stdout
 import spacy
-import os
 
 from app.neo4j import Neo4JGraph, DE
 
@@ -24,6 +23,12 @@ class MatchingResult:
     source_de_guuid: str
     result_de_id: str
     similarity: float
+
+@dataclass
+class MatchedDe:
+    de_id: str
+    aggregated_similarity: float
+    frequency: int
 
 async def match_design_episodes_by_description_and_tags(source_de_guuid: str) -> list[MatchingResult]:
     try:
@@ -97,27 +102,35 @@ def boost_by_weight(all_matchings: list[MatchingResult], weights: dict) -> list[
 
     return list(map(boost_similarity, all_matchings))
 
-def boost_similiarity_ranking_based_on_frequency(all_matchings: list[MatchingResult]) -> list[MatchingResult]:
+def aggregate_similarity_for_matched_de(all_matchings: list[MatchingResult]) -> list[MatchedDe]:
     frequency_map = {}
 
     for matching in all_matchings:
         if matching.result_de_id in frequency_map:
-            frequency_map[matching.result_de_id] = frequency_map[matching.result_de_id]+1
+            matched_de: MatchedDe = frequency_map[matching.result_de_id]
+            frequency_map[matching.result_de_id] = MatchedDe(
+                matching.result_de_id,
+                matched_de.aggregated_similarity + matching.similarity,
+                matched_de+1
+            )
         else:
-            frequency_map[matching.result_de_id] = 1
+            frequency_map[matching.result_de_id] = MatchedDe(matching.result_de_id, matching.similarity, 1)
+    return list(frequency_map.values())
 
-    def boost_similarity(matching: MatchingResult):
-        logger.info(f'DE:  {matching.result_de_id} was matched {frequency_map[matching.result_de_id]} times.')
-        matching.similarity = matching.similarity + matching.similarity * 0.1 * frequency_map[matching.result_de_id]
-        return matching
+def normalize_aggregated_similarity(all_matched_de: list[MatchedDe]) -> list[MatchedDe]:
+    return list(map(
+        lambda matched_de: MatchedDe(
+            matched_de.de_id,
+            matched_de.aggregated_similarity/matched_de.frequency,
+            matched_de.frequency)
+        , all_matched_de
+        ))
 
-    return list(map(boost_similarity, all_matchings))
+def get_best_matching_design_episodes(all_matched_de: list[MatchedDe]) -> list[MatchedDe]:
+    def useSimilarity(matched_de: MatchedDe):
+        return matched_de.aggregated_similarity
 
-def get_best_matching_design_episodes(all_matchings: list[MatchingResult]) -> list[MatchingResult]:
-    def useSimilarity(matching_result: MatchingResult):
-        return matching_result.similarity
-
-    all_matchings.sort(key=useSimilarity)
-    best_matching = all_matchings[-3:] if len(all_matchings) >= 3 else all_matchings
+    all_matched_de.sort(key=useSimilarity)
+    best_matching = all_matched_de[-3:] if len(all_matched_de) >= 3 else all_matched_de
     best_matching.reverse()
     return best_matching

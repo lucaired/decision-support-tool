@@ -87,7 +87,7 @@ export default function VariantCreatorStepper({
         formData.append('file', file)
 
         if (file !== undefined) {
-            axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
+            axios.post(`http://${backendUrl}:4000/ifc/transform`, formData, config)
             .then(function (response) {
                 setFile(undefined);
                 console.log(JSON.stringify(response.data));
@@ -126,7 +126,7 @@ export default function VariantCreatorStepper({
             formData.append('files', file)
         }
             
-        axios.post(`http://${backendUrl}:80/projects/variant/${node.id}/images`, formData, config)
+        axios.post(`http://${backendUrl}:4000/projects/variant/${node.id}/images`, formData, config)
         .then(function (response) {
             setImages(undefined);  
             console.log(JSON.stringify(response.data));

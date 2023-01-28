@@ -106,7 +106,7 @@ export function NewProjectModal({
             //@ts-ignore
             formData.append('file', file)
             
-            axios.post(`http://${backendUrl}:80/ifc/transform`, formData, config)
+            axios.post(`http://${backendUrl}:4000/ifc/transform`, formData, config)
             .then(function (response) {
             console.log(JSON.stringify(response.data));
             })

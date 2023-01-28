@@ -35,7 +35,7 @@ function App() {
         }
         // @ts-ignore
         project.tree = parsedTree
-        axios.post(`http://${backendUrl}:80/projects/`, project)
+        axios.post(`http://${backendUrl}:4000/projects/`, project)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -62,7 +62,7 @@ function App() {
         delete updateSet['_id']
         // @ts-ignore
         updateSet.tree = parseOutgoingTree(updateSet.tree)
-        axios.put(`http://${backendUrl}:80/projects/${project._id}`, updateSet)
+        axios.put(`http://${backendUrl}:4000/projects/${project._id}`, updateSet)
         // @ts-ignore
         .then(function (response) {
         // @ts-ignore
@@ -82,7 +82,7 @@ function App() {
     }
 
     const removeProjectHandler = (projectId: string) => {
-        axios.delete(`http://${backendUrl}:80/projects/${projectId}`)
+        axios.delete(`http://${backendUrl}:4000/projects/${projectId}`)
         // @ts-ignore
         .then(function (response) {
             // TODO: set to some other project
@@ -91,7 +91,7 @@ function App() {
         .catch((error) => console.log(error))
     }
 
-    const queryProjects = () => axios.get(`http://${backendUrl}:80/projects/`)
+    const queryProjects = () => axios.get(`http://${backendUrl}:4000/projects/`)
     // @ts-ignore
     .then(function (response) {
 
@@ -122,7 +122,7 @@ function App() {
 
     const queryMatchingProjects = (variantsToDesignEpisodes: Object) => {
         const projectId = activeProject._id
-        return axios.post(`http://${backendUrl}:80/matchings/project/${projectId}/match_by_design_episodes`, variantsToDesignEpisodes)
+        return axios.post(`http://${backendUrl}:4000/matchings/project/${projectId}/match_by_design_episodes`, variantsToDesignEpisodes)
         // @ts-ignore
         .then(function (response) {
 

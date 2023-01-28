@@ -102,7 +102,7 @@ function NewRatingModal({showRatingModal, handleRatingModalClose, handleRatingMo
 function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
 
     useEffect(() => {
-        axios.get(`http://${backendUrl}:80/surveys/${activeVariantId}`)
+        axios.get(`http://${backendUrl}:4000/surveys/${activeVariantId}`)
             .then(function (response) {
                 setSubjectiveEvaluations((subjectiveEvaluation) => response.data)
             }).catch((error) => console.log(error))
@@ -203,7 +203,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
             // @ts-ignore
             const surveyId = update[evaluationIndex]._id
 
-            axios.put(`http://${backendUrl}:80/surveys/${surveyId}`, update[evaluationIndex])
+            axios.put(`http://${backendUrl}:4000/surveys/${surveyId}`, update[evaluationIndex])
                 .then(function (response) {
                     setSubjectiveEvaluations((subjectiveEvaluations) => {
                         return update
@@ -214,7 +214,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
                 });
         } else {
             const survey = {variantId: activeVariantId, user: userName, factorRatings: [factorRating]}
-            axios.post(`http://${backendUrl}:80/surveys/`, survey)
+            axios.post(`http://${backendUrl}:4000/surveys/`, survey)
                 .then(function (response) {
                     const surveyId = response.data._id
                     setSubjectiveEvaluations((subjectiveEvaluation) => {
@@ -241,7 +241,7 @@ function SubjectiveEvaluationViewer({activeVariantId, weightsSets}) {
             // @ts-ignore
             const surveyId = subjectiveEvaluations[index]._id
 
-            axios.delete(`http://${backendUrl}:80/surveys/${surveyId}`)
+            axios.delete(`http://${backendUrl}:4000/surveys/${surveyId}`)
                 .then(function (response) {
                     setSubjectiveEvaluations((subjectiveEvaluation) => {
                         let update = [...subjectiveEvaluation]

@@ -1,11 +1,10 @@
 import logging
 from sys import stdout
-from backend.app.nlp_matching import aggregate_similarity_for_matched_de, normalize_aggregated_similarity
 from fastapi import APIRouter, HTTPException
 
 import app.mongodb.crud.project as crud
 from app.routers.project import Project
-from app.nlp_matching import boost_by_weight, match_design_episodes_by_description_and_tags, get_best_matching_design_episodes, boost_similiarity_ranking_based_on_frequency
+from app.nlp_matching import aggregate_similarity_for_matched_de, normalize_aggregated_similarity, boost_by_weight, match_design_episodes_by_description_and_tags, get_best_matching_design_episodes
 
 logger = logging.getLogger('mylogger')
 logger.setLevel(logging.DEBUG) # set logger level

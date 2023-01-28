@@ -196,7 +196,7 @@ export function DesignEpisodeMatchingModal({
         // retrieve Design Episodes show their pretty names
         const [allDesignEpisodes, setAllDesignEpisodes] = React.useState<DesignEpisode[]>([]);
 
-        const queryDesignEpisodes = () => axios.get(`http://${backendUrl}:80/projects/design_episodes`)
+        const queryDesignEpisodes = () => axios.get(`http://${backendUrl}:4000/projects/design_episodes`)
         // @ts-ignore
         .then(function (response) {
           setAllDesignEpisodes(response.data)

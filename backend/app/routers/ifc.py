@@ -7,13 +7,13 @@ router = APIRouter(
 )
 
 def transform_ifc_to_neo4j(file: SpooledTemporaryFile, file_name: str):
-    #from app.transform_ifc import run
+    from app.transform_ifc import run
     named_temp_file = NamedTemporaryFile()
     content = file.read()
     named_temp_file.write(content)
     try:
-        pass
-        #run(named_temp_file.name, file_name)
+        #pass
+        run(named_temp_file.name, file_name)
         # TODO: send notification
     except Exception as e:
         # TODO: send notification

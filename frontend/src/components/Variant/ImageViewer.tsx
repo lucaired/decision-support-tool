@@ -21,14 +21,14 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
     useEffect(() => {
         setImages([])
         axios.request({
-            url: `http://${backendUrl}:80/projects/variant/${activeVariantId}/images`,
+            url: `http://${backendUrl}:4000/projects/variant/${activeVariantId}/images`,
             method: 'GET',
         })
         .then((response)=> {
             // @ts-ignore
             response.data.forEach((imageName) => {
                 axios.request({
-                    url: `http://${backendUrl}:80/projects/variant/image/${imageName}`,
+                    url: `http://${backendUrl}:4000/projects/variant/image/${imageName}`,
                     method: 'GET',
                     responseType: 'arraybuffer'
                 })

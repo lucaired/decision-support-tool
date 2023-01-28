@@ -3,7 +3,7 @@ services:
   decision-support-server:
     build: ./backend
     ports:
-      - 80:80
+      - 4000:80
     volumes:
       - ./backend/app:/code/app
 

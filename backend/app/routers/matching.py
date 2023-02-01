@@ -18,7 +18,6 @@ router = APIRouter(
     prefix="/matchings",
 )
 
-
 @router.post(
     "/project/{id}/match_by_design_episodes",
     response_description="Get matching projects by DE matching",
@@ -56,7 +55,7 @@ async def create_project_matching_result(id: str, variant_design_episode_weights
        
         all_matched_de = aggregate_similarity_for_matched_de(all_matching_results)
         all_matched_de = normalize_aggregated_similarity(all_matched_de)
-        best_matching_design_episodes = get_best_matching_design_episodes(all_matching_results)
+        best_matching_design_episodes = get_best_matching_design_episodes(all_matched_de)
         best_matching_design_episode_ids = list(map(lambda de: de.de_id, best_matching_design_episodes))
         logger.info(best_matching_design_episode_ids)
         return await crud.get_projects_by_design_episode_guid(best_matching_design_episode_ids)

@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import { DecisionTree } from '../Tree/NodeHandler';
 import axios from 'axios';
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost:4000'
 
 interface DesignEpisode { 
   Guid: string;
@@ -196,7 +196,7 @@ export function DesignEpisodeMatchingModal({
         // retrieve Design Episodes show their pretty names
         const [allDesignEpisodes, setAllDesignEpisodes] = React.useState<DesignEpisode[]>([]);
 
-        const queryDesignEpisodes = () => axios.get(`http://${backendUrl}:4000/projects/design_episodes`)
+        const queryDesignEpisodes = () => axios.get(`http://${backendUrl}/projects/design_episodes`)
         // @ts-ignore
         .then(function (response) {
           setAllDesignEpisodes(response.data)

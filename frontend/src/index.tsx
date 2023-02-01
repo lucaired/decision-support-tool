@@ -5,9 +5,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const variantNeo4J = process.env.REACT_APP_VARIANT_NEO4J_URL || 'localhost'
+const host = process.env.REACT_APP_IFC_NEO4J_HOST || 'localhost'
+const user = process.env.REACT_APP_IFC_NEO4J_USER || 'neo4j'
+const password = process.env.REACT_APP_IFC_NEO4J_PASSWORD || '123'
 
-const driver = createDriver('neo4j', variantNeo4J, 7687, 'neo4j', '123')
+const driver = createDriver('neo4j', host, 7687, user, password)
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

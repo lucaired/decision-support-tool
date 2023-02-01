@@ -10,7 +10,7 @@ export interface ImageViewerProps {
     activeVariantId: string;
 }
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost:4000'
 
 export function ImageViewer({ activeVariantId }: ImageViewerProps) {
 
@@ -21,14 +21,14 @@ export function ImageViewer({ activeVariantId }: ImageViewerProps) {
     useEffect(() => {
         setImages([])
         axios.request({
-            url: `http://${backendUrl}:4000/projects/variant/${activeVariantId}/images`,
+            url: `http://${backendUrl}/projects/variant/${activeVariantId}/images`,
             method: 'GET',
         })
         .then((response)=> {
             // @ts-ignore
             response.data.forEach((imageName) => {
                 axios.request({
-                    url: `http://${backendUrl}:4000/projects/variant/image/${imageName}`,
+                    url: `http://${backendUrl}/projects/variant/image/${imageName}`,
                     method: 'GET',
                     responseType: 'arraybuffer'
                 })

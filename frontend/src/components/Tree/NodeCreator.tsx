@@ -9,7 +9,7 @@ import {DecisionTree} from "./NodeHandler";
 import NodeStringPropInput from './NodeStringPropInput';
 import axios from 'axios';
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost'
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost:4000'
 
 const steps = ['Enter basic information', 'Forge urn', 'IFC file name', 'Upload IFC file', 'Design Episodes', 'Variant image resources'];
 
@@ -87,7 +87,7 @@ export default function VariantCreatorStepper({
         formData.append('file', file)
 
         if (file !== undefined) {
-            axios.post(`http://${backendUrl}:4000/ifc/transform`, formData, config)
+            axios.post(`http://${backendUrl}/ifc/transform`, formData, config)
             .then(function (response) {
                 setFile(undefined);
                 console.log(JSON.stringify(response.data));
@@ -126,7 +126,7 @@ export default function VariantCreatorStepper({
             formData.append('files', file)
         }
             
-        axios.post(`http://${backendUrl}:4000/projects/variant/${node.id}/images`, formData, config)
+        axios.post(`http://${backendUrl}/projects/variant/${node.id}/images`, formData, config)
         .then(function (response) {
             setImages(undefined);  
             console.log(JSON.stringify(response.data));

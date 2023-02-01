@@ -6,6 +6,7 @@ import sys
 import time
 import logging
 from sys import stdout
+import os
 
 logger = logging.getLogger('mylogger')
 
@@ -15,6 +16,10 @@ logFormatter = logging.Formatter\
 consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
 consoleHandler.setFormatter(logFormatter)
 logger.addHandler(consoleHandler)
+
+uri = os.getenv("IFC_NEO4J_URL", "neo4j:7687")
+username = os.getenv("IFC_NEO4J_USER", "neo4j")
+password = os.getenv("IFC_NEO4J_PASSWORD", "123")
 
 class Graph4Ifc:  
     def __init__(self):
@@ -607,7 +612,7 @@ def run(path: str, model_name: str):
     
     #### Finish creating the graph content ####
     
-    conn = get_connection()
+    conn = get_connection(uri, username, password)
     _ifcgraph.load_to_neo4j(conn)
     logger.info("--End--")
 

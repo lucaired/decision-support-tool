@@ -1,16 +1,24 @@
 version: "3"
 services:
   decision-support-server:
+    container_name: server
     build: ./backend
     ports:
       - 4000:80
     volumes:
       - ./backend/app:/code/app
-
     depends_on:
       - "mongodb"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/
+      - DE_NEO4J_URL=neo4j://10.195.6.112:7687
+      - DE_NEO4J_USER=neo4j
+      - DE_NEO4J_PASSWORD=123
+      - DE_NEO4J_VERSION=4
+      - DE_NEO4J_DATABASE=neo4j
+      - IFC_NEO4J_URL=neo4j:7687
+      - IFC_NEO4J_USER=neo4j
+      - IFC_NEO4J_PASSWORD=123
   mongodb:
     image: mongo:latest
     container_name: "mongodb"
@@ -42,9 +50,13 @@ services:
     container_name: decision-support-client    
     environment:
     # expecting to be in the TUM VPN
-      - BACKEND_URL=0.0.0.0
-      - VARIANT_NEO4J_URL=0.0.0.0
-      - DE_NEO4J_URL=10.195.6.112
+      - REACT_APP_BACKEND_URL=192.168.2.168:4000
+      - REACT_APP_IFC_NEO4J_HOST=192.168.2.168
+      - REACT_APP_IFC_NEO4J_USER=neo4j
+      - REACT_APP_IFC_NEO4J_PASSWORD=123
+      - REACT_APP_DE_NEO4J_URL=10.195.6.112:7687
+      - REACT_APP_DE_NEO4J_USER=neo4j
+      - REACT_APP_DE_NEO4J_PASSWORD=123
     volumes:
       - ./frontend/src:/app/src
     ports:

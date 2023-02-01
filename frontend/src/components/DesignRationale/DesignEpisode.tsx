@@ -6,11 +6,9 @@ import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import Modal from "@mui/material/Modal";
 import {Box} from "@mui/material";
 
-// You have to be connected to TUM VPN to make this work
-let NEO4J_URI = process.env.REACT_APP_DE_NEO4J_URL || "10.195.6.112";
-NEO4J_URI = `neo4j://${NEO4J_URI}:7687`
-const NEO4J_USER = "neo4j";
-const NEO4J_PASSWORD = "123";
+const NEO4J_URI = process.env.REACT_APP_DE_NEO4J_URL || "10.195.6.112:7687";
+const NEO4J_USER = process.env.REACT_APP_DE_NEO4J_USER || "neo4j";
+const NEO4J_PASSWORD = process.env.REACT_APP_DE_NEO4J_PASSWORD || "123";
 
 interface DesignEpisodeProps {
     designEpisodeIds: string;

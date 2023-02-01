@@ -410,11 +410,11 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
     const getLabels = () => {
         return decisionLevel === 0 ? ['Whole Building'] :
-            decisionLevel === 1 ? getGeneralBuildingPartLabels() :
+            decisionLevel === 1 ? getGeneralBuildingPartLabels().sort() :
             // @ts-ignore
-            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys()) :
+            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys()).sort() :
                 // @ts-ignore
-                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).keys()):
+                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).keys()).sort():
                         []
     }
 
@@ -422,13 +422,13 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         // Element types without area greater
         // than 0 or no layer set are not shown
         return decisionLevel === 0 ? [getGWPForWholeBuilding()]:
-            decisionLevel === 1 ? getGeneralBuildingPartLabels()
+            decisionLevel === 1 ? getGeneralBuildingPartLabels().sort()
                 .map((label) => getGWPForGeneralBuildingPart(label)) :
             // @ts-ignore
-            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys())
+            decisionLevel === 2 ? Array.from(getBuildingParts(elementIndex['1']).keys()).sort()
                 .map(buildingPart => getGWPForBuildingPart(buildingPart)) :
                 // @ts-ignore
-                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).entries())
+                decisionLevel === 3 ? Array.from(getLayersForBuildingPart(elementIndex['1']).entries()).sort()
                     .map((entry) => getGWPForLayer(entry[0], entry[1])) :
                         []
     }

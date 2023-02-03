@@ -111,7 +111,7 @@ def aggregate_similarity_for_matched_de(all_matchings: list[MatchingResult]) -> 
             frequency_map[matching.result_de_id] = MatchedDe(
                 matching.result_de_id,
                 matched_de.aggregated_similarity + matching.similarity,
-                matched_de+1
+                matched_de.frequency+1
             )
         else:
             frequency_map[matching.result_de_id] = MatchedDe(matching.result_de_id, matching.similarity, 1)

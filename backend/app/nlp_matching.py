@@ -30,11 +30,11 @@ class MatchedDe:
     aggregated_similarity: float
     frequency: int
 
-async def match_design_episodes_by_description_and_tags(source_de_guuid: str) -> list[MatchingResult]:
+async def match_design_episodes_by_description_and_tags(source_de_guuid: str, project_de_ids: list[str]) -> list[MatchingResult]:
     try:
         neo = Neo4JGraph()
-        all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
-        logger.info(f"{len(all_design_episode_descriptions)} DEs to match")
+        all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions([])
+        logger.info(f"{len(all_design_episode_descriptions)} DEs to retrieved")
     except Exception as e:
         logger.error(e)
         return []
@@ -58,7 +58,8 @@ async def match_design_episodes_by_description_and_tags(source_de_guuid: str) ->
     logger.info('Parsing of source DE done, proceeding with search set')
     matching_results = []
 
-    for de in list(filter(lambda de: de.Guid != source_de_guuid, all_design_episode_descriptions)):
+    # exclude the DEs from the project
+    for de in list(filter(lambda de: de.Guid not in project_de_ids, all_design_episode_descriptions)):
         doc2 = _parse_description(nlp, de)
         description_similiarity = max(doc2.similarity(doc1), 0)
         tag_similarity = _overlap_coefficient(source_de.explanation_tags, de.explanation_tags)
@@ -131,6 +132,8 @@ def get_best_matching_design_episodes(all_matched_de: list[MatchedDe]) -> list[M
         return matched_de.aggregated_similarity
 
     all_matched_de.sort(key=useSimilarity)
+    for match in all_matched_de:
+        print(match)
     best_matching = all_matched_de[-3:] if len(all_matched_de) >= 3 else all_matched_de
     best_matching.reverse()
     return best_matching

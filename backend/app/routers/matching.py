@@ -41,12 +41,14 @@ async def create_project_matching_result(id: str, variant_design_episode_weights
                 else:
                     design_episode_weights[design_episode_id] = design_episode['designEpisodeWeight']
 
-        # Containes up to three tuples with the three most similiar 
-        # design episodes per search design episode
+        # Containes up to three tuples with the three most similiar, design episodes per search design episode
+        # Avoids matching against own project DEs by excluding them from the set we are matching against
+        project = Project.parse_obj(project_dict)
+        project_de_ids = project.tree.extract_all_design_episode_ids()
         all_matching_results = []
         for id in design_episode_variant_weights:
             if (len(id) > 0):
-                matching_results = await match_design_episodes_by_description_and_tags(id)
+                matching_results = await match_design_episodes_by_description_and_tags(id, project_de_ids)
                 all_matching_results.extend(matching_results)
 
         # TODO: how to weight this properly
@@ -57,7 +59,7 @@ async def create_project_matching_result(id: str, variant_design_episode_weights
         all_matched_de = normalize_aggregated_similarity(all_matched_de)
         best_matching_design_episodes = get_best_matching_design_episodes(all_matched_de)
         best_matching_design_episode_ids = list(map(lambda de: de.de_id, best_matching_design_episodes))
-        logger.info(best_matching_design_episode_ids)
+        logger.info(best_matching_design_episodes)
         return await crud.get_projects_by_design_episode_guid(best_matching_design_episode_ids)
 
     raise HTTPException(status_code=404, detail=f"Project {id} not found")

@@ -25,16 +25,17 @@ class Neo4JGraph:
         self.driver.close()
 
     @staticmethod
-    def _query_all_design_episode_descriptions(tx):
+    def _query_all_design_episode_descriptions(tx, project_de_ids: list[str]):
         result = tx.run("""
         MATCH (d:DesignEpisode)-[EpisodeElement]->(m)
+        WHERE NOT d.Guid IN $project_de_ids
         RETURN d.Guid, d.Description, Collect(distinct m.ExplanationTags), d.Name
-        """)
+        """, project_de_ids=project_de_ids)
         return [record.values() for record in result]
     
-    def query_all_design_episode_descriptions(self) -> list[DE]:
+    def query_all_design_episode_descriptions(self, project_de_ids: list[str]) -> list[DE]:
         with self.driver.session() as session:
-            all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions)
+            all_id_and_description = session.read_transaction(self._query_all_design_episode_descriptions, project_de_ids)
             return list(
                 map(
                     lambda element: DE(

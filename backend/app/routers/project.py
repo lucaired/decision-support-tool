@@ -66,7 +66,7 @@ async def get_all_project_design_episodes():
     # TODO: apply project scope in neo4j query
     try:
         neo = Neo4JGraph()
-        all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions()
+        all_design_episode_descriptions: list[DE] = neo.query_all_design_episode_descriptions([])
         return all_design_episode_descriptions
     except Exception as e:
         logger.error(e)

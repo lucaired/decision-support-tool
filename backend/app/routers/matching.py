@@ -59,7 +59,7 @@ async def create_project_matching_result(id: str, variant_design_episode_weights
         all_matched_de = normalize_aggregated_similarity(all_matched_de)
         best_matching_design_episodes = get_best_matching_design_episodes(all_matched_de)
         best_matching_design_episode_ids = list(map(lambda de: de.de_id, best_matching_design_episodes))
-        logger.info(best_matching_design_episodes)
+        logger.info(f'Best matches: {best_matching_design_episodes}')
         return await crud.get_projects_by_design_episode_guid(best_matching_design_episode_ids)
 
     raise HTTPException(status_code=404, detail=f"Project {id} not found")

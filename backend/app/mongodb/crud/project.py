@@ -113,16 +113,15 @@ async def get_projects_by_design_episode_guid(design_episode_ids: list[str]) -> 
                 all_project_objects
                 )
             )
-    gen = (
-        project_with_de_ids for project_with_de_ids in all_projects_with_design_episode_ids
-        if [value for value in project_with_de_ids[1] if value in design_episode_ids]
-    )
-
+    
     all_matched_projects_by_design_episode_ids = []
 
-    with contextlib.suppress(StopIteration):
-        poject = next(gen)
-        all_matched_projects_by_design_episode_ids.append(poject)
-
-    return list(map(lambda project_and_de_ids: project_and_de_ids[0], all_matched_projects_by_design_episode_ids))
+    # preserve ordering of the projects
+    for de_id in design_episode_ids:
+        for project_and_de_ids in all_projects_with_design_episode_ids:
+            if de_id in  project_with_de_ids[1]:
+                if project_and_de_ids[0] not in all_matched_projects_by_design_episode_ids:
+                    all_matched_projects_by_design_episode_ids.append(project_with_de_ids[0])
+    
+    return all_matched_projects_by_design_episode_ids
     

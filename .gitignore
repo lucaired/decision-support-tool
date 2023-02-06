@@ -1,7 +1,10 @@
 .DS_Store
 data/
 backend/app/routers/__pycache__/*
-backend/app/__pycache__/main.cpython-310.pyc
-backend/app/routers/project.py
+backend/app/__pycache__/*
 backend/app/routers/__pycache__/*
+backend/env
 neo4j/
+*.pyc
+*.pyo
+__pycache__/

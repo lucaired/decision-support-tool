@@ -134,6 +134,6 @@ def get_best_matching_design_episodes(all_matched_de: list[MatchedDe]) -> list[M
     all_matched_de.sort(key=useSimilarity)
     for match in all_matched_de:
         print(match)
-    best_matching = all_matched_de[-3:] if len(all_matched_de) >= 3 else all_matched_de
+    best_matching = all_matched_de[-5:] if len(all_matched_de) >= 5 else all_matched_de
     best_matching.reverse()
     return best_matching

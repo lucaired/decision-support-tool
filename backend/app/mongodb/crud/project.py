@@ -1,9 +1,19 @@
 import contextlib
 from bson import ObjectId
+import logging
 from pydantic import BaseModel, Field
+from sys import stdout
 
 from app.routers.shared import PyObjectId, flatten
 from ..database import mongodb
+
+logger = logging.getLogger('mylogger')
+logger.setLevel(logging.DEBUG) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 
 class Tree(BaseModel):
@@ -119,9 +129,9 @@ async def get_projects_by_design_episode_guid(design_episode_ids: list[str]) -> 
     # preserve ordering of the projects
     for de_id in design_episode_ids:
         for project_and_de_ids in all_projects_with_design_episode_ids:
-            if de_id in  project_with_de_ids[1]:
+            if de_id in project_and_de_ids[1]:
                 if project_and_de_ids[0] not in all_matched_projects_by_design_episode_ids:
-                    all_matched_projects_by_design_episode_ids.append(project_with_de_ids[0])
+                    all_matched_projects_by_design_episode_ids.append(project_and_de_ids[0])
     
     return all_matched_projects_by_design_episode_ids
     

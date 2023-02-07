@@ -98,7 +98,8 @@ def _overlap_coefficient(list1: list[str], list2: list[str]) -> float:
 def boost_by_weight(all_matchings: list[MatchingResult], weights: dict) -> list[MatchingResult]:
     def boost_similarity(matching: MatchingResult):
         if matching.source_de_guuid in weights:
-            matching.similarity = matching.similarity + matching.similarity * 0.1 * weights[matching.source_de_guuid]
+            if weights[matching.source_de_guuid] > 1:
+                matching.similarity = matching.similarity + matching.similarity * 0.1 * weights[matching.source_de_guuid]
         return matching
 
     return list(map(boost_similarity, all_matchings))

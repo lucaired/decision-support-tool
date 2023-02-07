@@ -6,7 +6,8 @@ import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import Modal from "@mui/material/Modal";
 import {Box} from "@mui/material";
 
-const NEO4J_URI = process.env.REACT_APP_DE_NEO4J_URL || "10.195.6.112:7687";
+let NEO4J_URI = process.env.REACT_APP_DE_NEO4J_URL || "10.195.6.112:7687";
+NEO4J_URI = `neo4j://${NEO4J_URI}";`
 const NEO4J_USER = process.env.REACT_APP_DE_NEO4J_USER || "neo4j";
 const NEO4J_PASSWORD = process.env.REACT_APP_DE_NEO4J_PASSWORD || "123";
 

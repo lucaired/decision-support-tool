@@ -71,14 +71,27 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
     let nodeLabelToMaterialLayerSet = new Map<string, Map<string, Object>>();
 
     const [elementIndex, setElementIndex] = React.useState<object>({});
+
     const handleElementIndex = (index: number) => {
+        // The indices are detected by the bar-chart component supplying information on what 
+        // element of the sorted array has been clicked. Since the original array will be unsorted
+        // we have to identify the correct index to show the right dataset in the next decision level.
+
         if (decisionLevel !== 3) {
             if (decisionLevel === 0) {
                 setElementIndex({...elementIndex, 0: index})
             } else if (decisionLevel === 1) {
-                setElementIndex({...elementIndex, 1: index})
+                // @ts-ignore
+                const label = getGeneralBuildingPartLabels().sort()[index]
+                // @ts-ignore
+                const unsortedIndex = getGeneralBuildingPartLabels().indexOf(label)
+                setElementIndex({...elementIndex, 1: unsortedIndex})
             } else if (decisionLevel === 2) {
-                setElementIndex({...elementIndex, 2: index})
+                // @ts-ignore
+                const label = Array.from(getBuildingParts(elementIndex['1']).keys()).sort()[index]
+                // @ts-ignore
+                const unsortedIndex = Array.from(getBuildingParts(elementIndex['1']).keys()).indexOf(label)
+                setElementIndex({...elementIndex, 2: unsortedIndex})
             }
             const newDecisionLevel = decisionLevel + 1
             handleSetDecisionLevel(newDecisionLevel)
@@ -499,7 +512,9 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
                     options={options}
                     data={data}
                     ref={chartRef}
-                    onClick={(event) => onClick(event, handleElementIndex)}
+                    onClick={(event) => {
+                        onClick(event, handleElementIndex)
+                    }}
                 />
             </div> : <p>Level of Development contains no layer information</p>}
         </div>);

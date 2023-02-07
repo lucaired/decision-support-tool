@@ -65,7 +65,8 @@ export function NewProjectModal({
                     decisionLevel: "construction",
                     children: [],
                     showNodeControl: false,
-                    designEpisodeIds: project.treeDesignEpisodeIds
+                    designEpisodeIds: project.treeDesignEpisodeIds,
+                    pathLength: 0,
                 }
             }
             sendFile();

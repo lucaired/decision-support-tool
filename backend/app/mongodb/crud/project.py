@@ -26,6 +26,7 @@ class Tree(BaseModel):
     decision_level: str = Field(..., alias="decisionLevel")
     children: list['Tree']
     show_node_control: bool = Field(alias="showNodeControl")
+    path_length: int = Field(alias="pathLength")
 
     def extract_all_design_episode_ids(self) -> list[str]:
         return self.design_episode_ids + flatten(list(map(lambda tree: tree.extract_all_design_episode_ids(), self.children)))

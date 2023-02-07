@@ -50,6 +50,7 @@ function GWPEvaluation({activeVariant}) {
         <div>
             <Button style={{background: "green", color: "white"}}>{decisionLevelTitle[decisionLevel]}</Button>
             <BuildingEvaluation
+                activeVariant={activeVariant}
                 records={records}
                 decisionLevel={decisionLevel}
                 handleSetDecisionLevel={handleSetDecisionLevel}
@@ -59,7 +60,7 @@ function GWPEvaluation({activeVariant}) {
 }
 
 // @ts-ignore
-function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
+function BuildingEvaluation({activeVariant, records, decisionLevel, handleSetDecisionLevel}) {
 
     let elementAreasByBuildingPart = new Map<string, number>();
     let elementLayerSetByBuildingPart = new Map<string, Map<string, Object>>();
@@ -273,7 +274,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
         */ 
         let gwp: number|Array<number> = layerName.length * 10
         if (!layer.hasOwnProperty('LayerThickness')) {
-            gwp = [gwp, gwp * 2]
+            gwp = [gwp, gwp * (1+1/(activeVariant.pathLength**2))]
         } else {
             // @ts-ignore
             gwp = gwp * layer['LayerThickness']
@@ -313,7 +314,7 @@ function BuildingEvaluation({records, decisionLevel, handleSetDecisionLevel}) {
 
         // only use the area if we don't have layer information available with an early return
         if (Array.from(layers.keys()).length === 0) {
-            gwpForBuildingPart = [area, area * 2]
+            gwpForBuildingPart = [area, area * (1+1/(activeVariant.pathLength**2))]
             return gwpForBuildingPart
         }
 

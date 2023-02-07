@@ -43,7 +43,8 @@ export default function VariantCreatorStepper({
         ifcFile: 'V1-1.ifc',
         decisionLevel: 'construction',
         bimReference: '',
-        designEpisodeIds: ''
+        designEpisodeIds: '',
+        pathLength: 0,
     })
 
     const handleNext = () => {

@@ -11,6 +11,7 @@ export type DecisionTree = {
     ifcFile: string,
     bimReference: string;
     designEpisodeIds: string;
+    pathLength: number;
 };
 
 export const setNodeProperty = (tree: DecisionTree, id: string, func: (tree: DecisionTree, id?: string, child?: DecisionTree) => void, newNode?: DecisionTree) => {
@@ -47,6 +48,7 @@ export const unsetNodeControl = (tree: DecisionTree) => {
 
 export const addNodeChild = (tree: DecisionTree, id?: string, child?: DecisionTree) => {
     if (child) {
+        child.pathLength = tree.pathLength + 1
         tree.children = tree.children ? [...tree.children, child] : [child]
     }
 }

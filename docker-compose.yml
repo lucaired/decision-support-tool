@@ -50,8 +50,8 @@ services:
     container_name: decision-support-client    
     environment:
     # expecting to be in the TUM VPN
-      - REACT_APP_BACKEND_URL=0.0.0.0:4000
-      - REACT_APP_IFC_NEO4J_HOST=0.0.0.0
+      - REACT_APP_BACKEND_URL=192.168.2.168:4000
+      - REACT_APP_IFC_NEO4J_HOST=192.168.2.168
       - REACT_APP_IFC_NEO4J_USER=neo4j
       - REACT_APP_IFC_NEO4J_PASSWORD=123
       - REACT_APP_DE_NEO4J_URL=10.195.6.112:7687
